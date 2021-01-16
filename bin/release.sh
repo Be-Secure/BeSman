@@ -19,7 +19,8 @@ fi
 
 if [[ -z $BESMAN_NAMESPACE ]];
     then
-        BESMAN_NAMESPACE={BESMAN_NAMESPACE:-hyperledgerkochi}
+        #BESMAN_NAMESPACE={BESMAN_NAMESPACE:-hyperledgerkochi}
+	BESMAN_NAMESPACE={BESMAN_NAMESPACE:-senthilbk}
 fi
 
 # prepare branch
