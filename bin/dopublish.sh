@@ -19,8 +19,8 @@ mkdir -p build/tmp
 
 # making of zip files
 
-#zip -rj $HOME/BESman/build/tmp/besman-latest.zip $HOME/BESman/dist/list.txt $HOME/BESman/src/main/bash/besman-* $HOME/BESman/src/main/bash/envs/besman-* $HOME/BESman/src/main/bash/commands/besman-*
-zip -rj $HOME/BeSman/build/tmp/besman-latest.zip $HOME/BeSman/dist/list.txt $HOME/BeSman/src/main/bash/besman-* $HOME/BESman/src/main/bash/envs/besman-* $HOME/BESman/src/main/bash/commands/besman-*
+zip -rj $HOME/BESman/build/tmp/besman-latest.zip $HOME/BESman/dist/list.txt $HOME/BESman/src/main/bash/besman-* $HOME/BESman/src/main/bash/envs/besman-* $HOME/BESman/src/main/bash/commands/besman-*
+#zip -rj $HOME/BeSman/build/tmp/besman-latest.zip $HOME/BeSman/dist/list.txt $HOME/BeSman/src/main/bash/besman-* $HOME/BESman/src/main/bash/envs/besman-* $HOME/BESman/src/main/bash/commands/besman-*
 
 #zip -r build/tmp/besman-latest.zip $HOME/BESman/src/
 cp $HOME/BESman/build/tmp/besman-latest.zip $HOME/BESman/build/tmp/besman-$bes_rel_version.zip
