@@ -2,7 +2,7 @@
 
 
 function __bes_status {
-file=($(find $KOBMAN_DIR/envs/ -type d -name "besman-*" -print))
+file=($(find $BESMAN_DIR/envs/ -type d -name "besman-*" -print))
 if [[ -z $file ]]; then
     
     __besman_echo_white "Please install an environment first"
