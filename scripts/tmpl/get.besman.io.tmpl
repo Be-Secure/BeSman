@@ -244,7 +244,7 @@ unzip -qo "$besman_zip_file" -d "$besman_stage_folder"
 echo "Install scripts..."
 
 
-curl -sL "https://raw.githubusercontent.com/${BESMAN_NAMESPACE}/BESman/master/dist/environments" > tmp.txt
+curl -sL "https://raw.githubusercontent.com/${BESMAN_NAMESPACE}/BESman/dev/dist/environments" > tmp.txt
 #echo "BESman" > tmp.txt
 sed -i 's/,/ /g' tmp.txt 
 environments=$(<tmp.txt)
