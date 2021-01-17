@@ -9,12 +9,12 @@ export BESMAN_SERVICE="https://raw.githubusercontent.com"
 #BESMAN_NAMESPACE="hyperledgerkochi"
 BESMAN_NAMESPACE="senthilbk"
 BESMAN_VERSION="0.0.1"
-#BESMAN_ENV_REPOS="$BESMAN_NAMESPACE/besman-env-testrepo"
+BESMAN_ENV_REPOS="$BESMAN_NAMESPACE/besman-env-testrepo"
 # BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
 
-BESMAN_NAMESPACE="{BESMAN_NAMESPACE:-senthilbk}"
+#BESMAN_NAMESPACE="{BESMAN_NAMESPACE:-senthilbk}"
 BESMAN_VERSION="0.0.1"
-BESMAN_ENV_REPOS="$BESMAN_NAMESPACE/kobman-env-repo"
+#BESMAN_ENV_REPOS="$BESMAN_NAMESPACE/kobman-env-repo"
 # BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
 
 
@@ -244,7 +244,7 @@ unzip -qo "$besman_zip_file" -d "$besman_stage_folder"
 echo "Install scripts..."
 
 
-curl -sL "https://raw.githubusercontent.com/${BESMAN_NAMESPACE}/BESman/master/dist/environments" > tmp.txt
+curl -sL "https://raw.githubusercontent.com/${BESMAN_NAMESPACE}/BESman/dev/dist/environments" > tmp.txt
 #echo "BESman" > tmp.txt
 sed -i 's/,/ /g' tmp.txt 
 environments=$(<tmp.txt)
