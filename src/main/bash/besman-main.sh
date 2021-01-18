@@ -7,6 +7,7 @@ function bes {
 	{
 		local environment=$1
 		if [[ ! -f $BESMAN_DIR/envs/besman-$environment.sh ]]; then
+			__besman_echo_red "Wrong Command Format"
 			__besman_echo_red "Could not find file besman-$environment.sh"
 			__besman_echo_white "Make sure you have given the correct environment name"
 			__besman_echo_white "If the issue persists, re-install BESman and try again"
