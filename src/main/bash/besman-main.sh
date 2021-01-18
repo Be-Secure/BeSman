@@ -19,6 +19,7 @@ function bes {
 	{
 		local command=$1
 		if [[ ! -f $BESMAN_DIR/src/besman-$command.sh ]]; then
+		        __besman_echo_red "Wrong Command Format"
 			__besman_echo_red "Could not find file besman-$environment.sh"
 			__besman_echo_white "Make sure you have given the correct command name"		
 			__besman_echo_white "If the issue persists, re-install BESman and try again"	
