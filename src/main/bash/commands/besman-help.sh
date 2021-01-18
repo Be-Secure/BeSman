@@ -2,7 +2,7 @@
 
 function __bes_help {
 cat << EOF
-KOBman - Help 
+BESman - Help 
 ---------------------------------------------------------
 $ bes <command> <qualifer> 
 
@@ -38,7 +38,7 @@ update        : $ bes update
 version       : Version of BESman Utility
 		-------------------------
 		$ bes --version or bes –V
-		This command displays the version of KOBman
+		This command displays the version of BESman
 		installed on the host.
 
 		Version of an Environment
