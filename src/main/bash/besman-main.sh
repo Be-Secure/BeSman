@@ -69,6 +69,7 @@ function bes {
 			[[ -z $version ]] && [[ -z $BESMAN_VERSION ]] && __besman_echo_red "Utility corrupted. Re-install BESman and try again" && return 1
 			__besman_validate_environment $environment || return 1
 			__besman_check_if_version_exists $environment $version || return 1
+			__besman_validate_version_format $version || return 1
 			__bes_$command $environment $version
 			;;
 		uninstall)
@@ -82,6 +83,7 @@ function bes {
 			__besman_check_parameter_present "$environment" "$version" || return 1
 			__besman_validate_environment $environment || return 1
 			__besman_check_if_version_exists $environment $version || return 1
+			__besman_validate_version_format $version || return 1
 			__bes_$command $environment $version
 			;;
 		help | list | status | update | upgrade | remove)
