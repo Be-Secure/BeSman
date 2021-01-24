@@ -53,13 +53,17 @@ elif [[ -f $BESMAN_DIR/envs/besman-$environment/current && $version != $(cat $BE
   __besman_echo_no_colour "Removing files..."
   rm -rf $BESMAN_DIR/envs/besman-$environment/$version
   # To remove the folder besman-$environment if its empty
-  l=$(ls $BESMAN_DIR/envs/besman-$environment)
+  l=$(ls $BESMAN_DIR/envs/b-$environment)
   if [[ -z $l ]]; then
     rm -rf $BESMAN_DIR/envs/besman-$environment
   fi
   __besman_echo_green "Files removed successfully."
 
 
+# Condition where Enviroment is presented but not installed in local system,it removes file under envs folder  
+elif [[  -f $BESMAN_DIR/envs/besman-$environment.sh ]]; then
+	rm -rf $BESMAN_DIR/envs/besman-$environment.sh
+	__besman_echo_green "Files removed successfully."
 fi
 
 } 
