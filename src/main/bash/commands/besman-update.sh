@@ -55,9 +55,26 @@ function __bes_update
 			done
 			__besman_download_envs_from_repo $namespace $repo_name
 		else
-			[[ -f $HOME/remote_list.txt ]] && rm $HOME/remote_list.txt
-			[[ -f $HOME/sorted_remote_list.txt ]] && rm $HOME/sorted_remote_list.txt 
-			continue
+			#Condition where it check if there is any difference between remote repo and local repo==
+			diff_remote=$(comm -13 $HOME/sorted_remote_list.txt $HOME/sorted_local_list.txt | grep $repo_name )
+			if [[ -n $diff_remote ]];then
+				__besman_echo_no_colour "" >> $cached_list
+				for i in ${diff_remote[@]};do
+					environment_name=$(echo $i | cut -d "/" -f 3 | cut -d "," -f 1)
+					version_name=$(echo $i | cut -d "," -f 2)
+					grep -v "$environment_name" $cached_list >$HOME/tmpfile && mv $HOME/tmpfile $cached_list
+					flag=2
+					# Since there is difference between remote repo and local repo, Respective envrioment files and foler will be uninstalled
+					__bes_uninstall $environment_name $version_name
+				done
+				
+			
+			else
+			
+				[[ -f $HOME/remote_list.txt ]] && rm $HOME/remote_list.txt
+				[[ -f $HOME/sorted_remote_list.txt ]] && rm $HOME/sorted_remote_list.txt 
+			   continue
+			fi
 		fi	
 		[[ -f $HOME/remote_list.txt ]] && rm $HOME/remote_list.txt
 		[[ -f $HOME/sorted_remote_list.txt ]] && rm $HOME/sorted_remote_list.txt 
@@ -67,7 +84,7 @@ function __bes_update
 	[[ -f $HOME/sorted_local_list.txt ]] && rm $HOME/sorted_local_list.txt  
 	
 	check_for_changes $flag
-	unset env_repos namespace repo_name remote_list_url cached_list diff delta flag
+	unset env_repos namespace repo_name remote_list_url cached_list diff delta flag environment_name version_name diff_remote
 
 	
 }
@@ -88,7 +105,13 @@ function check_for_changes
 		__besman_echo_no_colour ""
 		__besman_echo_white "Please run the below command to see the updated list"
 		__besman_echo_yellow "$ bes list"
+    elif [[ $flag -eq 2 ]]; then
+		__besman_echo_white "removed successfully."
+		__besman_echo_no_colour ""
+		__besman_echo_white "Please run the below command to see the updated list"
+		__besman_echo_yellow "$ bes list"
 	else
 		__besman_echo_no_colour "No updates found"
 	fi
 }
+
