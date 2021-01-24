@@ -60,6 +60,10 @@ elif [[ -f $BESMAN_DIR/envs/besman-$environment/current && $version != $(cat $BE
   __besman_echo_green "Files removed successfully."
 
 
+# Condition where Enviroment is presented but not installed in local system,it removed file under envs folder  
+elif [[  -f $BESMAN_DIR/envs/besman-$environment.sh ]]; then
+	rm -rf $BESMAN_DIR/envs/besman-$environment.sh
+	__besman_echo_green "Files removed successfully."
 fi
 
 } 
