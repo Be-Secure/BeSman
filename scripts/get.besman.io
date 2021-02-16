@@ -74,12 +74,13 @@ echo "Looking for figlet..."
 if [ -z $(which figlet) ]; then
 	echo "Not found."
 	echo "======================================================================================================"
-	echo " Please install figlet on your system using your favourite package manager."
-	echo ""
-	echo " Execute  after installing figlet."
-	echo "======================================================================================================"
-	echo ""
-	exit 1
+	echo " so installing figlet on your system "
+	sudo apt install -y figlet
+	#echo ""
+	#echo " Execute  after installing figlet."
+	#echo "======================================================================================================"
+	#echo ""
+	#exit 1
 fi
 
 figlet Setting up BESman >> besman.txt
@@ -110,24 +111,28 @@ echo "Looking for unzip..."
 if [ -z $(which unzip) ]; then
 	echo "Not found."
 	echo "======================================================================================================"
-	echo " Please install unzip on your system using your favourite package manager."
-	echo ""
-	echo " Restart after installing unzip."
-	echo "======================================================================================================"
-	echo ""
-	exit 1
+	echo " so installing unzip on your system "
+	sudo apt install -y unzip
+	#echo " Please install unzip on your system using your favourite package manager."
+	#echo ""
+	#echo " Restart after installing unzip."
+	#echo "======================================================================================================"
+	#echo ""
+	#exit 1
 fi
 
 echo "Looking for zip..."
 if [ -z $(which zip) ]; then
 	echo "Not found."
 	echo "======================================================================================================"
-	echo " Please install zip on your system using your favourite package manager."
-	echo ""
-	echo " Restart after installing zip."
-	echo "======================================================================================================"
-	echo ""
-	exit 1
+	echo " so installing zip on your system "
+	sudo apt install -y zip
+	#echo " Please install zip on your system using your favourite package manager."
+	#echo ""
+	#echo " Restart after installing zip."
+	#echo "======================================================================================================"
+	#echo ""
+	#exit 1
 fi
 
 echo "Looking for curl..."
@@ -135,11 +140,13 @@ if [ -z $(which curl) ]; then
 	echo "Not found."
 	echo ""
 	echo "======================================================================================================"
-	echo " Please install curl on your system using your favourite package manager."
-	echo ""
-	echo " Restart after installing curl."
-	echo "======================================================================================================"
-	echo ""
+	echo " so installing curl on your system "
+	sudo apt install -y curl
+	#echo " Please install curl on your system using your favourite package manager."
+	#echo ""
+	#echo " Restart after installing curl."
+	#echo "======================================================================================================"
+	#echo ""
 	exit 1
 fi
 
