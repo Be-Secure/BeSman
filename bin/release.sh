@@ -25,8 +25,8 @@ fi
 
 # prepare branch
 cd $HOME/BESman
-#git checkout master
-git checkout dev
+git checkout master
+#git checkout dev
 git branch -D $branch
 git checkout -b $branch
 
@@ -55,5 +55,5 @@ git tag -a $bes_version -m "Releasing version $bes_version"
 git push origin $bes_version
 
 #checkout to master
-#git checkout master
-git checkout dev
+git checkout master
+#git checkout dev
