@@ -45,5 +45,5 @@ git commit -m "Released the version $bes_rel_version"
 git push origin -f -u $dist_branch
 
 #checkout back to master
-#git checkout master
-git checkout dev
+git checkout master
+#git checkout dev
