@@ -4,10 +4,10 @@ function __bes_remove
 {
     __besman_echo_red "This operation would remove the BESman utility and installed environments"
     __besman_interactive_uninstall || return 1 
-    # if [[ -d $BESMAN_ENV_ROOT ]]; then
-    #     __besman_echo_no_colour "Removing dev environment"
-    #     rm -rf $BESMAN_ENV_ROOT
-    # fi
+     if [[ -d $BESMAN_ENV_ROOT ]]; then
+         __besman_echo_no_colour "Removing dev environment"
+         rm -rf $BESMAN_ENV_ROOT
+     fi
     __besman_secure_curl "https://raw.githubusercontent.com/$BESMAN_NAMESPACE/BESman/master/dist/environments" >> $HOME/tmp_env_names.txt
     sed -i 's/,/ /g' $HOME/tmp_env_names.txt
     local environment=$(cat $HOME/tmp_env_names.txt)
