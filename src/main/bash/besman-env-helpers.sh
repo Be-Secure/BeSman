@@ -72,7 +72,7 @@ function __besman_create_fork
   fi
   if [[ -z $(which hub) ]]; then
     __besman_echo_no_colour "Installing hub..."
-    snap install hub --classic 
+    sudo snap install hub --classic 
   fi
   curl -s https://api.github.com/repos/$BESMAN_USER_NAMESPACE/$environment | grep -q "Not Found"
   if [[ "$?" == "0" ]]; then
