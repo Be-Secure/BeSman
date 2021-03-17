@@ -6,16 +6,12 @@
 BESMAN_PLATFORM=$(uname)
 export BESMAN_SERVICE="https://raw.githubusercontent.com"
 
-BESMAN_NAMESPACE="hyperledgerkochi"
+BESMAN_NAMESPACE="Be-Secure"
 #BESMAN_NAMESPACE="senthilbk"
 BESMAN_VERSION="0.0.1"
-BESMAN_ENV_REPOS="$BESMAN_NAMESPACE/besman-env-testrepo"
+BESMAN_ENV_REPOS="$BESMAN_NAMESPACE/BeSman-env-repo"
 # BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
 
-#BESMAN_NAMESPACE="{BESMAN_NAMESPACE:-senthilbk}"
-BESMAN_VERSION="0.0.1"
-BESMAN_ENV_REPOS="$BESMAN_NAMESPACE/kobman-env-repo"
-# BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
 
 
 
@@ -215,7 +211,7 @@ touch "$besman_user_config_file"
 echo "BESMAN_VERSION=$BESMAN_VERSION" >> "$besman_user_config_file"
 echo "BESMAN_USER_NAMESPACE=" >> "$besman_user_config_file"
 echo "BESMAN_ENV_ROOT=$HOME/BESman_env" >> "$besman_user_config_file"
-echo "BESMAN_NAMESPACE=hyperledgerkochi" >> "$besman_user_config_file"
+echo "BESMAN_NAMESPACE=Be-Secure" >> "$besman_user_config_file"
 echo "BESMAN_INTERACTIVE_USER_MODE=true" >> "$besman_user_config_file"
 echo "BESMAN_DIR=$HOME/.besman" >> "$besman_user_config_file"
 echo "BESMAN_ENV_REPOS=$BESMAN_ENV_REPOS" >> "$besman_user_config_file"
