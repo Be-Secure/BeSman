@@ -19,28 +19,28 @@ mkdir -p build/tmp
 
 # making of zip files
 
-zip -rj $HOME/BESman/build/tmp/besman-latest.zip $HOME/BESman/dist/list.txt $HOME/BESman/src/main/bash/besman-* $HOME/BESman/src/main/bash/envs/besman-* $HOME/BESman/src/main/bash/commands/besman-*
+zip -rj $HOME/BeSman/build/tmp/besman-latest.zip $HOME/BeSman/dist/list.txt $HOME/BeSman/src/main/bash/besman-* $HOME/BeSman/src/main/bash/envs/besman-* $HOME/BeSman/src/main/bash/commands/besman-*
 #zip -rj $HOME/BeSman/build/tmp/besman-latest.zip $HOME/BeSman/dist/list.txt $HOME/BeSman/src/main/bash/besman-* $HOME/BESman/src/main/bash/envs/besman-* $HOME/BESman/src/main/bash/commands/besman-*
 
 #zip -r build/tmp/besman-latest.zip $HOME/BESman/src/
-cp $HOME/BESman/build/tmp/besman-latest.zip $HOME/BESman/build/tmp/besman-$bes_rel_version.zip
+cp $HOME/BeSman/build/tmp/besman-latest.zip $HOME/BeSman/build/tmp/besman-$bes_rel_version.zip
 
 # moving get.besman.io to tmp/
-mv $HOME/BESman/scripts/get.besman.io $HOME/BESman/build/tmp/
+mv $HOME/BeSman/scripts/get.besman.io $HOME/BeSman/build/tmp/
 
 # moving into dist branch
 git checkout $dist_branch
 
 # collecting files from Release branch tmp/ folder to dist branch
-git checkout $branch -- $HOME/BESman/build/tmp/* &> /dev/null
+git checkout $branch -- $HOME/BeSman/build/tmp/* &> /dev/null
 
 mkdir dist &> /dev/null
 # moving of latest files from tmp/ to dist/
-mv $HOME/BESman/build/tmp/* $HOME/BESman/dist/
+mv $HOME/BeSman/build/tmp/* $HOME/BeSman/dist/
 
 # ls -l $HOME/BESman/dist/
 # saving changes and pushing
-git add $HOME/BESman/dist/*
+git add $HOME/BeSman/dist/*
 git commit -m "Released the version $bes_rel_version"
 git push origin -f -u $dist_branch
 
