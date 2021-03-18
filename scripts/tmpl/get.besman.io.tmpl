@@ -221,7 +221,7 @@ echo "Download script archive..."
 
 # once move to besman namespace needs to update besman-latest.zip 
 #curl -sL --location --progress-bar "${BESMAN_SERVICE}/${BESMAN_NAMESPACE}/BESman/dist/dist/besman-latest.zip" > "$besman_zip_file"
-curl -sL --location --progress-bar "${BESMAN_SERVICE}/${BESMAN_NAMESPACE}/BESman/dist/dist/besman-latest.zip" > "$besman_zip_file"
+curl -sL --location --progress-bar "${BESMAN_SERVICE}/${BESMAN_NAMESPACE}/BeSman/dist/dist/besman-latest.zip" > "$besman_zip_file"
 #cp "/vagrant/ProEnv/besman-latest.zip"  "$besman_zip_file"
 
 
@@ -231,7 +231,7 @@ if [[ -z "$ARCHIVE_OK" ]]; then
 	echo ""
 	echo "If problems persist, please ask for help on our Github:"
 	echo "* easy sign up: https://github.com/"
-	echo "https://github.com/${BESMAN_NAMESPACE}/BESman/issues"
+	echo "https://github.com/${BESMAN_NAMESPACE}/BeSman/issues"
 	rm -rf "$BESMAN_DIR"
 	exit 2
 fi
@@ -248,7 +248,7 @@ unzip -qo "$besman_zip_file" -d "$besman_stage_folder"
 echo "Install scripts..."
 
 
-curl -sL "https://raw.githubusercontent.com/${BESMAN_NAMESPACE}/BESman/master/dist/environments" > tmp.txt
+curl -sL "https://raw.githubusercontent.com/${BESMAN_NAMESPACE}/BeSman/master/dist/environments" > tmp.txt
 #echo "BESman" > tmp.txt
 sed -i 's/,/ /g' tmp.txt 
 environments=$(<tmp.txt)
