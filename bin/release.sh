@@ -23,7 +23,7 @@ if [[ -z $BESMAN_NAMESPACE ]];
 fi
 
 # prepare branch
-cd $HOME/BESman
+cd $HOME/BeSman
 git checkout master
 #git checkout dev
 git branch -D $branch
@@ -31,9 +31,9 @@ git checkout -b $branch
 
 
 #copy the tmpl file to /scripts
-cp $HOME/BESman/scripts/tmpl/*.tmpl $HOME/BESman/scripts/
+cp $HOME/BeSman/scripts/tmpl/*.tmpl $HOME/BeSman/scripts/
 # replacing @xxx@ variables with acutal values.
-for file in $HOME/BESman/scripts/*.tmpl;
+for file in $HOME/BeSman/scripts/*.tmpl;
 do
     sed -i "s/@BES_VERSION@/$bes_version/g" $file
     sed -i "s/@BES_ARCHIVE_DOWNLOAD_REPO@/$BES_ARCHIVE_DOWNLOAD_REPO/g" $file
@@ -43,7 +43,7 @@ do
 done
 
 # committing the changes
-git add $HOME/BESman/scripts/*.*
+git add $HOME/BeSman/scripts/*.*
 git commit -m "Update version of $branch to $bes_version"
 
 #push release branch
