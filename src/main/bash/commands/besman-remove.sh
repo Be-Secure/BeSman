@@ -8,7 +8,7 @@ function __bes_remove
          __besman_echo_no_colour "Removing dev environment"
          rm -rf $BESMAN_ENV_ROOT
      fi
-    __besman_secure_curl "https://raw.githubusercontent.com/$BESMAN_NAMESPACE/BESman/master/dist/environments" >> $HOME/tmp_env_names.txt
+    __besman_secure_curl "https://raw.githubusercontent.com/$BESMAN_NAMESPACE/BeSman/master/dist/environments" >> $HOME/tmp_env_names.txt
     sed -i 's/,/ /g' $HOME/tmp_env_names.txt
     local environment=$(cat $HOME/tmp_env_names.txt)
     for i in $environment; do
