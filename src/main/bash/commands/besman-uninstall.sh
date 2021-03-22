@@ -12,7 +12,7 @@ if [[ $environment == "all" && -z $version ]]; then
   __besman_echo_white "This operation would remove all the environments and its files"
   __besman_interactive_uninstall || return 1
   __besman_echo_white "Removing files..."
-  __besman_secure_curl "https://raw.githubusercontent.com/$BESMAN_NAMESPACE/BESman/master/dist/environments" >> $HOME/env_tmp.txt
+  __besman_secure_curl "https://raw.githubusercontent.com/$BESMAN_NAMESPACE/BeSman/master/dist/environments" >> $HOME/env_tmp.txt
   sed -i 's/,/ /g' $HOME/env_tmp.txt
   local curled_environment=$(cat $HOME/env_tmp.txt)
   for i in ${curled_environment[@]}; do
@@ -61,10 +61,10 @@ elif [[ -f $BESMAN_DIR/envs/besman-$environment/current && $version != $(cat $BE
 
 
 # Condition where Enviroment is presented but not installed in local system,it removed file under envs folder  
-elif [[  -f $BESMAN_DIR/envs/besman-$environment.sh ]]; then
-	rm -rf $BESMAN_DIR/envs/besman-$environment.sh
+#elif [[  -f $BESMAN_DIR/envs/besman-$environment.sh ]]; then
+#	rm -rf $BESMAN_DIR/envs/besman-$environment.sh
 	#__besman_echo_green "Files removed successfully."
-fi
+#fi
 
 } 
 
