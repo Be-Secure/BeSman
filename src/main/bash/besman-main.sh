@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 
-function bes {
-	[[ -z "$1" ]] && __bes_help && return 0
 
-	function __besman_check_for_env_file
+function __besman_check_for_env_file
 	{
 		local environment=$1
 		if [[ ! -f $BESMAN_DIR/envs/besman-$environment.sh ]]; then
@@ -15,7 +13,7 @@ function bes {
 		fi
 	}
 
-	function __besman_check_for_command_file
+function __besman_check_for_command_file
 	{
 		local command=$1
 		if [[ ! -f $BESMAN_DIR/src/besman-$command.sh ]]; then
@@ -28,6 +26,11 @@ function bes {
 
 	}
 
+
+function bes {
+	[[ -z "$1" ]] && __bes_help && return 0
+
+	
 	opts=()
 	args=()
 	local command environment version
@@ -106,4 +109,4 @@ function bes {
 	esac
 	unset environment version command args opts
 	
-}	
+}
