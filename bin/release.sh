@@ -14,13 +14,13 @@ fi
 #setting up environment variables
 if [[ -z $BES_ARCHIVE_DOWNLOAD_REPO ]];
     then
-        BES_ARCHIVE_DOWNLOAD_REPO={BES_ARCHIVE_DOWNLOAD_REPO:-"BeSman"}
+        BES_ARCHIVE_DOWNLOAD_REPO=${BES_ARCHIVE_DOWNLOAD_REPO:-"BeSman"}
 fi
 
 if [[ -z $BESMAN_NAMESPACE ]];
     then
-        #BESMAN_NAMESPACE={BESMAN_NAMESPACE:-"Be-Secure"}
-        BESMAN_NAMESPACE={BESMAN_NAMESPACE:-"senthilbk"}
+        #BESMAN_NAMESPACE=${BESMAN_NAMESPACE:-"Be-Secure"}
+        BESMAN_NAMESPACE=${BESMAN_NAMESPACE:-"senthilbk"}
 fi
 
 # prepare branch
