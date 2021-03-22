@@ -6,7 +6,7 @@ zip -r $BESMAN_DIR/bak/besman_bak.zip .besman
 __besman_echo_white "Removing current version..."
 find $BESMAN_DIR -mindepth 1 -name bak -prune -o -exec rm -rf {} +
 __besman_echo_white "Fetching latest version..."
-__besman_secure_curl https://raw.githubusercontent.com/$BESMAN_NAMESPACE/BESman/dist/dist/get.besman.io | bash
+__besman_secure_curl https://raw.githubusercontent.com/$BESMAN_NAMESPACE/BeSman/dist/dist/get.besman.io | bash
 unzip $BESMAN_DIR/bak/besman_bak.zip -d $BESMAN_DIR/bak
 __besman_echo_white "Restoring user configs..."
 dir=$(find  $BESMAN_DIR/bak/.besman/envs -type d -name besman-*)
