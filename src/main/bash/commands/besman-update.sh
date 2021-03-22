@@ -67,7 +67,8 @@ function __bes_update
                                         grep -v "$i" $cached_list >$HOME/tmpfile && mv $HOME/tmpfile $cached_list
                                         flag=2
                                         # Since there is difference between remote repo and local repo, Respective envrioment files and foler will be uninstalled
-                                        __bes_uninstall $environment_name $version_name
+                                       # __bes_uninstall $environment_name $version_name
+                                       rm -rf $BESMAN_DIR/envs/besman-$environment.sh
                                 done
 
 
