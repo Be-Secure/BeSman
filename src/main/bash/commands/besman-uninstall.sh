@@ -64,7 +64,7 @@ elif [[ -f $BESMAN_DIR/envs/besman-$environment/current && $version != $(cat $BE
 #elif [[  -f $BESMAN_DIR/envs/besman-$environment.sh ]]; then
 #	rm -rf $BESMAN_DIR/envs/besman-$environment.sh
 	#__besman_echo_green "Files removed successfully."
-#fi
+fi
 
 } 
 
