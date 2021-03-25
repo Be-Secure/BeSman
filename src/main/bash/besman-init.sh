@@ -6,10 +6,10 @@ function __besman_set_user_configs
 	#	source $BESMAN_DIR/etc/user-config.cfg
 	#fi
 # The functions sets all the user configs specified in the user-config.cfg file
-	if [[ ! -f $BESMAN_DIR/etc/user-config.cfg ]]; then
+	if [[ ! -f $HOME/.besman/etc/user-config.cfg ]]; then
 		return 1
 	else
-		source $BESMAN_DIR/etc/user-config.cfg
+		source $HOME/.besman/etc/user-config.cfg
 	fi
 	while read -r user_configs; do
 		if echo $user_configs | grep -q "^#"
@@ -21,7 +21,7 @@ function __besman_set_user_configs
 		local user_config_values=$(cut -d "=" -f 2 $HOME/tmp.txt)
 		unset $user_config_param
 		export $user_config_param=$user_config_values
-	done < $BESMAN_DIR/etc/user-config.cfg
+	done < $HOME/.besman/etc/user-config.cfg
 }
 __besman_set_user_configs || return 1
 [ -f $HOME/tmp.txt ] && rm $HOME/tmp.txt 
