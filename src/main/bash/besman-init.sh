@@ -33,9 +33,7 @@ fi
 
 # set besman namespace if not set
 if [ -z "$BESMAN_NAMESPACE" ]; then
-	#export BESMAN_NAMESPACE="hyperledgerkochi"
-	#export BESMAN_NAMESPACE="Be-Secure"
-	export BESMAN_NAMESPACE="senthilbk"
+	export BESMAN_NAMESPACE="Be-Secure"
 fi
 
 if [ -z "$BESMAN_DIR" ]; then
