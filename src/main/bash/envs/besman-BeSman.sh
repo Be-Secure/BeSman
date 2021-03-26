@@ -1,12 +1,12 @@
 #!/bin/bash
 
-function __besman_install_BESman
+function __besman_install_BeSman
 {
 	local environment_name="$1"
 	
 	local version_id="$2"
 	if [[ -z $BESMAN_ENV_ROOT ]]; then
-		export BESMAN_ENV_ROOT="$HOME/BESman_env"
+		export BESMAN_ENV_ROOT="$HOME/BeSman_env"
 	fi
 	
 	if [[ ! -d $BESMAN_ENV_ROOT ]]; then
@@ -42,14 +42,14 @@ function __besman_create_dev_environment
 	mkdir -p ${BESMAN_ENV_ROOT}/dependency
 }
 
-function __besman_uninstall_BESman
+function __besman_uninstall_BeSman
 {
 	local environment=$1
 	if [[ ! -d $BESMAN_ENV_ROOT/$environment ]]; then
 		__besman_echo_no_colour "Could not find $BESMAN_ENV_ROOT/$environment"
 		return 1
 	fi
-	__besman_echo_white "Removing dev environment for BESman"
+	__besman_echo_white "Removing dev environment for BeSman"
 	# cd $BESMAN_ENV_ROOT/$environment
 	git --git-dir=$BESMAN_ENV_ROOT/$environment/.git --work-tree=$BESMAN_ENV_ROOT/$environment status | grep -e "modified" -e "untracked"
 	if [[ "$?" == "0" ]]; then
@@ -64,7 +64,7 @@ function __besman_uninstall_BESman
 
 }
 
-function __besman_validate_BESman
+function __besman_validate_BeSman
 {
 	local environment=$1
 	if [[ ! -d $BESMAN_ENV_ROOT/$environment ]]; then
@@ -78,22 +78,22 @@ function __besman_validate_BESman
 
 }
 
-# function __besman_update_BESman
+# function __besman_update_BeSman
 # {
 # 	##TODO:- add the code for updating BESman dev
 # }
 
-# function __besman_upgrade_BESman
+# function __besman_upgrade_BeSman
 # {
 # 	##TODO:- add the code for upgradation 
 # }
 
-# function __besman_start_BESman
+# function __besman_start_BeSman
 # {
 # 	##Not Applicable
 # }
 
-# function __besman_stop_BESman
+# function __besman_stop_BeSman
 # {
 # 	##Not Applicable
 # }
