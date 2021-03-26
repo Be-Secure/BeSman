@@ -2,7 +2,7 @@
 
 function __bes_remove
 {
-    __besman_echo_red "This operation would remove the BESman utility and installed environments"
+    __besman_echo_red "This operation would remove the BeSman utility and installed environments"
     __besman_interactive_uninstall || return 1 
      if [[ -d $BESMAN_ENV_ROOT ]]; then
          __besman_echo_no_colour "Removing dev environment"
@@ -23,7 +23,7 @@ function __bes_remove
     fi
     __besman_echo_no_colour "Removing environment variables..."
     unset BESMAN_DIR BESMAN_VERSION BESMAN_NAMESPACE BESMAN_USER_NAMESPACE BESMAN_INTERACTIVE_USER_MODE
-    __besman_echo_green "BESman utility removed successfully."
+    __besman_echo_green "BeSman utility removed successfully."
     sed -i '/.besman/d' $HOME/.bashrc
     exec bash
 
