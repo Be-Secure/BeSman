@@ -5,7 +5,7 @@ function __bes_update
         if [[ ! -f $BESMAN_DIR/var/list.txt ]]; then
                 __besman_echo_red "Update failed"
                 __besman_echo_red "Could not find list file in your system."
-                __besman_echo_red "Please reinstall BESman and try again"
+                __besman_echo_red "Please reinstall BeSman and try again"
                 return 1
         fi
 
