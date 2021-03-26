@@ -80,18 +80,18 @@ if [ -z $(which figlet) ]; then
 	#exit 1
 fi
 
-figlet Setting up BESman >> besman.txt
+figlet Setting up BeSman >> besman.txt
 cat besman.txt
 rm besman.txt
 # Sanity checks
 
-echo "Looking for a previous installation of BESMAN..."
+echo "Looking for a previous installation of BeSMAN..."
 if [ -d $BESMAN_DIR/bin ]; then
-	echo "BESMAN found."
+	echo "BeSMAN found."
 	echo ""
 	echo "======================================================================================================"
-	echo " You already have BESMAN installed."
-	echo " BESMAN was found at:"
+	echo " You already have BeSMAN installed."
+	echo " BeSMAN was found at:"
 	echo ""
 	echo "    ${BESMAN_DIR}"
 	echo ""
@@ -178,7 +178,7 @@ else
 fi
 
 
-echo "Installing BESMAN scripts..."
+echo "Installing BeSMAN scripts..."
 
 
 # Create directory structure
@@ -211,7 +211,7 @@ echo "Setting up user configs"
 touch "$besman_user_config_file"
 echo "BESMAN_VERSION=$BESMAN_VERSION" >> "$besman_user_config_file"
 echo "BESMAN_USER_NAMESPACE=" >> "$besman_user_config_file"
-echo "BESMAN_ENV_ROOT=$HOME/BESman_env" >> "$besman_user_config_file"
+echo "BESMAN_ENV_ROOT=$HOME/BeSman_env" >> "$besman_user_config_file"
 echo "BESMAN_NAMESPACE=$BESMAN_NAMESPACE" >> "$besman_user_config_file"
 echo "BESMAN_INTERACTIVE_USER_MODE=true" >> "$besman_user_config_file"
 echo "BESMAN_DIR=$HOME/.besman" >> "$besman_user_config_file"
