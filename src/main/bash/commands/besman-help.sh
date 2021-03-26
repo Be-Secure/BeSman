@@ -2,7 +2,7 @@
 
 function __bes_help {
 cat << EOF
-BESman - Help 
+BeSman - Help 
 ---------------------------------------------------------
 $ bes <command> <qualifer> 
 <qualifier>   : environment, version, namespace
@@ -11,26 +11,26 @@ $ bes <command> <qualifer>
 install       : $ bes install –env [env_name] -V [version]
 		The command is used to install the specified
 		environment.
-		Eg: $ bes install -env BESman –V 0.0.2
+		Eg: $ bes install -env BeSman –V 0.0.2
 uninstall     : $ bes uninstall --environment [env_name]
 		or
 		$ bes uninstall –env [env_name] -V [version]
 		The command is used to uninstall the specified
 		environment.
-		Eg: $ bes uninstall –env BESman
+		Eg: $ bes uninstall –env BeSman
 status        : $ bes status
 		The command displays the installed environments.
 list          : $ bes list
 		The command lists the various environment that
 		can be installed.
 upgrade       : $ bes upgrade
-		Upgrades BESman to next version available.
+		Upgrades BeSman to next version available.
 update        : $ bes update
 		Updates the list file with lastest changes.
-version       : Version of BESman Utility
+version       : Version of BeSman Utility
 		-------------------------
 		$ bes --version or bes –V
-		This command displays the version of BESman
+		This command displays the version of BeSman
 		installed on the host.
 		Version of an Environment
 		-------------------------
@@ -39,9 +39,9 @@ version       : Version of BESman Utility
 		environment.
 		Eg: $ bes -V -env greenlight
 help          : $ bes help
-		Displays the BESman manual
+		Displays the BeSman manual
 remove 	      : $ bes rm
-		Removes BESman utility and installed environments 
+		Removes BeSman utility and installed environments 
 		from the local system
 EOF
 }
