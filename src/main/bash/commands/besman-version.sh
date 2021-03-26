@@ -7,7 +7,7 @@ local environment_value=$2
 
 if [ -z "$environment_parameter" ]
 then
-	echo "BESman utility version" "$(cat ${BESMAN_DIR}/var/version.txt)"
+	echo "BeSman utility version" "$(cat ${BESMAN_DIR}/var/version.txt)"
     	return 0
 fi
 
