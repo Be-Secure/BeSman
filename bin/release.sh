@@ -19,8 +19,7 @@ fi
 
 if [[ -z $BESMAN_NAMESPACE ]];
     then
-        #BESMAN_NAMESPACE=${BESMAN_NAMESPACE:-"Be-Secure"}
-        BESMAN_NAMESPACE=${BESMAN_NAMESPACE:-"senthilbk"}
+        BESMAN_NAMESPACE=${BESMAN_NAMESPACE:-"Be-Secure"}        
 fi
 
 # prepare branch
