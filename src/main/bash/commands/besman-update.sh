@@ -64,11 +64,23 @@ function __bes_update
                                         environment_name=$(echo $i | cut -d "/" -f 3 | cut -d "," -f 1)
                                         version_name=$(echo $i | cut -d "," -f 2)
                                         #grep -v "$environment_name" $cached_list >$HOME/tmpfile && mv $HOME/tmpfile $cached_list
-                                        grep -v "$i" $cached_list >$HOME/tmpfile && mv $HOME/tmpfile $cached_list
-                                        flag=2
+                                        #grep -v "$i" $cached_list >$HOME/tmpfile && mv $HOME/tmpfile $cached_list
+                                        #flag=2
                                         # Since there is difference between remote repo and local repo, Respective envrioment files and foler will be uninstalled
                                        # __bes_uninstall $environment_name $version_name
-                                       rm -rf $BESMAN_DIR/envs/besman-$environment.sh
+                                       if [ -d $BESMAN_DIR/envs/besman-$environment_name ]
+                                       then
+                                         grep -v "$i" $cached_list >$HOME/tmpfile && mv $HOME/tmpfile $cached_list
+                                         rm -rf $BESMAN_DIR/envs/besman-$environment_name.sh
+                                         flag=2
+                                         __besman_echo_yellow "besman-$environment_name has been removed and is no longer available for installation"
+                                      fi
+                                      if [ ! -d $BESMAN_DIR/envs/besman-$environment_name ]
+                                      then
+                                              grep -v "$i" $cached_list >$HOME/tmpfile && mv $HOME/tmpfile $cached_list
+                                              rm -rf $BESMAN_DIR/envs/besman-$environment_name.sh
+                                              flag=2
+                                      fi
                                 done
 
 
