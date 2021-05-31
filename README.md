@@ -25,7 +25,7 @@
 
 
 <!-- ABOUT THE PROJECT  -->
-# BeSman 
+# About The Project 
 
 BeSman or Be-Secure  Manager is a commandline Utility for provision of customized security environments and this utility comes under the Be-Secure project which is a an umbrella of open source security projects and utilities tracked by Wipro’s open source security team and its open source partner network.
 
@@ -33,7 +33,9 @@ BeSman or Be-Secure  Manager is a commandline Utility for provision of customize
 <!-- GETTING STARTED -->
 # Command Line Interface
 BeSman, (Be-Secure manager) gives you the *bes* command on your shell. User can use these bes commands to automate the setting up of various development environments required for bes projects.
-BeSman is a tool for providing secure environments for user. It provides a convenient command line interface for installing, removing and listing Environments.
+BeSman is a tool for providing secure environments for user. It provides a convenient command line interface for installing, removing and listing Environments. Please use bes help command to get bes commands
+	
+	eg. bes help
 
 
 # Prerequisite
@@ -47,10 +49,12 @@ oah-installer will help to install oah shell.  The oah shell will provide oah co
 
 
 # Installation and commands  
-	Windows users should use Gitbash with mingw. 
+Windows users should use Gitbash with mingw. 
 
         i.   curl -s https://raw.githubusercontent.com/Be-Secure/oah-installer/master/install.sh | bash
+	
         ii.  oah install -v oah-bes-vm 
+	
         iii. Use VM which got created while installing oah-bes-vm to work with bes commands. 
  
 
