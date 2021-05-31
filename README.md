@@ -19,7 +19,7 @@
         <li><a href="#Version-commands">Version commands</a></li>
        <li><a href="#Other-useful-commands">Other useful commands</a></li>	       
       </ul>
-    <li><a href="#Contribution">Contribution</a></li>
+    <li><a href="#How to contribute">Contribution</a></li>
   </ol>
 </details>
 
@@ -33,9 +33,10 @@ BeSman or Be-Secure  Manager is a commandline Utility for provision of customize
 <!-- GETTING STARTED -->
 # Command Line Interface
 BeSman, (Be-Secure manager) gives you the *bes* command on your shell. User can use these bes commands to automate the setting up of various development environments required for bes projects.
-BeSman is a tool for providing secure environments for user. It provides a convenient command line interface for installing, removing and listing Environments. Please use bes help command to get bes commands
+BeSman is a tool for providing secure environments for user. It provides a convenient command line interface for installing, removing and listing Environments. 
+Please use bes help command to get bes commands
 	
-	eg. bes help
+	bes help
 
 
 # Prerequisite
@@ -51,11 +52,13 @@ oah-installer will help to install oah shell.  The oah shell will provide oah co
 # Installation and commands  
 Windows users should use Gitbash with mingw. 
 
-        i.   curl -s https://raw.githubusercontent.com/Be-Secure/oah-installer/master/install.sh | bash
+i. Fetch and install the oah shell.
+          curl -s https://raw.githubusercontent.com/Be-Secure/oah-installer/master/install.sh | bash
+
+ii. Install the VM using the oah command.
+          oah install -v oah-bes-vm 
 	
-        ii.  oah install -v oah-bes-vm 
-	
-        iii. Use VM which got created while installing oah-bes-vm to work with bes commands. 
+iii. Use VM which got created while installing oah-bes-vm to work with bes commands. 
  
 
 ### Local Installation
@@ -63,7 +66,7 @@ Windows users should use Gitbash with mingw.
 To install BeSman locally running against your local server, run the following commands:
 
 
-	$ source ~/.besman/bin/besman-init.sh
+	 source ~/.besman/bin/besman-init.sh
 
 
 ### Local environment commands
@@ -72,36 +75,36 @@ Run the following commands on the terminal to manage respective environments.
 
 ### Install commands:
 
-        $ bes install -env [environment_name] -V [version_tag]
+         bes install -env [environment_name] -V [version_tag]
 
         Example   :
-           $ bes install -env bes-ansibledev-env -V 0.0.1
+            bes install -env bes-ansibledev-env -V 0.0.1
 
 Please run the following command to get the list of other environments and its versions.
 
-	   	`$ bes list`
+	   	` bes list`
 
 
 
 ### Uninstall commands:
 
-        $ bes uninstall -env [environment_name] -V [version]
+         bes uninstall -env [environment_name] -V [version]
 
         Example   :
-           $ bes uninstall -env  bes-ansibledev-env -V 0.0.1
+            bes uninstall -env  bes-ansibledev-env -V 0.0.1
 
 
 ### Version commands:
 
-    $ bes --version
-    $ bes --version -env [environment_name]
+     bes --version
+     bes --version -env [environment_name]
 
  
 ### Other useful commands:        
 
-        $ bes list
-        $ bes status        
-        $ bes help     
+         bes list
+         bes status        
+         bes help     
 
 
 <!-- CONTRIBUTING -->
