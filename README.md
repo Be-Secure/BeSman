@@ -53,9 +53,11 @@ oah-installer will help to install oah shell.  The oah shell will provide oah co
 Windows users should use Gitbash with mingw. 
 
 i. Fetch and install the oah shell.
+	
 	curl -s https://raw.githubusercontent.com/Be-Secure/oah-installer/master/install.sh | bash
 
 ii. Install the VM using the oah command.
+	
 	oah install -v oah-bes-vm 
 	
 iii. Use VM which got created while installing oah-bes-vm to work with bes commands. 
