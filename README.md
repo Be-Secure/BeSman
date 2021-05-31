@@ -19,7 +19,7 @@
         <li><a href="#Version-commands">Version commands</a></li>
        <li><a href="#Other-useful-commands">Other useful commands</a></li>	       
       </ul>
-    <li><a href="#How to contribute">Contribution</a></li>
+    <li><a href="#How-to-contribute">How to contribute</a></li>
   </ol>
 </details>
 
@@ -53,10 +53,10 @@ oah-installer will help to install oah shell.  The oah shell will provide oah co
 Windows users should use Gitbash with mingw. 
 
 i. Fetch and install the oah shell.
-          curl -s https://raw.githubusercontent.com/Be-Secure/oah-installer/master/install.sh | bash
+	curl -s https://raw.githubusercontent.com/Be-Secure/oah-installer/master/install.sh | bash
 
 ii. Install the VM using the oah command.
-          oah install -v oah-bes-vm 
+	oah install -v oah-bes-vm 
 	
 iii. Use VM which got created while installing oah-bes-vm to work with bes commands. 
  
@@ -108,8 +108,7 @@ Please run the following command to get the list of other environments and its v
 
 
 <!-- CONTRIBUTING -->
-## Contribution
-
+## How to contribute
 Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
 1. Fork the Project
