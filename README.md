@@ -2,7 +2,7 @@
    
 ### A secure environment provider for your tech mission
 
-BeSman or Be-Secure  Manager is a commandline Utility for provision of customized security environments and this utility comes under the Be-Secure project which is a an umbrella of open source security projects and utilities tracked by Wipro’s open source security team and its open source partner network.
+BeSman or Be-Secure Manager is a commandline Utility for provision of customized security environments and this utility comes under the Be-Secure project which is a an umbrella of open source security projects and utilities tracked by open source security team.
 <br><br>
 ## Installation
 Windows users should use Gitbash with mingw. 
