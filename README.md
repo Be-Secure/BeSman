@@ -2,7 +2,16 @@
    
 ### A secure environment provider for your tech mission
 
-BeSman or Be-Secure Manager is a commandline Utility for provision of customized security environments and this utility comes under the Be-Secure project which is a an umbrella of open source security projects and utilities tracked by open source security team.
+BeSman or Be-Secure Manager is a commandline Utility for provision of customized security environments and this utility comes under the Be-Secure project which is an umbrella project of open source security projects, tools, sandbox environments to perform security assessments and secure open source technology stacks.
+<br><br>
+
+## Prerequisite
+
+Please use OAH commands to create Bes installed virtual machine. Use oah-installer to get oah environments/commands. 
+[OpenAppHack (OAH) is built on top of opensource DevOps tools. OAH is a vendor neutral environment provisioning approach that enables rapid development and prototyping of open source solution.]
+
+For more details about oah-installar, please visit [github page](https://github.com/Be-Secure/oah-installer/blob/master/README.md) and for oah shell info, use [readme](https://github.com/Be-Secure/oah-shell/blob/master/README.md) for the same.
+
 <br><br>
 ## Installation
 Windows users should use Gitbash with mingw. 
@@ -46,12 +55,5 @@ Run the following commands on the terminal to manage respective environments.
 	bes help
 	bes list
 
-
-# Prerequisite
-
-Please use OAH commands to create Bes installed virtual machine. Use oah-installer to get oah environments/commands. 
-[OpenAppHack (OAH) is built on top of opensource DevOps tools. OAH is a vendor neutral environment provisioning approach that enables rapid development and prototyping of open source solution.]
-
-For more details about oah-installar, please visit [github page](https://github.com/Be-Secure/oah-installer/blob/master/README.md) and for oah shell info, use [readme](https://github.com/Be-Secure/oah-shell/blob/master/README.md) for the same.
 
 oah-installer will help to install oah shell.  The oah shell will provide oah commands to spin up different oah virtual machines. The oah-bes-vm is one of the many virtual machine that can be spun up using oah shell. Both installer and shell comes under OAH initiatives. 
