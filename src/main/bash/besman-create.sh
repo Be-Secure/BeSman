@@ -4,26 +4,30 @@ function __bes_create
 {
    
     # bes create --playbook cve vuln name ext  
-    type=$1
+    local type=$1
     if [[ $type == "--playbook" || $type == "-P" ]]; then
-        echo "authenticating.."
         __besman_check_github_id || return 1
+        echo "authenticating.."
         __besman_gh_auth || return 1    
         echo "forking"
         __besman_gh_fork $BESMAN_NAMESPACE $BESMAN_PLAYBOOK_REPO 
-        [[ "$?" != "0" ]] && return 1
-        echo "cloning"
-        
-        __besman_gh_clone $BESMAN_USER_NAMESPACE $BESMAN_PLAYBOOK_REPO $HOME/$BESMAN_PLAYBOOK_REPO
-        [[ "$?" != "0" ]] && return 1
-        cve=$2
-        vuln=$3
-        env=$4
-        ext=$5
+        [[ "$?" != "0" ]] && return 1        
+        if [[ ! -d $HOME/$BESMAN_PLAYBOOK_REPO ]]; then
+            echo "cloning"  
+            __besman_gh_clone $BESMAN_USER_NAMESPACE $BESMAN_PLAYBOOK_REPO $HOME/$BESMAN_PLAYBOOK_REPO
+            [[ "$?" != "0" ]] && return 1
+        fi
+        local flag=$2
+        local purpose=$3
+        local vuln=$4
+        local env=$5
+        local ext=$6
         [[ -z $ext ]] && ext="md"
-        target_path=$HOME/$BESMAN_PLAYBOOK_REPO
-        __besman_create_playbook "$cve" "$vuln" "$env" "$ext" "$target_path"
-        unset cve vuln env ext target_path
+        __besman_create_playbook "$purpose" "$vuln" "$env" "$ext" 
+
+        
+
+        unset vuln env ext target_path purpose
     else
         create_env
     fi
@@ -31,7 +35,7 @@ function __bes_create
 
 function __besman_create_playbook
 {
-    args=("${@}")
+    local args=("${@}")
     for (( i=0;i<${#};i++ ))
     do
         if [[ -z ${args[$i]}  ]]; then
@@ -39,19 +43,20 @@ function __besman_create_playbook
 
         fi
     done
-    cve=${args[0]}
-    vuln=${args[1]}
-    env=${args[2]}
-    ext=${args[3]}
+    local purpose=${args[0]}
+    local vuln=${args[1]}
+    local env=${args[2]}
+    local ext=${args[3]}
     # [[ -z $ext ]] && ext="md"
-    touch $target_path/besman-$cve-$vuln-$env-playbook.$ext
+    local target_path=$HOME/$BESMAN_PLAYBOOK_REPO
+    touch $target_path/besman-$purpose-$vuln-$env-playbook.$ext
     if [[ "$?" == "0" ]]; then
     __besman_echo_green "Playbook created successfully"
     else
     __besman_echo_red "Could not create playbook"
     fi
     __besman_open_file $target_path
-    unset args cve vuln env ext
+    unset args vuln env ext purpose
 }   
 
 # function create_env
