@@ -5,7 +5,7 @@ function __bes_pull
     local type repo dir remote branch
     type=$1
     if [[ $type == "playbook" ]]; then
-        repo=BESMAN_PLAYBOOK_REPO
+        repo=$BESMAN_PLAYBOOK_REPO
         dir=$BESMAN_DIR/playbook
     elif [[ $type == "environment" ]]; then
         repo=besecure-ce-env-repo
