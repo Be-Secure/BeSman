@@ -28,7 +28,7 @@ function __besman_interactive_uninstall
 {
   if [[ $BESMAN_INTERACTIVE_USER_MODE = "true" ]]; then
     read -p "Would you like to proceed?(y/n):" c
-    if [[ $c == "n" ]]; then
+    if [[ $c == "n" || $c == "no" || $c == "N" || $c == "NO" ]]; then
       __besman_echo_no_colour "Exiting!!!"
       return 1
     else
@@ -65,7 +65,7 @@ function __besman_create_fork
     __besman_echo_no_colour ""
     __besman_echo_no_colour "Eg: export BESMAN_USER_NAMESPACE=abc123"
     __besman_echo_no_colour ""
-    __besman_echo_no_colour "Please run the install command after exporting your Github id"
+    __besman_echo_no_colour "Please run the command again after exporting your Github id"
     __besman_echo_no_colour ""
     __besman_error_rollback "$environment"
     return 1
@@ -98,26 +98,47 @@ function __besman_create_fork
   fi
 }
 
+function __besman_open_file
+{
+    local file=$1
+
+    if [[ -n $(which jupyter) ]]; then
+        __besman_echo_yellow "Opening file in Jupyter notebook"
+        jupyter notebook $file
+    elif [[ -n $(which code) ]]; then
+        __besman_echo_yellow "Opening file in VS Code"
+        code $file
+    fi
+}   
+
 function __besman_download_envs_from_repo
 {
   # __besman_echo_white "Downloading environments from external repos"
   local namespace=$1
   local repo_name=$2
+  local flag=$3
+
+  if [[ $3 == 1 ]]; then
+    target_path=$BESMAN_DIR/playbook/
+  else
+    target_path=$BESMAN_DIR/envs/
+  fi
   local environment_files namespace repo_name zip_stage_folder remote_zip_url
   zip_stage_folder=$HOME/zip_stage_folder
   mkdir -p $zip_stage_folder
   remote_zip_url="https://github.com/$namespace/$repo_name/archive/master.zip"
   __besman_secure_curl "$remote_zip_url" >> $HOME/$repo_name.zip
   unzip -q $HOME/$repo_name.zip -d $zip_stage_folder
-  environment_files=$(find $zip_stage_folder/$repo_name-master -type f -name "besman-*.sh")
+  environment_files=$(find $zip_stage_folder/$repo_name-master -type f -name "besman-*")
   if [[ -z ${environment_files[@]} ]]; then
      rm $HOME/$repo_name.zip
     [[ -d $zip_stage_folder ]] && rm -rf $zip_stage_folder
     unset environment_files namespace repo_name zip_stage_folder remote_zip_url
     return 1
   fi
+  [[ $flag == 1 ]] && mkdir -p $target_path
   for j in ${environment_files[@]}; do
-    mv $j $BESMAN_DIR/envs/
+    mv $j $target_path
   done
   rm $HOME/$repo_name.zip
   [[ -d $zip_stage_folder ]] && rm -rf $zip_stage_folder
@@ -169,4 +190,21 @@ function __besman_error_rollback
     rm -rf $BESMAN_ENV_ROOT
   fi
 
+}
+
+function __besman_cve_format_check
+{
+  local cve=$1
+  echo "$cve" | grep -qwE "CVE-[0-9]{4}-[0-9]{4,}"
+  [[ "$?" != "0" ]] && __besman_echo_red "CVE format incorrect"  && __besman_echo_no_colour "Format: CVE-YYYY-NNNN..." && return 1
+  unset cve
+}
+
+function __besman_validate_assessment
+{
+  local type=$1
+  assessments=("active" "passive" "external" "internal" "host" "network" "application" "db" "wireless" "distributed" "credentialed" "non-credentialed")
+  echo "${assessments[@]}" | grep -qw "$type"
+  [[ "$?" != "0" ]] && __besman_echo_red "Could not find assessment type" &&  __besman_echo_no_colour "Select from the following:" && echo "${assessments[@]}" && return 1
+  unset type assessments
 }
