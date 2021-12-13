@@ -18,8 +18,7 @@ function __bes_save() {
 	 __besman_validate_playbook_type $filename || return 1
 
 	 cd $playbookdir
-	 git add $filename && git commit -m "Playbook - $filename created"
- 	 git push origin main
+	 __besman_playbook_push $filename
  else
 	 __besman_echo_red "Could not find repository/playbook"
  fi

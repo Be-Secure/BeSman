@@ -208,3 +208,16 @@ function __besman_validate_assessment
   [[ "$?" != "0" ]] && __besman_echo_red "Could not find assessment type" &&  __besman_echo_no_colour "Select from the following:" && echo "${assessments[@]}" && return 1
   unset type assessments
 }
+
+function __besman_playbook_push
+{
+  local filename=$1
+  __besman_echo_no_colour "File name to be stagged is, $filename"
+  git add $filename
+
+  __besman_echo_no_colour "Playbook to be commited, $filename"
+  git commit -m "Playbook - $filename created"
+
+  git push origin main
+  unset filename
+}
