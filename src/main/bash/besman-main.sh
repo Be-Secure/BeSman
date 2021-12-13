@@ -30,7 +30,7 @@ function bes {
 
 	opts=()
 	args=()
-	local command environment version assess_flag purpose
+	local command environment version assess_flag purpose type
 	while [[ -n "$1" ]]; do
 		case "$1" in 
 			rm | remove)
@@ -122,10 +122,22 @@ function bes {
 				__bes_$command $opt_environment
 			fi
 			;;
+		pull)
+			[[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
+			[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
+			if [[ ( ${opts[0]} == "--playbook" ) || ( ${opts[0]} == "-P" ) ]]; then
+				type=playbook
+			
+			else
+				type=environment
+			fi
+			__bes_$command $type
+			unset type
+			;;
 		create)
 			# bes create --playbook -cve <cve-details> -vuln <vulnerability> -env <env name> -ext <extension>
 			# fun args[0]  opts[0] opts[1]  args[1]    opts[2]  args[2]     opts[3] args[3]  opts[4] args[4]
-			local type purpose vuln env ext
+			local purpose vuln env ext
 			type=${opts[0]}
 			if [[ ( -n $type ) && ( $type == --playbook || $type == -P ) ]]; then
 				[[ ${#args[@]} != ${#opts[@]} ]] && __besman_echo_red "Incorrect syntax" && return 1

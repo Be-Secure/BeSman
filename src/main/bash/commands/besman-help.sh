@@ -43,5 +43,27 @@ help          : $ bes help
 remove 	      : $ bes rm
 		Removes BeSman utility and installed environments 
 		from the local system
+
+create        : To create a playbook. The playbook will be named 
+		based on the options passed within the command.
+
+		$ bes create --playbook <options> <arguments>
+
+		Options:
+
+			-cve : To pass CVE details. 
+					$ bes create --playbook -cve CVE-2018-2019
+			-vuln : To pass the vulnerability category.
+					$ bes create --playbook -vuln xss
+			-env :	To pass the environment name.
+					$ bes create --playbook -env drupal
+			-ext : To pass the extension of the playbook.
+					$ bes create --playbook -ext py
+
+			NOTE: If any of the above values are not passed. Default value "untitled" will be assigned in its place except for -ext. 
+					If -ext is not passed, the default value will be "md".
+		
+		Eg: $ bes create --playbook -cve CVE-2018-2019 -vuln rce -env drupal -ext php
+
 EOF
 }
