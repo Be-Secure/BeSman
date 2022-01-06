@@ -209,15 +209,3 @@ function __besman_validate_assessment
   unset type assessments
 }
 
-function __besman_gh_push
-{
-  local filename=$1
-  __besman_echo_no_colour "File name to be stagged is, $filename"
-  git add $filename
-
-  __besman_echo_no_colour "Playbook to be commited, $filename"
-  git commit -m "Playbook - $filename created"
-
-  git push origin main
-  unset filename
-}

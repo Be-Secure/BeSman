@@ -14,14 +14,18 @@ function __bes_save() {
  local playbookdir="$HOME/besecure-ce-playbook-repo"
  local filename=$1
 
- if [[ ( -d "$playbookdir" ) && ( -f $playbookdir/$filename ) ]]; then  
-	 __besman_validate_playbook_type $filename || return 1
-
+ if [[ ( -d "$playbookdir" ) && ( -f $playbookdir/$filename ) ]]; then 
 	 cd $playbookdir
-	 __besman_playbook_push $filename
+	 __besman_validate_playbook_type $filename || return 1
+	 
+	 __besman_git_stage $filename || return 1 
+	 __besman_git_commit "Playbook $filename created" || return 1
+
+	__besman_git_push origin main
+	__besman_echo_red "Save success"
+	
  else
 	 __besman_echo_red "Could not find repository/playbook"
  fi
  unset playbookdir filename
 }
-
