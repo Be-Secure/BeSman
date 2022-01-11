@@ -99,7 +99,7 @@ function bes {
 			__bes_$command
 			;;
 		list)
-			if [[ -z $opt_environment ]]; then
+			if [[ -z ${opts[0]} ]]; then
 				
 				[[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
 				[[ "${#opts[@]}" -ne 0 ]] && __besman_echo_red "Incorrect syntax" && return 1
@@ -107,7 +107,7 @@ function bes {
 			else
 				[[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
 				[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
-				__bes_$command $opt_environment
+				__bes_$command ${opts[0]}
 			fi
 			;;
 		update)
