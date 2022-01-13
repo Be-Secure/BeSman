@@ -11,7 +11,7 @@ function __besman_validate_playbook_type
 
 
 function __bes_mod() {
- local playbookdir="$HOME/besecure-ce-playbook-repo"
+ local playbookdir="$HOME/$BESMAN_PLAYBOOK_REPO"
  local filename=$1
 
  if [[ ( -d "$playbookdir" ) && ( -f $playbookdir/$filename ) ]]; then
