@@ -66,3 +66,11 @@ function __besman_vim_playbook
    unset filename
 
 }
+
+function __besman_gh_pr
+{
+    local filename=$1
+    gh pr  create --title "[Publish] Playbook name: $filename"
+    unset filename
+}
+
