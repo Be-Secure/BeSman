@@ -58,3 +58,11 @@ function __besman_check_github_id
     return 1
   fi
 }
+
+function __besman_vim_playbook
+{
+   local filename=$1
+   vim $filename
+   unset filename
+
+}
