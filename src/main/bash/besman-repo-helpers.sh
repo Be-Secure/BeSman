@@ -72,3 +72,11 @@ function __besman_open_file
         code $file
     fi
 }
+
+function __besman_gh_pr
+{
+    local filename=$1
+    gh pr  create --title "[Publish] Playbook name: $filename"
+    unset filename
+}
+
