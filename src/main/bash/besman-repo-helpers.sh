@@ -59,10 +59,16 @@ function __besman_check_github_id
   fi
 }
 
-function __besman_vim_playbook
-{
-   local filename=$1
-   vim $filename
-   unset filename
 
+function __besman_open_file
+{
+    local file=$1
+
+    if [[ -n $(which jupyter) ]]; then
+        __besman_echo_yellow "Opening file in Jupyter notebook"
+        jupyter notebook $file
+    elif [[ -n $(which code) ]]; then
+        __besman_echo_yellow "Opening file in VS Code"
+        code $file
+    fi
 }

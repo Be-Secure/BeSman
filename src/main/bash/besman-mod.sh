@@ -16,14 +16,13 @@ function __bes_mod() {
 
  if [[ ( -d "$playbookdir" ) && ( -f $playbookdir/$filename ) ]]; then
          cd $playbookdir
-         __besman_validate_playbook_type $filename || return 1
 
-         __besman_vim_playbook $filename || return 1
+         __besman_open_file $playbookdir || return 1
          __besman_git_stage $filename || return 1
 
 
          __besman_git_commit "Playbook $filename modified" || return 1
-     __besman_git_push origin main
+         __besman_git_push origin main
          __besman_echo_green "Edit success"
 
  else
