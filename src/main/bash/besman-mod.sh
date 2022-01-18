@@ -1,15 +1,5 @@
 #!/usr/bin/env bash
 
-function __besman_validate_playbook_type
-{
-
- local filename=$1
- echo $filename | grep -qe "untitled"
- [[ $? -eq  0 ]] && __besman_echo_red "File name should not contain the term, untitled!!!" && return 1
- unset filename
-}
-
-
 function __bes_mod() {
  local playbookdir="$HOME/$BESMAN_PLAYBOOK_REPO"
  local filename=$1
