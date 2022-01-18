@@ -73,10 +73,19 @@ function __besman_open_file
     fi
 }
 
+
 function __besman_gh_pr
 {
     local filename=$1
-    gh pr  create --title "[Publish] Playbook name: $filename"
+    gh pr  create -t "[Publish] Playbook name: $filename" -b "For publishing $filename" -R "Be-Secure/$BESMAN_PLAYBOOK_REPO"
     unset filename
 }
+
+function __besman_gh_issue
+{
+    local filename=$1
+    gh issue create -t "[Playbook-issue]" -b "Auto created issue as part of playbook creation, $filename" -R "Be-Secure/$BESMAN_PLAYBOOK_REPO"
+    unset filename
+}
+
 
