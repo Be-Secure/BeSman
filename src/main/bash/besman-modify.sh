@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-function __bes_mod
+function __bes_modify
  {
 
  local playbookdir="$HOME/$BESMAN_PLAYBOOK_REPO"
@@ -10,11 +10,6 @@ function __bes_mod
          cd $playbookdir
 
          __besman_open_file $playbookdir || return 1
-         __besman_git_stage $filename || return 1
-
-         __besman_git_commit "Playbook $filename modified" || return 1
-         __besman_git_push origin main
-         __besman_echo_green "Edit success"
 
  else
          __besman_echo_red "Could not find repository/playbook"
