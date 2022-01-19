@@ -197,6 +197,16 @@ function bes {
                         fi
 
                    ;;
+                save)
+                        [[ ( ${#opts[@]} -ne 1 ) && ( ${args[@]} -ne 2 ) ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
+                        local file_name=${args[1]}
+
+                        if [[ ( ${opts[0]} == "-P" ) || ( ${opts[0]} == "--playbook" ) ]]; then
+                                __bes_$command $file_name
+                        fi
+
+                   ;;
+
 		*)
 			__besman_echo_red "Unrecognized command: $command" && return 1
 			;;

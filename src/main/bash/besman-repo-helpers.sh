@@ -72,3 +72,29 @@ function __besman_open_file
         code $file
     fi
 }
+
+function __besman_git_stage
+{
+    local filename=$1
+    git add $filename
+    [[ $? -ne 0 ]] && echo "Could not stage file: $filename" && return 1
+    unset filename
+}
+
+function __besman_git_commit
+{
+    local message="$1"
+    git commit -m "$message"
+    [[ $? -ne 0 ]] && echo "Could not perform commit with message: $message" && return 1
+    unset message
+}
+
+function __besman_git_push
+{
+    local remote=$1
+    local branch=$2
+    git push $remote $branch
+    unset remote branch
+}
+
+
