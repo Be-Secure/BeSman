@@ -58,3 +58,19 @@ function __besman_check_github_id
     return 1
   fi
 }
+
+
+function __besman_gh_issue-pr
+{
+    local filename=$1
+    nano ./.templates/issue_template
+    issue_id=$(gh issue create -t "[Issue for playbook $filename]"  -F "./.templates/issue_template" -R "Be-Secure/$BESMAN_PLAYBOOK_REPO" | sed 's|.*/||' )
+    if [[ $? -eq 0 ]]; then
+        nano ./.templates/pr_template
+        gh pr  create -t "[Publish] Playbook name: $filename | issue id : $issue_id"  -F "./.templates/pr_template" -R "Be-Secure/$BESMAN_PLAYBOOK_REPO"
+
+    fi
+
+
+    unset filename
+}
