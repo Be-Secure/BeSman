@@ -28,14 +28,14 @@ EOF
 function __besman_gh_auth_status 
 {
     local namespace=$1
-    gh auth status &>> $HOME/out.txt
-    if cat $HOME/out.txt | grep -q "$namespace"
+    gh auth status &>> $HOME/gh_auth_out.txt
+    if cat $HOME/gh_auth_out.txt | grep -q "$namespace"
     then
         return 0
     else
         return 1
     fi
-    [[ -f $HOME/out.txt ]] && rm $HOME/out.txt
+    [[ -f $HOME/gh_auth_out.txt ]] && rm $HOME/gh_auth_out.txt
 }
 
 function __besman_gh_clone
