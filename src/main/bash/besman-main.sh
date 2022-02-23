@@ -69,7 +69,7 @@ function bes {
 		install)
 			
 			[[ ( ${#opts[@]} -eq 0 || ${#opts[@]} -gt 2 ) ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
-			[[ ( ${#args[@]} -eq 0 || ${#args[@]} -gt 2 ) ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
+			[[ ( ${#args[@]} -eq 0 || ${#args[@]} -gt 3 ) ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
 			if [[ -z $version && -n $BESMAN_VERSION ]]; then
 				version=$BESMAN_VERSION
 			fi
@@ -122,6 +122,13 @@ function bes {
 				__bes_$command $opt_environment
 			fi
 			;;
+		modify)
+            [[ ( ${#opts[@]} -ne 1 ) && ( ${args[@]} -ne 2 ) ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
+                local file_name=${args[1]}
+                    if [[ ( ${opts[0]} == "-P" ) || ( ${opts[0]} == "--playbook" ) ]]; then
+                             __bes_$command $file_name
+                    fi
+			;;	
 		pull)
 			[[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
 			[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
