@@ -25,7 +25,18 @@ EOF
     fi
    
 }
-
+function __besman_gh_auth_status 
+{
+    local namespace=$1
+    gh auth status &>> $HOME/out.txt
+    if cat $HOME/out.txt | grep -q "$namespace"
+    then
+        return 0
+    else
+        return 1
+    fi
+    [[ -f $HOME/out.txt ]] && rm $HOME/out.txt
+}
 
 function __besman_gh_clone
 {
@@ -45,16 +56,37 @@ function __besman_gh_fork
 
 function __besman_check_github_id
 {
-      if [[ -z $BESMAN_USER_NAMESPACE ]]; then
-    __besman_echo_no_colour "Please run the below command by substituing <namespace> with your GitHub id"
-    __besman_echo_no_colour ""
-    __besman_echo_white "$ export BESMAN_USER_NAMESPACE=<namespace>"
-    __besman_echo_no_colour ""
-    __besman_echo_no_colour "Eg: export BESMAN_USER_NAMESPACE=abc123"
-    __besman_echo_no_colour ""
-    __besman_echo_no_colour "Please run the command again after exporting your Github id"
-    __besman_echo_no_colour ""
-    # __besman_error_rollback "$environment"
-    return 1
-  fi
+
+    if [[ -z $BESMAN_USER_NAMESPACE ]]; then
+        __besman_echo_no_colour "Please run the below command by substituing <namespace> with your GitHub id"
+        __besman_echo_no_colour ""
+        __besman_echo_white "$ export BESMAN_USER_NAMESPACE=<namespace>"
+        __besman_echo_no_colour ""
+        __besman_echo_no_colour "Eg: export BESMAN_USER_NAMESPACE=abc123"
+        __besman_echo_no_colour ""
+        __besman_echo_no_colour "Please run the command again after exporting your Github id"
+        __besman_echo_no_colour ""
+        # __besman_error_rollback "$environment"
+        return 1
+    fi
+}
+
+function __besman_git_pull
+{
+    local remote branch
+    remote=$1
+    branch=$2
+    git pull $remote $branch > $HOME/temp.txt
+    if [[ "$?" != "0" ]]; then
+        cat $HOME/temp.txt
+        return 1
+    elif cat $HOME/temp.txt | grep -q 'Already up to date.'
+    then
+        # echo "elif & -1"
+        return 2
+    else
+        return 0
+    fi
+
+    # [[ -f $HOME/temp.txt ]] && rm $HOME/temp.txt
 }
