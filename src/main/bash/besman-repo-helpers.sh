@@ -71,22 +71,3 @@ function __besman_check_github_id
     fi
 }
 
-function __besman_git_pull
-{
-    local remote branch
-    remote=$1
-    branch=$2
-    git pull $remote $branch > $HOME/temp.txt
-    if [[ "$?" != "0" ]]; then
-        cat $HOME/temp.txt
-        return 1
-    elif cat $HOME/temp.txt | grep -q 'Already up to date.'
-    then
-        # echo "elif & -1"
-        return 2
-    else
-        return 0
-    fi
-
-    # [[ -f $HOME/temp.txt ]] && rm $HOME/temp.txt
-}
