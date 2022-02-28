@@ -180,7 +180,7 @@ function bes {
 			;;
 
 
-                publish)
+                open)
                         [[ ( ${#opts[@]} -ne 1 ) && ( ${args[@]} -ne 2 ) ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
                         local file_name=${args[1]}
 
