@@ -60,16 +60,4 @@ function __besman_check_github_id
 }
 
 
-function __besman_open_file
-{
-    local dir=$1
-
-    if [[ -n $(which jupyter) ]]; then
-        __besman_echo_yellow "Opening file in Jupyter notebook"
-        jupyter notebook $dir
-    elif [[ -n $(which code) ]]; then
-        __besman_echo_yellow "Opening file in VS Code"
-        code $dir
-    fi
-}
 
