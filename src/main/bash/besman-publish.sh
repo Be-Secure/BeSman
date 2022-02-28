@@ -8,20 +8,19 @@ function __bes_publish()
  local env_dir="$HOME/$BESMAN_ENV_REPO"
  local filename=$1
 
- 
- if [[ ( -d "$playbookdir" ) && ( -f $playbookdir/$filename ) ]]; then
+
+ if [[ -d "$playbookdir" ]]; then
 
          cd $playbookdir
-         __besman_gh_issue-pr $filename || return 1
 
-	 #if [[ ( ${opts[0]} == "-P" ) || ( ${opts[0]} == "--playbook" ) ]]; then
-	 #	 __besman_gh_issue $filename || return 1
-         #fi
+         __besman_gh_issue_create $filename
+         if [[ ! -z $issue_id  ]]; then
+                 __besman_gh_pr_create $filename  $issue_id
 
+         fi
  else
          __besman_echo_red "Could not find repository/playbook"
  fi
-
 
  unset playbookdir patchdir env_dir filename
 }

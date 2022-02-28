@@ -59,18 +59,34 @@ function __besman_check_github_id
   fi
 }
 
+ function __besman_gh_pr_create
+ {
+     local filename=$1
+     local issue_id=$2
 
-function __besman_gh_issue-pr
+     cp -rp .github/TEMPLATE/pr_template .
+     sed -i "s/ID/$issue_id/g" pr_template
+     nano ./pr_template
+     gh pr  create -t "[Publish] Playbook name: $filename"  -F "./pr_template" -R "Be-Secure/$BESMAN_PLAYBOOK_REPO"
+     rm -f ./pr_template
+     unset filename
+ }
+
+function __besman_gh_issue_create
 {
     local filename=$1
-    nano ./.templates/issue_template
-    issue_id=$(gh issue create -t "[Issue for playbook $filename]"  -F "./.templates/issue_template" -R "Be-Secure/$BESMAN_PLAYBOOK_REPO" | sed 's|.*/||' )
+
+    cp -rp .github/TEMPLATE/issue_template .
+    nano ./issue_template
+    issue_id=$(gh issue create -t "[Issue for playbook $filename]"  -F "./issue_template" -R "Be-Secure/BeSLighthouse" | sed 's|.*/||' )
     if [[ $? -eq 0 ]]; then
-        nano ./.templates/pr_template
-        gh pr  create -t "[Publish] Playbook name: $filename | issue id : $issue_id"  -F "./.templates/pr_template" -R "Be-Secure/$BESMAN_PLAYBOOK_REPO"
-
+        rm -f ./issue_template
+        return $issue_id
+    else
+        return 1
     fi
-
-
+    rm -f ./issue_template
     unset filename
 }
+
+
