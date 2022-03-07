@@ -25,7 +25,18 @@ EOF
     fi
    
 }
-
+function __besman_gh_auth_status 
+{
+    local namespace=$1
+    gh auth status &>> $HOME/gh_auth_out.txt
+    if cat $HOME/gh_auth_out.txt | grep -q "$namespace"
+    then
+        return 0
+    else
+        return 1
+    fi
+    [[ -f $HOME/gh_auth_out.txt ]] && rm $HOME/gh_auth_out.txt
+}
 
 function __besman_gh_clone
 {
@@ -45,16 +56,18 @@ function __besman_gh_fork
 
 function __besman_check_github_id
 {
-      if [[ -z $BESMAN_USER_NAMESPACE ]]; then
-    __besman_echo_no_colour "Please run the below command by substituing <namespace> with your GitHub id"
-    __besman_echo_no_colour ""
-    __besman_echo_white "$ export BESMAN_USER_NAMESPACE=<namespace>"
-    __besman_echo_no_colour ""
-    __besman_echo_no_colour "Eg: export BESMAN_USER_NAMESPACE=abc123"
-    __besman_echo_no_colour ""
-    __besman_echo_no_colour "Please run the command again after exporting your Github id"
-    __besman_echo_no_colour ""
-    # __besman_error_rollback "$environment"
-    return 1
-  fi
+
+    if [[ -z $BESMAN_USER_NAMESPACE ]]; then
+        __besman_echo_no_colour "Please run the below command by substituing <namespace> with your GitHub id"
+        __besman_echo_no_colour ""
+        __besman_echo_white "$ export BESMAN_USER_NAMESPACE=<namespace>"
+        __besman_echo_no_colour ""
+        __besman_echo_no_colour "Eg: export BESMAN_USER_NAMESPACE=abc123"
+        __besman_echo_no_colour ""
+        __besman_echo_no_colour "Please run the command again after exporting your Github id"
+        __besman_echo_no_colour ""
+        # __besman_error_rollback "$environment"
+        return 1
+    fi
 }
+
