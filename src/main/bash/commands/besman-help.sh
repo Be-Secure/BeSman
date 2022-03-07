@@ -65,5 +65,11 @@ create        : To create a playbook. The playbook will be named
 		
 		Eg: $ bes create --playbook -cve CVE-2018-2019 -vuln rce -env drupal -ext php
 
+		
+pull          : $ bes pull --playbook
+
+		To pull down playbooks from Be-Secure playbook repository.
+
+
 EOF
 }
