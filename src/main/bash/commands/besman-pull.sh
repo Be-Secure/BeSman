@@ -5,10 +5,10 @@ function __bes_pull
     local type repo dir remote branch return_val
     type=$1
     if [[ $type == "playbook" ]]; then
-        repo=playbook-test-repo
+        repo=$BESMAN_PLAYBOOK_REPO
         dir=$BESMAN_DIR/playbook
     elif [[ $type == "environment" ]]; then
-        repo=besecure-ce-env-repo
+        # repo=besecure-ce-env-repo
         dir=$BESMAN_DIR/envs
     fi
     remote=origin
