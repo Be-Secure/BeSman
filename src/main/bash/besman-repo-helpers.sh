@@ -44,7 +44,18 @@ function __besman_gh_clone
     local repo=$2
     local clone_path=$3
     gh repo clone $namespace/$repo $clone_path -- -q
-    
+    unset namespace repo clone_path
+
+}
+
+function __besman_gh_quiet_clone
+{
+    local namespace=$1
+    local repo=$2
+    local clone_path=$3
+    gh repo clone $namespace/$repo $clone_path -- --quiet
+
+    unset namespace repo clone_path
 }
 
 function __besman_gh_fork
