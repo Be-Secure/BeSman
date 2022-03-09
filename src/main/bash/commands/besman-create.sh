@@ -4,11 +4,11 @@ function __bes_create
 {
    
     # bes create --playbook cve vuln name ext  
-    local type=$1 #stores the type of the input - playbook/environment
+    local file_type=$1 #stores the file_type of the input - playbook/environment
     local return_val 
     
-    # Checks whether the $type is playbook or not
-    if [[ $type == "--playbook" || $type == "-P" ]]; then
+    # Checks whether the $file_type is playbook or not
+    if [[ $file_type == "--playbook" || $file_type == "-P" ]]; then
     
         # checks whether the user github id has been populated or not under $BESMAN_USER_NAMESPACE 
         __besman_check_github_id || return 1
@@ -54,7 +54,7 @@ function __bes_create
 
         unset vuln env ext target_path return_val purpose
 
-    elif [[ $type == "--environment" || $type == "-env" ]]; then
+    elif [[ $file_type == "--environment" || $file_type == "-env" ]]; then
         
         local env_name bes_env_folder
 
@@ -71,6 +71,8 @@ function __bes_create
         unset env_name bes_env_folder
 
     fi
+
+    unset file_type
 }
 
 function __besman_create_playbook
