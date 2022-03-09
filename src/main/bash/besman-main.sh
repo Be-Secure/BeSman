@@ -138,11 +138,11 @@ function bes {
 		create)
 			# bes create --playbook -cve <cve-details> -vuln <vulnerability> -env <env name> -ext <extension>
 			# fun args[0]  opts[0] opts[1]  args[1]    opts[2]  args[2]     opts[3] args[3]  opts[4] args[4]
-			local purpose vuln env ext
-			type=${opts[0]}
-			if [[ ( -n $type ) && ( $type == --playbook || $type == -P ) ]]; then
+			local purpose vuln env ext file_type
+			file_type=${opts[0]}
+			if [[ ( -n $file_type ) && ( $file_type == --playbook || $file_type == -P ) ]]; then
 				[[ ${#args[@]} != ${#opts[@]} ]] && __besman_echo_red "Incorrect syntax" && return 1
-				# type=playbook
+				# file_type=playbook
 				for (( i=0; i<${#opts[@]}; i++ ))
 				do
 					if [[ ( ${opts[i]} == "-P" ) || ( ${opts[i]} == "--playbook" ) ]]; then					
@@ -171,22 +171,22 @@ function bes {
 				# ext=${args[4]}
 
 				if [[ $assess_flag -eq 1 ]]; then
-					__bes_$command "$type" "$assess_flag" "$purpose" "$vuln" "$env" "$ext" 
+					__bes_$command "$file_type" "$assess_flag" "$purpose" "$vuln" "$env" "$ext" 
 				else
-					__bes_$command "$type" "$assess_flag" "$purpose" "$vuln" "$env" "$ext" 
+					__bes_$command "$file_type" "$assess_flag" "$purpose" "$vuln" "$env" "$ext" 
 				fi
 
 			fi
-			elif [[ ( -n $type ) && ( $type == "--environment" || $type == "-env" ) ]]; then
+			elif [[ ( -n $file_type ) && ( $file_type == "--environment" || $file_type == "-env" ) ]]; then
 
 				local env_name
 
 				env_name=${args[1]}
 
-				__bes_$command "$type" "$env_name"
+				__bes_$command "$file_type" "$env_name"
 
 			fi
-			unset type purpose vuln env ext env_name
+			unset purpose vuln env ext env_name file_type
 			;;
 		version)
 			[[ ${#opts[@]} -eq 0 ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
