@@ -57,7 +57,8 @@ function bes {
 	# local opt_environment="${opts[0]}"
 	# fi
 	[[ -z $command ]] && command="${args[0]}"
-	if [[ ( ${opts[0]} != "--playbook" ) && ( ${opts[0]} != "-P" ) ]]; then
+	# if [[ ( ${opts[0]} != "--playbook" ) && ( ${opts[0]} != "-P" ) ]]; then
+	if [[ $command != "create" ]]; then
 		[[ -z $environment ]] && environment="${args[1]}"
 		[[ -z $version ]] && version="${args[2]}"
 	fi
@@ -176,7 +177,16 @@ function bes {
 				fi
 
 			fi
-			unset type purpose vuln env ext
+			elif [[ ( -n $type ) && ( $type == "--environment" || $type == "-env" ) ]]; then
+
+				local env_name
+
+				env_name=${args[1]}
+
+				__bes_$command "$type" "$env_name"
+
+			fi
+			unset type purpose vuln env ext env_name
 			;;
 		version)
 			[[ ${#opts[@]} -eq 0 ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
