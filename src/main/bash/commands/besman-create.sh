@@ -53,10 +53,23 @@ function __bes_create
         
 
         unset vuln env ext target_path return_val purpose
-    else
-    # TODO
-        create_env
-    
+
+    elif [[ $type == "--environment" || $type == "-env" ]]; then
+        
+        local env_name bes_env_folder
+
+        env_name=$2
+
+        bes_env_folder=$BESMAN_DIR/envs
+
+        [[ -f $bes_env_folder/besman-$env_name.sh ]] && __besman_echo_red "Environment already present" && return 1
+
+        # touch $bes_env_folder/besman-$env_name
+
+        __besman_create_env "$env_name" "$bes_env_folder"
+
+        unset env_name bes_env_folder
+
     fi
 }
 
@@ -98,8 +111,51 @@ function __besman_create_playbook
     unset args vuln env ext purpose
 }   
 
-# function create_env
-# {
-#     # TODO
-# }
+function __besman_create_env
+{
+    local env_name bes_env_folder environment_path
+
+    env_name=$1
+
+    bes_env_folder=$2
+
+    environment_path=$bes_env_folder/besman-$env_name.sh
+    
+
+    cat <<EOF >> $environment_path
+
+#!/bin/bash
+
+function __besman_install_$env_name
+{
+    # Code to install the environment
+}
+
+function __besman_uninstall_$env_name
+{
+    # Code to uninstall the environment
+}
+
+function __besman_validate_$env_name
+{
+    # Code to validate the environment
+}
+
+function __besman_update_$env_name
+{
+    # Code to update the environment
+}
+
+function __besman_upgrade_$env_name
+{
+    # Code to upgrade the environment
+}
+
+
+EOF
+
+__besman_echo_green "The file has been created at $environment_path"
+unset env_name bes_env_folder environment_path
+
+}
 
