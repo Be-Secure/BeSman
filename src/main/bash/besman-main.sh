@@ -122,6 +122,16 @@ function bes {
 				__bes_$command $opt_environment
 			fi
 			;;
+		save)
+			[[ ( ${#opts[@]} -ne 1 ) && ( ${args[@]} -ne 2 ) ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
+			local file_name=${args[1]}
+
+			if [[ ( ${opts[0]} == "-P" ) || ( ${opts[0]} == "--playbook" ) ]]; then
+				__bes_$command $file_name
+		 	fi
+		        	
+		   ;;
+		   		
 		pull)
 			[[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
 			[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
