@@ -134,6 +134,17 @@ function bes {
 			__bes_$command $type
 			unset type
 			;;
+
+		
+		open)
+				[[ ( ${#opts[@]} -ne 1 ) && ( ${args[@]} -ne 2 ) ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
+				local file_name=${args[1]}
+
+				if [[ ( ${opts[0]} == "-P" ) || ( ${opts[0]} == "--playbook" ) ]]; then
+						__bes_$command $file_name
+				fi
+
+			;;
 		create)
 			# bes create --playbook -cve <cve-details> -vuln <vulnerability> -env <env name> -ext <extension>
 			# fun args[0]  opts[0] opts[1]  args[1]    opts[2]  args[2]     opts[3] args[3]  opts[4] args[4]
