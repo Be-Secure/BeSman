@@ -29,6 +29,25 @@ EOF
     fi    
 }
 
+function __besman_check_for_ansible
+{
+    if [[ -z $(which ansible) ]]; then
+        __besman_echo_red "Ansible not found"
+        return 1
+    fi
+
+}
+
+function __besman_check_for_trigger_playbook
+{
+    local playbook=$1
+    if [[ ! -f $playbook ]]; then
+        echo $playbook
+        return 1
+    else
+        return 0
+    fi
+}
 
 
 function __besman_update_requirements_file
@@ -64,6 +83,7 @@ function __besman_run_ansible_playbook_extra_vars
 {
     local playbook vars
     playbook=$1
+    [[ ! -f $playbook ]] && __besman_echo_red "$playbook not found" && unset playbook vars && return 1
     vars=$2
     __besman_echo_white "Running $playbook with --extra-vars $vars"
     ansible-playbook $playbook --ask-become-pass --extra-vars "$vars"
@@ -76,4 +96,28 @@ function __besman_ansible_galaxy_install_roles_from_requirements
 {
     __besman_echo_white "Installing ansible roles from $BESMAN_ANSIBLE_ROLE_PATH/requirements.yml under $BESMAN_ANSIBLE_ROLE_PATH"
     ansible-galaxy install -r $BESMAN_ANSIBLE_ROLE_PATH/requirements.yml -p $BESMAN_ANSIBLE_ROLE_PATH
+}
+
+function __besman_create_ansible_playbook
+{
+    local playbook=$1
+    touch $playbook
+    cat <<EOF >> $playbook
+---
+name: Triggering roles
+hosts: localhost || all
+vars:
+- bes_command: '{{ bes_command }}'
+- role_path: '{{ role_path }}'
+  roles:
+    
+EOF
+
+    roles=$(echo $BESMAN_ANSIBLE_GALAXY_ROLES | sed 's/:/ /g')
+    for i in ${roles[@]}; do
+        repo_name=$(echo $i | cut -d "/" -f 2)
+        [[ -z $BESMAN_ANSIBLE_ROLE_PATH/repo_name ]]  && __besman_echo_white "$repo_name not found" && continue
+        echo "    - '{{ role_path }}/$repo_name'" >> $playbook
+    done
+
 }
