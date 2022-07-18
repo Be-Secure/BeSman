@@ -1,7 +1,21 @@
 #!/bin/bash
 
+function __besman_check_for_gh
+{
+    if [[ -z $(which gh) ]]; then
+        __besman_echo_red "GitHub CLI - gh not found. Please install and try again"
+        return 1
+    else
+        return 0
+    fi
+}
+
 function __besman_gh_auth
 {
+    local namespace 
+    namespace=$1
+    __besman_gh_auth_status "$namespace"
+    [[ "$?" -eq 0 ]] && "gh user already authenticated" && return 0
     if [[ -z $BESMAN_GH_TOKEN ]]; then
 
         cat <<EOF
@@ -31,11 +45,13 @@ function __besman_gh_auth_status
     gh auth status &>> $HOME/gh_auth_out.txt
     if cat $HOME/gh_auth_out.txt | grep -q "$namespace"
     then
+        [[ -f $HOME/gh_auth_out.txt ]] && rm $HOME/gh_auth_out.txt
         return 0
     else
+        [[ -f $HOME/gh_auth_out.txt ]] && rm $HOME/gh_auth_out.txt
         return 1
     fi
-    [[ -f $HOME/gh_auth_out.txt ]] && rm $HOME/gh_auth_out.txt
+    
 }
 
 function __besman_gh_clone
@@ -81,4 +97,3 @@ function __besman_check_github_id
         return 1
     fi
 }
-
