@@ -81,7 +81,7 @@ function bes {
 			;;
 		uninstall)
 			[[ ( ${#opts[@]} -eq 0 || ${#opts[@]} -gt 2 ) ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
-			[[ ( ${#args[@]} -eq 0 || ${#args[@]} -gt 2 ) ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
+			[[ ( ${#args[@]} -eq 0 || ${#args[@]} -gt 3 ) ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
 			[[ $environment == "all" ]] && __bes_$command $environment && return 0
 			if [[ -z $version && -f $BESMAN_DIR/envs/besman-$environment/current ]]; then
 				version=($(cat $BESMAN_DIR/envs/besman-$environment/current))
@@ -111,16 +111,22 @@ function bes {
 			fi
 			;;
 		update)
-			if [[ -z $opt_environment ]]; then
+			if [[ -z $environment ]]; then
 				
 				[[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
 				[[ "${#opts[@]}" -ne 0 ]] && __besman_echo_red "Incorrect syntax" && return 1
 				__bes_$command
 			else
-				[[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
+				[[ "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
 				[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
-				__bes_$command $opt_environment
+				__bes_$command $environment
 			fi
+			;;	
+		validate)
+				[[ "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
+				[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
+				__besman_validate_environment $environment || return 1
+				__bes_$command $environment
 			;;
 		pull)
 			[[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
