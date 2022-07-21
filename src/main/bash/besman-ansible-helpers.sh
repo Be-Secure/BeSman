@@ -104,12 +104,12 @@ function __besman_create_ansible_playbook
     touch $playbook
     cat <<EOF >> $playbook
 ---
-name: Triggering roles
-hosts: localhost || all
-vars:
-- bes_command: '{{ bes_command }}'
-- role_path: '{{ role_path }}'
-  roles:
+- name: Triggering roles
+  hosts: localhost || all
+  vars:
+    - bes_command: '{{ bes_command }}'
+    - role_path: '{{ role_path }}'
+    roles:
     
 EOF
 
@@ -117,7 +117,7 @@ EOF
     for i in ${roles[@]}; do
         repo_name=$(echo $i | cut -d "/" -f 2)
         [[ -z $BESMAN_ANSIBLE_ROLE_PATH/repo_name ]]  && __besman_echo_white "$repo_name not found" && continue
-        echo "    - '{{ role_path }}/$repo_name'" >> $playbook
+        echo "      - '{{ role_path }}/$repo_name'" >> $playbook
     done
 
 }
