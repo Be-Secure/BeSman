@@ -119,6 +119,7 @@ function bes {
 			else
 				[[ "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
 				[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
+				__besman_validate_environment $environment || return 1
 				__bes_$command $environment
 			fi
 			;;	
@@ -127,6 +128,12 @@ function bes {
 				[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
 				__besman_validate_environment $environment || return 1
 				__bes_$command $environment
+			;;
+		reset)
+				[[ "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
+				[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
+				__besman_validate_environment $environment || return 1
+				__bes_$command $environment 
 			;;
 		pull)
 			[[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
