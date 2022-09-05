@@ -98,6 +98,12 @@ function bes {
 			[[ "${#opts[@]}" -ne 0 ]] && __besman_echo_red "Incorrect syntax" && return 1
 			__bes_$command
 			;;
+		run)
+			[[ "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
+			[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
+			_bes_$command ${opts[0]}
+
+			;;
 		list)
 			if [[ -z ${opts[0]} ]]; then
 				
