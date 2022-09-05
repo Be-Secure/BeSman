@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 #
-#   Copyright 2017 Marco Vermeulen
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -85,6 +84,15 @@ function __besman_echo {
 	fi
 }
 
+function __besman_highlight_echo
+{
+	if [[ "$besman_colour_enable" == 'false' ]]; then
+		echo -e "$2"
+	else
+		echo -e "\033[$1$2\033[0m"
+	fi
+}
+
 function __besman_echo_red {
 	__besman_echo "31m" "$1"
 }
@@ -117,7 +125,45 @@ function __besman_echo_violet {
 	__besman_echo "35m" "$1"
 }
 
+function __besman_echo_black_highlight
+{
+	__besman_highlight_echo "40m" "$1"
+}
 
+function __besman_echo_red_highlight
+{
+	__besman_highlight_echo "41m" "$1"
+}
+
+function __besman_echo_green_highlight
+{
+	__besman_highlight_echo "42m" "$1"
+}
+
+function __besman_echo_yellow_highlight
+{
+	__besman_highlight_echo "43m" "$1"
+}
+
+function __besman_echo_blue_highlight
+{
+	__besman_highlight_echo "44m" "$1"
+}
+
+function __besman_echo_purple_highlight
+{
+	__besman_highlight_echo "45m" "$1"
+}
+
+function __besman_echo_cyan_highlight
+{
+	__besman_highlight_echo "46m" "$1"
+}
+
+function __besman_echo_white_highlight
+{
+	__besman_highlight_echo "47m" "$1"
+}
 
 function __besman_echo_confirm {
 	if [[ "$besman_colour_enable" == 'false' ]]; then
