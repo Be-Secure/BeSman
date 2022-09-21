@@ -99,10 +99,15 @@ function bes {
 			__bes_$command
 			;;
 		run)
-			[[ "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
-			[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
-			_bes_$command ${opts[0]}
+			if [[ -z "${#opts[1]}" ]]; then
 
+				[[ "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
+				[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
+				__bes_$command ${args[1]}
+			else
+				
+				__bes_$command "${args[@]}" 
+			fi
 			;;
 		list)
 			if [[ -z ${opts[0]} ]]; then
