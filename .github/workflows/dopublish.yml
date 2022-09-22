@@ -8,14 +8,13 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
       - name: Set env for version
         run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
         # run: RELEASE_VERSION=${GITHUB_REF#refs/*/}
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          ref: release
+      - name: Switch to release branch
+        run: git checkout release
       - name: Setting up dir
         run: mkdir -p build/tmp 
       - name: Generate artifacts
@@ -24,6 +23,8 @@ jobs:
           cp ./build/tmp/besman-latest.zip ./build/tmp/besman-$RELEASE_VERSION.zip
           mv ./scripts/get.besman.io ./build/tmp/
           ls ./build/tmp/
+      - name: Switch branch
+        run: git checkout dist
       - name: Copy To Branches Action
         uses: planetoftheweb/copy-to-branches@v1
         env:
