@@ -32,7 +32,7 @@ jobs:
           git config --global user.email 'action@github.com'
           git fetch                         # fetch branches
           git checkout $TARGET_BRANCH --      # checkout to your branch
-          mkdir dist 
+          mkdir -p dist 
           git checkout release -- ./build/tmp/* 
           mv ./build/tmp/* ./dist/
           git add $HOME/BeSman/dist/*
