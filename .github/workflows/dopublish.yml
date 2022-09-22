@@ -36,7 +36,7 @@ jobs:
           git checkout $TARGET_BRANCH --      # checkout to your branch
           mkdir -p dist 
           git checkout ${GITHUB_REF##*/} -- $files 
-          mv ./build/tmp/* ./dist/
+          mv ./$files ./dist/
           git add ./dist/*
           git commit -m "Released the version $RELEASE_VERSION"
           git push origin -f -u dist
