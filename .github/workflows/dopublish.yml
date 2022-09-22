@@ -42,8 +42,9 @@ jobs:
 
       - name: Moving files and push
         run: |
+          git pull origin dist
           mkdir -p dist
-          mv ./build/tmp/ ./dist/
+          mv ./build/tmp/* ./dist/
           git add ./dist/*
           git commit -m "Released the version $RELEASE_VERSION"
           git push origin -f -u dist
