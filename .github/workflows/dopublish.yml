@@ -26,6 +26,7 @@ jobs:
       
       - name: Copy artifacts to dist and push
         env:
+          SOURCE_BRANCH: 'release'
           TARGET_BRANCH: 'dist'
         run: |
           git config --global user.name 'GitHub Action'
@@ -33,7 +34,7 @@ jobs:
           git fetch                         # fetch branches
           git checkout $TARGET_BRANCH --      # checkout to your branch
           mkdir -p dist 
-          git checkout release -- ./build/tmp/* 
+          git checkout $SOURCE_BRANCH -- ./build/tmp/* 
           mv ./build/tmp/* ./dist/
           git add ./dist/*
           git commit -m "Released the version $RELEASE_VERSION"
