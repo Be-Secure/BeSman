@@ -35,7 +35,7 @@ jobs:
           mkdir -p dist 
           git checkout release -- ./build/tmp/* 
           mv ./build/tmp/* ./dist/
-          git add $HOME/BeSman/dist/*
+          git add ./dist/*
           git commit -m "Released the version $RELEASE_VERSION"
           git push origin -f -u dist
 
