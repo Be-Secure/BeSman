@@ -29,12 +29,13 @@ jobs:
           SOURCE_BRANCH: 'release'
           TARGET_BRANCH: 'dist'
         run: |
+          files=$(find ./build/tmp/ -type f) # get the file list
           git config --global user.name 'GitHub Action'
           git config --global user.email 'action@github.com'
           git fetch                         # fetch branches
           git checkout $TARGET_BRANCH --      # checkout to your branch
           mkdir -p dist 
-          git checkout $SOURCE_BRANCH -- ./build/tmp/* 
+          git checkout ${GITHUB_REF##*/} -- $files 
           mv ./build/tmp/* ./dist/
           git add ./dist/*
           git commit -m "Released the version $RELEASE_VERSION"
