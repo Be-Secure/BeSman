@@ -23,6 +23,7 @@ jobs:
           zip -rj ./build/tmp/besman-latest.zip ./dist/list.txt ./src/main/bash/besman-* ./src/main/bash/envs/besman-* ./src/main/bash/commands/besman-*
           cp ./build/tmp/besman-latest.zip ./build/tmp/besman-$RELEASE_VERSION.zip
           mv ./scripts/get.besman.io ./build/tmp/
+          ls ./build/tmp/
       
       - name: Copy artifacts to dist and push
         env:
@@ -35,8 +36,6 @@ jobs:
           git fetch                         # fetch branches
           git checkout $TARGET_BRANCH --      # checkout to your branch
           mkdir -p dist
-          echo "${GITHUB_REF##*/}"
-          echo "${SOURCE_BRANCH}" 
           git checkout ${SOURCE_BRANCH} -- $files
           echo "listing"
           ls 
