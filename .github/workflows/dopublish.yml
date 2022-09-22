@@ -40,6 +40,8 @@ jobs:
           key: release
           files: ./build/tmp/*
 
+      - name: Listing tmp files
+        run: ls ./build/tmp/*
       # - name: Copy artifacts to dist and push
       #   env:
       #     SOURCE_BRANCH: 'release'
