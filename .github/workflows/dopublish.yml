@@ -14,7 +14,11 @@ jobs:
         run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
         # run: RELEASE_VERSION=${GITHUB_REF#refs/*/}
       - name: Switch to release branch
-        run: git checkout release
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git fetch
+          git checkout release
       - name: Setting up dir
         run: mkdir -p build/tmp 
       - name: Generate artifacts
@@ -24,7 +28,11 @@ jobs:
           mv ./scripts/get.besman.io ./build/tmp/
           ls ./build/tmp/
       - name: Switch branch
-        run: git checkout dist
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git fetch
+          git checkout dist
       - name: Copy To Branches Action
         uses: planetoftheweb/copy-to-branches@v1
         env:
