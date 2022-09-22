@@ -42,6 +42,7 @@ jobs:
 
       - name: Listing tmp files
         run: |
+          git checkout dist --
           git branch
           ls ./build/tmp/
       # - name: Copy artifacts to dist and push
