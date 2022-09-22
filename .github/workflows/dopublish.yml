@@ -43,7 +43,7 @@ jobs:
       - name: Listing tmp files
         run: |
           git branch
-          ls ./build/tmp/*
+          ls ./build/tmp/
       # - name: Copy artifacts to dist and push
       #   env:
       #     SOURCE_BRANCH: 'release'
