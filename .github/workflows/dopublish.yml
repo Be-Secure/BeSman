@@ -37,7 +37,7 @@ jobs:
           mkdir -p dist
           echo "${GITHUB_REF##*/}"
           echo "${SOURCE_BRANCH}" 
-          git checkout ${GITHUB_REF##*/} -- $files
+          git checkout ${SOURCE_BRANCH} -- $files
           echo "listing"
           ls 
           mv ./$files ./dist/
