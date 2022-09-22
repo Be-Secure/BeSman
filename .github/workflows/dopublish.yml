@@ -40,11 +40,13 @@ jobs:
           key: release
           files: ./build/tmp/*
 
-      - name: Listing tmp files
+      - name: Moving files and push
         run: |
-          git checkout dist --
-          git branch
-          ls ./build/tmp/
+          mkdir -p dist
+          mv ./build/tmp/ ./dist/
+          git add ./dist/*
+          git commit -m "Released the version $RELEASE_VERSION"
+          git push origin -f -u dist
       # - name: Copy artifacts to dist and push
       #   env:
       #     SOURCE_BRANCH: 'release'
