@@ -24,26 +24,30 @@ jobs:
           cp ./build/tmp/besman-latest.zip ./build/tmp/besman-$RELEASE_VERSION.zip
           mv ./scripts/get.besman.io ./build/tmp/
           ls ./build/tmp/
-      
-      - name: Copy artifacts to dist and push
+      - name: Copy To Branches Action
+        uses: planetoftheweb/copy-to-branches@v1
         env:
-          SOURCE_BRANCH: 'release'
-          TARGET_BRANCH: 'dist'
-        run: |
-          # files=$(find ./build/tmp/ -type f) # get the file list
-          # echo $files
-          git config --global user.name 'GitHub Action'
-          git config --global user.email 'action@github.com'
-          git fetch                         # fetch branches
-          git checkout $TARGET_BRANCH --      # checkout to your branch
-          mkdir -p dist
-          git checkout ${SOURCE_BRANCH} -- ./build/tmp/
-          echo "listing"
-          ls 
-          mv ./$files ./dist/
-          git add ./dist/*
-          git commit -m "Released the version $RELEASE_VERSION"
-          git push origin -f -u dist
+          key: release
+          files: ./build/tmp/*
+      # - name: Copy artifacts to dist and push
+      #   env:
+      #     SOURCE_BRANCH: 'release'
+      #     TARGET_BRANCH: 'dist'
+      #   run: |
+      #     # files=$(find ./build/tmp/ -type f) # get the file list
+      #     # echo $files
+      #     git config --global user.name 'GitHub Action'
+      #     git config --global user.email 'action@github.com'
+      #     git fetch                         # fetch branches
+      #     git checkout $TARGET_BRANCH --      # checkout to your branch
+      #     mkdir -p dist
+      #     git checkout ${SOURCE_BRANCH} -- ./build/tmp/
+      #     echo "listing"
+      #     ls 
+      #     mv ./build/tmp/ ./dist/
+      #     git add ./dist/*
+      #     git commit -m "Released the version $RELEASE_VERSION"
+      #     git push origin -f -u dist
 
       # - name: Test
       #   run: |
