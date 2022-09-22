@@ -30,14 +30,14 @@ jobs:
           SOURCE_BRANCH: 'release'
           TARGET_BRANCH: 'dist'
         run: |
-          files=$(find ./build/tmp/ -type f) # get the file list
-          echo $files
+          # files=$(find ./build/tmp/ -type f) # get the file list
+          # echo $files
           git config --global user.name 'GitHub Action'
           git config --global user.email 'action@github.com'
           git fetch                         # fetch branches
           git checkout $TARGET_BRANCH --      # checkout to your branch
           mkdir -p dist
-          git checkout ${SOURCE_BRANCH} -- $files
+          git checkout ${SOURCE_BRANCH} -- ./build/tmp/
           echo "listing"
           ls 
           mv ./$files ./dist/
