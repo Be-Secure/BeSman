@@ -33,15 +33,12 @@ jobs:
           git config --global user.email 'action@github.com'
           git fetch
           git checkout dist --
-          git checkout release -- ./build/tmp/*
-          mv ./build/tmp/ ./dist/
-          git commit -m "Released the version $RELEASE_VERSION"
-          git push origin -f -u dist
-      # - name: Copy To Branches Action
-      #   uses: planetoftheweb/copy-to-branches@v1
-      #   env:
-      #     key: release
-      #     files: ./build/tmp/*
+
+      - name: Copy To Branches Action
+        uses: planetoftheweb/copy-to-branches@v1
+        env:
+          key: release
+          files: ./build/tmp/*
 
       # - name: Copy artifacts to dist and push
       #   env:
