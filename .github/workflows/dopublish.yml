@@ -31,6 +31,7 @@ jobs:
           TARGET_BRANCH: 'dist'
         run: |
           files=$(find ./build/tmp/ -type f) # get the file list
+          echo $files
           git config --global user.name 'GitHub Action'
           git config --global user.email 'action@github.com'
           git fetch                         # fetch branches
