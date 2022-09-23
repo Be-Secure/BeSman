@@ -5,7 +5,7 @@ on:
     tags:
       - '*.*.*'
 jobs:
-  publish artifact:
+  publish_artifact:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -48,8 +48,8 @@ jobs:
           git commit -m "Released the version $RELEASE_VERSION"
           git push origin -f -u dist
       
-  create release:
-    needs: publish artifact
+  create_release:
+    needs: publish_artifact
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
