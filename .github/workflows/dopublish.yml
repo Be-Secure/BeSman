@@ -1,4 +1,4 @@
-name: Publish Binaries
+name: Release BeSman
 on:
   push:
     # Sequence of  patterns matched against refs/tags
