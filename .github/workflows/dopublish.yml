@@ -5,7 +5,7 @@ on:
     tags:
       - '*.*.*'
 jobs:
-  publish_artifact:
+  publish_artifacts:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -26,7 +26,7 @@ jobs:
           cp ./build/tmp/besman-latest.zip ./build/tmp/besman-$RELEASE_VERSION.zip
           mv ./scripts/get.besman.io ./build/tmp/
           ls ./build/tmp/
-      - name: Switch to dist and push
+      - name: Switch to dist 
         run: |
           git fetch
           git checkout dist --
@@ -47,7 +47,7 @@ jobs:
           git push origin -f -u dist
       
   create_release:
-    needs: publish_artifact
+    needs: publish_artifacts
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -63,8 +63,6 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
-          body: |
-            Testing
           draft: false
           prerelease: false
       
