@@ -5,7 +5,7 @@ on:
     tags:
       - '*.*.*'
 jobs:
-  publish:
+  publish artifact:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -48,6 +48,12 @@ jobs:
           git commit -m "Released the version $RELEASE_VERSION"
           git push origin -f -u dist
       
+  create release:
+    needs: publish artifact
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -71,5 +77,5 @@ jobs:
           asset_path: ./dist/besman-latest.zip
           asset_name: besman-latest.zip
           asset_content_type: application/zip
-      
+        
       
