@@ -28,8 +28,6 @@ jobs:
           ls ./build/tmp/
       - name: Switch to dist and push
         run: |
-          git config --global user.name 'GitHub Action'
-          git config --global user.email 'action@github.com'
           git fetch
           git checkout dist --
 
