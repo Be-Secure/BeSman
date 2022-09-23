@@ -47,10 +47,6 @@ jobs:
           git add ./dist/*
           git commit -m "Released the version $RELEASE_VERSION"
           git push origin -f -u dist
-      
-      - name: Set env var for latest binary
-        env: 
-          latest: ./dist/besman-latest.zip
         
       - name: Create release
         id: create_release
