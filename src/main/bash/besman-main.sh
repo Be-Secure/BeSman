@@ -123,16 +123,17 @@ function bes {
 			fi
 			;;
 		pull)
-			[[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
-			[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
+			[[ "${#args[@]}" -gt 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
+			[[ "${#opts[@]}" -gt 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
 			if [[ ( ${opts[0]} == "--playbook" ) || ( ${opts[0]} == "-P" ) ]]; then
 				type=playbook
+				namespace="${args[1]}"
 			
 			else
 				type=environment
 			fi
-			__bes_$command $type
-			unset type
+			__bes_$command $type $namespace
+			unset type namespace
 			;;
 		create)
 			# bes create --playbook -cve <cve-details> -vuln <vulnerability> -env <env name> -ext <extension>
