@@ -4,7 +4,7 @@ function __bes_list {
 
 local playbook_flag=$1
 if [[ ( -n $playbook_flag ) && ( -d $BESMAN_DIR/playbook ) ]]; then
-    [[ -z $(ls $BESMAN_DIR/playbook) ]] && __besman_echo_white "No playbook available" && return 1
+    [[ -z $(ls $BESMAN_DIR/playbook | grep -v "README.md") ]] && __besman_echo_white "No playbook available" && return 1
     ls $BESMAN_DIR/playbook >> $HOME/temp.txt
     __besman_echo_no_colour "Available playbooks"
     __besman_echo_no_colour "-------------------"
