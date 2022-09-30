@@ -1,11 +1,25 @@
 #!/bin/bash
 
+function __besman_check_for_gh
+{
+    if [[ -z $(which gh) ]]; then
+        __besman_echo_red "GitHub CLI - gh not found. Please install and try again"
+        return 1
+    else
+        return 0
+    fi
+}
+
+
 function __besman_gh_auth
 {
+    local namespace 
+    namespace=$1
+    __besman_gh_auth_status "$namespace"
+    [[ "$?" -eq 0 ]] && echo "gh user already authenticated" && return 0
     if [[ -z $BESMAN_GH_TOKEN ]]; then
 
         cat <<EOF
-
 Missing personal access token. Please follow the below steps.
 1. Open link https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
 2. Create a personal access token with the following permissions:
@@ -25,17 +39,43 @@ EOF
     fi
    
 }
+function __besman_git_pull
+{   
+    [[ ! -d .git ]] && __besman_echo_red "Not a git repo" && return 1
+    local remote branch out_flag
+    remote=$1
+    branch=$2
+    out_flag=1
+    git pull $remote $branch >> $HOME/pull.out
+    if cat $HOME/pull.out | grep -q "up to date"
+    then
+        [[ $out_flag -eq 1 ]] && rm $HOME/pull.out
+        return 2
+    elif cat $HOME/pull.out | grep -q "error"
+    then 
+        out_flag=0
+        __besman_echo_white "Please check $HOME/pull.out for logs"
+        return 1
+    else
+        [[ $out_flag -eq 1 ]] && rm $HOME/pull.out
+        return 0
+    fi
+
+    unset remote branch out_flag
+}
 function __besman_gh_auth_status 
 {
     local namespace=$1
     gh auth status &>> $HOME/gh_auth_out.txt
     if cat $HOME/gh_auth_out.txt | grep -q "$namespace"
     then
+        [[ -f $HOME/gh_auth_out.txt ]] && rm $HOME/gh_auth_out.txt
         return 0
     else
+        [[ -f $HOME/gh_auth_out.txt ]] && rm $HOME/gh_auth_out.txt
         return 1
     fi
-    [[ -f $HOME/gh_auth_out.txt ]] && rm $HOME/gh_auth_out.txt
+    
 }
 
 function __besman_gh_clone
@@ -44,6 +84,7 @@ function __besman_gh_clone
     local repo=$2
     local clone_path=$3
     gh repo clone $namespace/$repo $clone_path -- -q
+    [[ "$?" -eq 1 ]] && return 1
     unset namespace repo clone_path
 
 }
@@ -54,7 +95,7 @@ function __besman_gh_quiet_clone
     local repo=$2
     local clone_path=$3
     gh repo clone $namespace/$repo $clone_path -- --quiet
-
+    [[ "$?" -eq 1 ]] && return 1
     unset namespace repo clone_path
 }
 
