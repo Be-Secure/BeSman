@@ -81,7 +81,7 @@ function bes {
 			;;
 		uninstall)
 			[[ ( ${#opts[@]} -eq 0 || ${#opts[@]} -gt 2 ) ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
-			[[ ( ${#args[@]} -eq 0 || ${#args[@]} -gt 2 ) ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
+			[[ ( ${#args[@]} -eq 0 || ${#args[@]} -gt 3 ) ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
 			[[ $environment == "all" ]] && __bes_$command $environment && return 0
 			if [[ -z $version && -f $BESMAN_DIR/envs/besman-$environment/current ]]; then
 				version=($(cat $BESMAN_DIR/envs/besman-$environment/current))
