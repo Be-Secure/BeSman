@@ -1,17 +1,25 @@
 #!/bin/bash
 
 function __bes_pull
-{   
-    local type repo dir remote branch return_val
+{   __besman_check_for_gh || return 1
+    __besman_check_github_id $BESMAN_USER_NAMESPACE || return 1
+    __besman_gh_auth $BESMAN_USER_NAMESPACE
+    local type repo dir remote branch return_val namespace
     type=$1
+    namespace=$2
     if [[ $type == "playbook" ]]; then
-        repo=playbook-test-repo
+        [[ -z $namespace ]] && namespace=$BESMAN_NAMESPACE
+        repo=$BESMAN_PLAYBOOK_REPO
         dir=$BESMAN_DIR/playbook
     elif [[ $type == "environment" ]]; then
         repo=besecure-ce-env-repo
         dir=$BESMAN_DIR/envs
     fi
-    remote=origin
+    if [[ $namespace == $BESMAN_NAMESPACE ]]; then
+        remote=upstream
+    else
+        remote=origin
+    fi
     branch=main
     if [[ -d $dir ]]; then
         cd $dir
@@ -31,8 +39,9 @@ function __bes_pull
     else
         mkdir -p $dir 
         __besman_echo_white "Fetching playbooks..." 
-        __besman_gh_quiet_clone $BESMAN_USER_NAMESPACE $repo $dir
+        __besman_gh_quiet_clone $namespace $repo $dir
+        [[ "$?" -eq 1 ]] && __besman_echo_red "Something went wrong" && rm -rf $dir &&return 1
         __besman_echo_green "Playbooks added successfully"
     fi
-    unset type repo dir remote branch return_val
+    unset type repo dir remote branch return_val namespace
 }
