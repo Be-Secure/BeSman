@@ -11,7 +11,7 @@ export BESMAN_SERVICE="https://raw.githubusercontent.com"
 
 BESMAN_NAMESPACE="Be-Secure"
 BESMAN_VERSION="0.0.1"
-BESMAN_ENV_REPOS="$BESMAN_NAMESPACE/besecure-ce-env-repo"
+BESMAN_ENV_REPOS="$BESMAN_NAMESPACE/BeSman-env-repo"
 # BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
 
 
@@ -216,6 +216,8 @@ echo "BESMAN_NAMESPACE=$BESMAN_NAMESPACE" >> "$besman_user_config_file"
 echo "BESMAN_INTERACTIVE_USER_MODE=true" >> "$besman_user_config_file"
 echo "BESMAN_DIR=$HOME/.besman" >> "$besman_user_config_file"
 echo "BESMAN_ENV_REPOS=$BESMAN_ENV_REPOS" >> "$besman_user_config_file"
+echo "BESMAN_PLAYBOOK_REPO=besecure-ce-playbook-repo" >> "$besman_user_config_file"
+echo "BESMAN_GH_TOKEN=" >> "$besman_user_config_file"
 
 echo "Download script archive..."
 
