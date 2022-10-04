@@ -15,7 +15,7 @@ function __besman_gh_auth
     local namespace 
     namespace=$1
     __besman_gh_auth_status "$namespace"
-    [[ "$?" -eq 0 ]] && "gh user already authenticated" && return 0
+    [[ "$?" -eq 0 ]] && echo "gh user already authenticated" && return 0
     if [[ -z $BESMAN_GH_TOKEN ]]; then
 
         cat <<EOF
