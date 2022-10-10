@@ -68,12 +68,8 @@ function bes {
 	case $command in 
 		install)
 			
-			[[ ( ${#opts[@]} -eq 0 || ${#opts[@]} -gt 2 ) ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
-			[[ ( ${#args[@]} -eq 0 || ${#args[@]} -gt 3 ) ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
-			if [[ -z $version && -n $BESMAN_VERSION ]]; then
-				version=$BESMAN_VERSION
-			fi
-			[[ -z $version ]] && [[ -z $BESMAN_VERSION ]] && __besman_echo_red "Utility corrupted. Re-install BESman and try again" && return 1
+			[[ ${#opts[@]} -ne 2 ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
+			[[ ${#args[@]} -ne 3 ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
 			__besman_validate_environment $environment || return 1
 			__besman_check_if_version_exists $environment $version || return 1
 			__besman_validate_version_format $version || return 1
@@ -81,7 +77,7 @@ function bes {
 			;;
 		uninstall)
 			[[ ( ${#opts[@]} -eq 0 || ${#opts[@]} -gt 2 ) ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
-			[[ ( ${#args[@]} -eq 0 || ${#args[@]} -gt 2 ) ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
+			[[ ( ${#args[@]} -eq 0 || ${#args[@]} -gt 3 ) ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
 			[[ $environment == "all" ]] && __bes_$command $environment && return 0
 			if [[ -z $version && -f $BESMAN_DIR/envs/besman-$environment/current ]]; then
 				version=($(cat $BESMAN_DIR/envs/besman-$environment/current))
@@ -123,16 +119,17 @@ function bes {
 			fi
 			;;
 		pull)
-			[[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
-			[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
+			[[ "${#args[@]}" -gt 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
+			[[ "${#opts[@]}" -gt 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
 			if [[ ( ${opts[0]} == "--playbook" ) || ( ${opts[0]} == "-P" ) ]]; then
 				type=playbook
+				namespace="${args[1]}"
 			
 			else
 				type=environment
 			fi
-			__bes_$command $type
-			unset type
+			__bes_$command $type $namespace
+			unset type namespace
 			;;
 		create)
 			# bes create --playbook -cve <cve-details> -vuln <vulnerability> -env <env name> -ext <extension>

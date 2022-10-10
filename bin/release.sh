@@ -44,7 +44,7 @@ done
 
 # committing the changes
 git add $HOME/BeSman/scripts/*.*
-git commit -m "Update version of $branch to $bes_version"
+git commit -m "Updating version of $branch to $bes_version"
 
 #push release branch
 git push -f -u origin $branch
