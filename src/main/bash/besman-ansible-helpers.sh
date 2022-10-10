@@ -87,6 +87,7 @@ function __besman_run_ansible_playbook_extra_vars
     vars=$2
     __besman_echo_white "Running $playbook with --extra-vars $vars"
     ansible-playbook $playbook --ask-become-pass --extra-vars "$vars"
+    [[ "$?" ne 0 ]] && return 1
     unset playbook vars
 }
 
