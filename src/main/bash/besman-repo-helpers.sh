@@ -10,6 +10,7 @@ function __besman_check_for_gh
     fi
 }
 
+
 function __besman_gh_auth
 {
     local namespace 
@@ -19,7 +20,6 @@ function __besman_gh_auth
     if [[ -z $BESMAN_GH_TOKEN ]]; then
 
         cat <<EOF
-
 Missing personal access token. Please follow the below steps.
 1. Open link https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
 2. Create a personal access token with the following permissions:
@@ -38,6 +38,30 @@ EOF
         [[ -f $HOME/token.txt ]] && rm $HOME/token.txt
     fi
    
+}
+function __besman_git_pull
+{   
+    [[ ! -d .git ]] && __besman_echo_red "Not a git repo" && return 1
+    local remote branch out_flag
+    remote=$1
+    branch=$2
+    out_flag=1
+    git pull $remote $branch >> $HOME/pull.out
+    if cat $HOME/pull.out | grep -q "up to date"
+    then
+        [[ $out_flag -eq 1 ]] && rm $HOME/pull.out
+        return 2
+    elif cat $HOME/pull.out | grep -q "error"
+    then 
+        out_flag=0
+        __besman_echo_white "Please check $HOME/pull.out for logs"
+        return 1
+    else
+        [[ $out_flag -eq 1 ]] && rm $HOME/pull.out
+        return 0
+    fi
+
+    unset remote branch out_flag
 }
 function __besman_gh_auth_status 
 {
@@ -60,6 +84,7 @@ function __besman_gh_clone
     local repo=$2
     local clone_path=$3
     gh repo clone $namespace/$repo $clone_path -- -q
+    [[ "$?" -eq 1 ]] && return 1
     unset namespace repo clone_path
 
 }
@@ -70,7 +95,7 @@ function __besman_gh_quiet_clone
     local repo=$2
     local clone_path=$3
     gh repo clone $namespace/$repo $clone_path -- --quiet
-
+    [[ "$?" -eq 1 ]] && return 1
     unset namespace repo clone_path
 }
 
