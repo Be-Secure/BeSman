@@ -117,7 +117,7 @@ EOF
     roles=$(echo $BESMAN_ANSIBLE_GALAXY_ROLES | sed 's/:/ /g')
     for i in ${roles[@]}; do
         repo_name=$(echo $i | cut -d "/" -f 2)
-        [[ -z $BESMAN_ANSIBLE_ROLE_PATH/repo_name ]]  && __besman_echo_white "$repo_name not found" && continue
+        [[ -z $BESMAN_ANSIBLE_ROLE_PATH/$repo_name ]]  && __besman_echo_white "$repo_name not found" && continue
         echo "      - '{{ role_path }}/$repo_name'" >> $playbook
     done
 
