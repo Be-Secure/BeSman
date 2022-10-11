@@ -5,6 +5,11 @@ function __bes_update
         local environment=$1
         if [[ -n $environment ]]; then
                 __besman_update_$environment
+                if [[ "$?" -ne 0 ]]; then
+                        __besman_echo_red "Update failed"
+                else
+                        __besman_echo_green "Update successful"
+                fi
         else
 
                 if [[ ! -f $BESMAN_DIR/var/list.txt ]]; then
