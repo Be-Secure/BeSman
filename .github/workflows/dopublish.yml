@@ -1,0 +1,80 @@
+name: Release BeSman
+on:
+  push:
+    # Sequence of  patterns matched against refs/tags
+    tags:
+      - '*.*.*'
+jobs:
+  publish_artifacts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set env for version
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      - name: Switch to release branch
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git fetch
+          git checkout release
+      - name: Setting up dir
+        run: mkdir -p build/tmp 
+      - name: Generate artifacts
+        run: |
+          zip -rj ./build/tmp/besman-latest.zip ./dist/list.txt ./src/main/bash/besman-* ./src/main/bash/envs/besman-* ./src/main/bash/commands/besman-*
+          cp ./build/tmp/besman-latest.zip ./build/tmp/besman-$RELEASE_VERSION.zip
+          mv ./scripts/get.besman.io ./build/tmp/
+          ls ./build/tmp/
+      - name: Switch to dist 
+        run: |
+          git fetch
+          git checkout dist --
+
+      - name: Copy To Branches Action
+        uses: planetoftheweb/copy-to-branches@v1
+        env:
+          key: release
+          files: ./build/tmp/*
+
+      - name: Moving files and push Binaries to dist
+        run: |
+          git pull origin dist
+          mkdir -p dist
+          mv ./build/tmp/* ./dist/
+          git add ./dist/*
+          git commit -m "Released the version $RELEASE_VERSION"
+          git push origin -f -u dist
+      
+  create_release:
+    needs: publish_artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: dist
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+      
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ./dist/besman-latest.zip
+          asset_name: besman-latest.zip
+          asset_content_type: application/zip
+        
+      
