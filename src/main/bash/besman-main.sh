@@ -107,16 +107,29 @@ function bes {
 			fi
 			;;
 		update)
-			if [[ -z $opt_environment ]]; then
+			if [[ -z $environment ]]; then
 				
 				[[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
 				[[ "${#opts[@]}" -ne 0 ]] && __besman_echo_red "Incorrect syntax" && return 1
 				__bes_$command
 			else
-				[[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
+				[[ "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
 				[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
-				__bes_$command $opt_environment
+				__besman_validate_environment $environment || return 1
+				__bes_$command $environment
 			fi
+			;;	
+		validate)
+				[[ "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
+				[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
+				__besman_validate_environment $environment || return 1
+				__bes_$command $environment
+			;;
+		reset)
+				[[ "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
+				[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
+				__besman_validate_environment $environment || return 1
+				__bes_$command $environment 
 			;;
 		pull)
 			[[ "${#args[@]}" -gt 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
