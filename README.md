@@ -8,16 +8,17 @@ BeSman or Be-Secure Manager is a command line utility for provisioning customize
 We will be using [oah-installer](https://github.com/be-secure/oah-installer), a component of [**OpenAppHack(OAH)**](https://openapphack.github.io/OAH/), to install [oah-shell](https://github.com/be-secure/oah-shell) in the local system and using it to bring up [oah-bes-vm](https://github.com/be-secure/oah-bes-vm) with BeSman installed.<br> OpenAppHack (OAH) is built on top of opensource DevOps tools. Its a vendor neutral environment provisioning approach that enables rapid development and prototyping of open source solution. For more details about oah-installar, please visit [github page](https://github.com/Be-Secure/oah-installer/blob/master/README.md) and for oah shell info, use [readme](https://github.com/Be-Secure/oah-shell/blob/master/README.md) for the same.
 <br>
 
-## Pre-requisites
+
+
+## Install using OAH
+
+### Pre-requisites 
 
 - <a href="https://www.virtualbox.org/" target="_blank">Virtual Box</a>
 - <a href="https://www.vagrantup.com/" target="_blank">Vagrant</a>
 - <a href="https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html" target="_blank">Ansible</a>
 
 `NOTE: Use Gitbash with mingw, if the base OS is Windows`
-
-
-## Installation
 
 1. Open your terminal 
 
@@ -44,6 +45,21 @@ We will be using [oah-installer](https://github.com/be-secure/oah-installer), a 
 6. Setup oah-bes-vm for BeSman by executing the below command.
 
         oah install -v oah-bes-vm
+
+## Install from source
+
+1. Get the latest binary
+    
+		curl -L https://raw.githubusercontent.com/Be-Secure/BeSman/dist/dist/get.besman.io | bash
+
+2. Source the files into memory
+   
+		source $HOME/.besman/bin/besman-init.sh
+
+3. Run the below command to confirm installation
+
+		bes help
+
 ## BeSman commands
 
 Run the following commands on the terminal to manage respective environments.
