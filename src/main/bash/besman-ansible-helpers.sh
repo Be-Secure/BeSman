@@ -108,6 +108,7 @@ function __besman_create_ansible_playbook
 - name: Triggering roles
   hosts: localhost || all
   vars:
+    - home_dir: lookup('env','HOME')
     - oah_command: '{{ bes_command }}'
     - role_path: '{{ role_path }}'
   roles:
