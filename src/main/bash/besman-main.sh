@@ -3,18 +3,6 @@
 function bes {
 	[[ -z "$1" ]] && __bes_help && return 0
 
-	function __besman_check_for_env_file
-	{
-		local environment=$1
-		if [[ ! -f $BESMAN_DIR/envs/besman-$environment.sh ]]; then
-			__besman_echo_red "Wrong Command Format"
-			__besman_echo_red "Could not find file besman-$environment.sh"
-			__besman_echo_white "Make sure you have given the correct environment name"
-			__besman_echo_white "If the issue persists, re-install BESman and try again"
-			return 1
-		fi
-	}
-
 	function __besman_check_for_command_file
 	{
 		local command=$1
@@ -51,20 +39,13 @@ function bes {
 		environment="${args[0]}" 
 		local opt_environment="${opts[1]}"
 	fi
-	# if [[ -z $command && ("${opts[0]}" == "-P" || "${opts[0]}" == "--playbook") ]]; then
-	# command="${args[0]}"
-	# environment="" 
-	# local opt_environment="${opts[0]}"
-	# fi
 	[[ -z $command ]] && command="${args[0]}"
 	if [[ ( ${opts[0]} != "--playbook" ) && ( ${opts[0]} != "-P" ) ]]; then
 		[[ -z $environment ]] && environment="${args[1]}"
 		[[ -z $version ]] && version="${args[2]}"
 	fi
 	__besman_check_for_command_file $command || return 1
-	if [[ -n $environment && $environment != "all" ]]; then
-		__besman_check_for_env_file $environment || return 1
-	fi
+
 	case $command in 
 		install)
 			
@@ -174,10 +155,7 @@ function bes {
 						ext=${args[i]}
 					fi				
 				done
-				# cve=${args[1]}
-				# vuln=${args[2]}
-				# env=${args[3]}
-				# ext=${args[4]}
+
 
 				if [[ $assess_flag -eq 1 ]]; then
 					__bes_$command "$type" "$assess_flag" "$purpose" "$vuln" "$env" "$ext" 
