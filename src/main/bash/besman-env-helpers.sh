@@ -111,40 +111,7 @@ function __besman_open_file
     fi
 }   
 
-function __besman_download_envs_from_repo
-{
-  # __besman_echo_white "Downloading environments from external repos"
-  local namespace=$1
-  local repo_name=$2
-  local flag=$3
 
-  if [[ $3 == 1 ]]; then
-    target_path=$BESMAN_DIR/playbook/
-  else
-    target_path=$BESMAN_DIR/envs/
-  fi
-  local environment_files namespace repo_name zip_stage_folder remote_zip_url
-  zip_stage_folder=$HOME/zip_stage_folder
-  mkdir -p $zip_stage_folder
-  remote_zip_url="https://github.com/$namespace/$repo_name/archive/master.zip"
-  __besman_secure_curl "$remote_zip_url" >> $HOME/$repo_name.zip
-  unzip -q $HOME/$repo_name.zip -d $zip_stage_folder
-  environment_files=$(find $zip_stage_folder/$repo_name-master -type f -name "besman-*")
-  if [[ -z ${environment_files[@]} ]]; then
-     rm $HOME/$repo_name.zip
-    [[ -d $zip_stage_folder ]] && rm -rf $zip_stage_folder
-    unset environment_files namespace repo_name zip_stage_folder remote_zip_url
-    return 1
-  fi
-  [[ $flag == 1 ]] && mkdir -p $target_path
-  for j in ${environment_files[@]}; do
-    mv $j $target_path
-  done
-  rm $HOME/$repo_name.zip
-  [[ -d $zip_stage_folder ]] && rm -rf $zip_stage_folder
-  unset environment_files namespace repo_name zip_stage_folder remote_zip_url
-  
-}
 function __besman_validate_environment
 {
 	local environment_name=$1
