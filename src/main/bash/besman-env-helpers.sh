@@ -1,5 +1,17 @@
 #!/usr/bin/env bash
 
+function __besman_check_input_env_format
+{
+  local environment=$1
+
+  if [[ $(echo $environment | sed  "s/\// /g" | wc -w) -eq 3 ]]; then
+    
+    __besman_echo_red "Incorrect format for environment name."
+    return 1
+
+  fi
+  unset environment
+}
 
 function __besman_check_parameter_present
 {
