@@ -3,18 +3,6 @@
 function bes {
 	[[ -z "$1" ]] && __bes_help && return 0
 
-	function __besman_check_for_env_file
-	{
-		local environment=$1
-		if [[ ! -f $BESMAN_DIR/envs/besman-$environment.sh ]]; then
-			__besman_echo_red "Wrong Command Format"
-			__besman_echo_red "Could not find file besman-$environment.sh"
-			__besman_echo_white "Make sure you have given the correct environment name"
-			__besman_echo_white "If the issue persists, re-install BESman and try again"
-			return 1
-		fi
-	}
-
 	function __besman_check_for_command_file
 	{
 		local command=$1
@@ -51,20 +39,14 @@ function bes {
 		environment="${args[0]}" 
 		local opt_environment="${opts[1]}"
 	fi
-	# if [[ -z $command && ("${opts[0]}" == "-P" || "${opts[0]}" == "--playbook") ]]; then
-	# command="${args[0]}"
-	# environment="" 
-	# local opt_environment="${opts[0]}"
-	# fi
+
 	[[ -z $command ]] && command="${args[0]}"
 	if [[ ( ${opts[0]} != "--playbook" ) && ( ${opts[0]} != "-P" ) ]]; then
 		[[ -z $environment ]] && environment="${args[1]}"
 		[[ -z $version ]] && version="${args[2]}"
 	fi
 	__besman_check_for_command_file $command || return 1
-	if [[ -n $environment && $environment != "all" ]]; then
-		__besman_check_for_env_file $environment || return 1
-	fi
+
 	case $command in 
 		install)
 			
@@ -78,6 +60,7 @@ function bes {
 		uninstall)
 			[[ ( ${#opts[@]} -eq 0 || ${#opts[@]} -gt 2 ) ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
 			[[ ( ${#args[@]} -eq 0 || ${#args[@]} -gt 3 ) ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
+			__besman_check_input_env_format "$environment" || return 1
 			[[ $environment == "all" ]] && __bes_$command $environment && return 0
 			if [[ -z $version && -f $BESMAN_DIR/envs/besman-$environment/current ]]; then
 				version=($(cat $BESMAN_DIR/envs/besman-$environment/current))
@@ -126,6 +109,7 @@ function bes {
 			else
 				[[ "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
 				[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
+				__besman_check_input_env_format "$environment" || return 1
 				__besman_validate_environment $environment || return 1
 				__bes_$command $environment
 			fi
@@ -133,12 +117,14 @@ function bes {
 		validate)
 				[[ "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
 				[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
+				__besman_check_input_env_format "$environment" || return 1
 				__besman_validate_environment $environment || return 1
 				__bes_$command $environment
 			;;
 		reset)
 				[[ "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
 				[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
+				__besman_check_input_env_format "$environment" || return 1
 				__besman_validate_environment $environment || return 1
 				__bes_$command $environment 
 			;;
@@ -151,6 +137,8 @@ function bes {
 			
 			else
 				type=environment
+				__besman_check_input_env_format "$environment" || return 1
+
 			fi
 			__bes_$command $type $namespace
 			unset type namespace
@@ -202,6 +190,7 @@ function bes {
 		version)
 			[[ ${#opts[@]} -eq 0 ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
 			if [[ -n $opt_environment ]]; then
+				__besman_check_input_env_format "$environment" || return 1
 				__besman_validate_environment $environment || return 1
 				__bes_$command $opt_environment $environment
 			elif [[ -z $environment ]]; then

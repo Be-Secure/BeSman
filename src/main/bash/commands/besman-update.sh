@@ -64,7 +64,6 @@ function __bes_update
                                 for i in ${diff[@]}; do
                                         echo $i >> $cached_list
                                 done
-                                __besman_download_envs_from_repo $namespace $repo_name
                         else
                                 #Condition where it check if there is any difference between remote repo and local repo==
                                 diff_remote=$(comm -13 $HOME/sorted_remote_list.txt $HOME/sorted_local_list.txt | grep $repo_name )
