@@ -37,7 +37,7 @@ function bes {
 				command=remove
 				args=("${args[@]}" "$1")
 			;;
-			-env | -V | --environment | --version | --playbook | -P | -cve | -vuln | -ext | -assess)         opts=("${opts[@]}" "$1");; ## -env | -V 
+			-env | -V | --environment | --version | --playbook | -P | -cve | -vuln | -ext | -assess | --input)         opts=("${opts[@]}" "$1");; ## -env | -V 
         	*)          args=("${args[@]}" "$1");; ## command | env_name | version_tag
     	esac
     	shift
@@ -93,6 +93,17 @@ function bes {
 			[[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
 			[[ "${#opts[@]}" -ne 0 ]] && __besman_echo_red "Incorrect syntax" && return 1
 			__bes_$command
+			;;
+		run)
+			if [[ -z "${#opts[1]}" ]]; then
+
+				[[ "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
+				[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
+				__bes_$command ${args[1]}
+			else
+				
+				__bes_$command "${args[@]}" 
+			fi
 			;;
 		list)
 			if [[ -z ${opts[0]} ]]; then
