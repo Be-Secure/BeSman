@@ -39,6 +39,7 @@ function bes {
 		environment="${args[0]}" 
 		local opt_environment="${opts[1]}"
 	fi
+
 	[[ -z $command ]] && command="${args[0]}"
 	if [[ ( ${opts[0]} != "--playbook" ) && ( ${opts[0]} != "-P" ) ]]; then
 		[[ -z $environment ]] && environment="${args[1]}"
@@ -59,6 +60,7 @@ function bes {
 		uninstall)
 			[[ ( ${#opts[@]} -eq 0 || ${#opts[@]} -gt 2 ) ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
 			[[ ( ${#args[@]} -eq 0 || ${#args[@]} -gt 3 ) ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
+			__besman_check_input_env_format "$environment" || return 1
 			[[ $environment == "all" ]] && __bes_$command $environment && return 0
 			if [[ -z $version && -f $BESMAN_DIR/envs/besman-$environment/current ]]; then
 				version=($(cat $BESMAN_DIR/envs/besman-$environment/current))
@@ -96,6 +98,7 @@ function bes {
 			else
 				[[ "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
 				[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
+				__besman_check_input_env_format "$environment" || return 1
 				__besman_validate_environment $environment || return 1
 				__bes_$command $environment
 			fi
@@ -103,12 +106,14 @@ function bes {
 		validate)
 				[[ "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
 				[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
+				__besman_check_input_env_format "$environment" || return 1
 				__besman_validate_environment $environment || return 1
 				__bes_$command $environment
 			;;
 		reset)
 				[[ "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
 				[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
+				__besman_check_input_env_format "$environment" || return 1
 				__besman_validate_environment $environment || return 1
 				__bes_$command $environment 
 			;;
@@ -121,6 +126,8 @@ function bes {
 			
 			else
 				type=environment
+				__besman_check_input_env_format "$environment" || return 1
+
 			fi
 			__bes_$command $type $namespace
 			unset type namespace
@@ -155,7 +162,10 @@ function bes {
 						ext=${args[i]}
 					fi				
 				done
-
+				# cve=${args[1]}
+				# vuln=${args[2]}
+				# env=${args[3]}
+				# ext=${args[4]}
 
 				if [[ $assess_flag -eq 1 ]]; then
 					__bes_$command "$type" "$assess_flag" "$purpose" "$vuln" "$env" "$ext" 
@@ -169,6 +179,7 @@ function bes {
 		version)
 			[[ ${#opts[@]} -eq 0 ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
 			if [[ -n $opt_environment ]]; then
+				__besman_check_input_env_format "$environment" || return 1
 				__besman_validate_environment $environment || return 1
 				__bes_$command $opt_environment $environment
 			elif [[ -z $environment ]]; then
