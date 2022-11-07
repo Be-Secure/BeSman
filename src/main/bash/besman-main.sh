@@ -37,7 +37,7 @@ function bes {
 				command=remove
 				args=("${args[@]}" "$1")
 			;;
-			-env | -V | --environment | --version | --playbook | -P | -cve | -vuln | -ext | -assess)         opts=("${opts[@]}" "$1");; ## -env | -V 
+			-env | -V | --environment | --version | --playbook | -P | -cve | -vuln | -ext | -assess | --input)         opts=("${opts[@]}" "$1");; ## -env | -V 
         	*)          args=("${args[@]}" "$1");; ## command | env_name | version_tag
     	esac
     	shift
