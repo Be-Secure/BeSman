@@ -2,34 +2,29 @@
 
 
 function __bes_install {
-	local input_environment_name=$1 # The format of the input environment_name: <env_namespace>/<env_repo_name>/<env_name>
+	local input_environment_name=$1 # The format of the input environment name: <env_namespace>/<env_repo_name>/<env_name>
+	
+	# Syntax check for var input_environment_name. 
+	# Format of input environment name = <namespace>/<repo name>/<environment name>
+	# Word count of var input_environment_name, after replace '/' with ' ', will be 3
+	[[ $(echo $input_environment_name | sed  "s/\// /g" | wc -w) -ne 3 ]] && __besman_echo_red "Please provide the environment name as <namespace>/<repo_name>/<env_name>" && return 1
+	
 	local version_id=$2
 	local return_val ossp env_repo_namespace env_repo environment_name
 	
-
+	# To get the actual environment name, after removing <namespace> and <repo name>
 	environment_name=$(echo "$input_environment_name" | cut -d "/" -f 3) 
-
-
-	# Checks if environment script is available in the local.
-	if [[ ! -f "${BESMAN_DIR}/envs/besman-${environment_name}.sh" ]]; then
-
-		if ! echo "$input_environment_name" | grep -q "/"
-		then
-			__besman_echo_red "Please provide the environment name as <namespace>/<repo_name>/<env_name>"
-			return 1
-		fi
-		__besman_get_remote_env "$input_environment_name" "$environment_name"
-		
-	fi
-
-
-	mkdir -p ${BESMAN_DIR}/envs/besman-"${environment_name}"
-	touch ${BESMAN_DIR}/envs/besman-${environment_name}/current
-	current="${BESMAN_DIR}/envs/besman-${environment_name}/current"
 	
 	# If environmnet not installed.
 	if [[ ! -d "${BESMAN_DIR}/envs/besman-${environment_name}/$version_id" ]];
-	then
+	then		
+
+		__besman_get_remote_env "$input_environment_name" "$environment_name"
+
+		mkdir -p ${BESMAN_DIR}/envs/besman-"${environment_name}"
+		touch ${BESMAN_DIR}/envs/besman-${environment_name}/current
+		current="${BESMAN_DIR}/envs/besman-${environment_name}/current"
+		
 		
 		mkdir -p ${BESMAN_DIR}/envs/besman-${environment_name}/$version_id
 
@@ -52,7 +47,7 @@ function __bes_install {
 		return 1
 
 	else
-		
+		# If user tries to install the already installed version of the environment
 		__besman_echo_white "${environment_name} $version_id is currently installed in your system "
 		
 	fi
