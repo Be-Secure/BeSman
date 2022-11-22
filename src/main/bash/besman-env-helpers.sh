@@ -1,5 +1,81 @@
 #!/usr/bin/env bash
 
+function __besman_source_env_parameters
+{
+
+  local environment=$1
+
+  local env_config="$HOME/besman-$environment.yml"
+
+  local local_vars_flag env_vars_flag key value line tmp_var_file
+
+  tmp_var_file=$HOME/tmp_var_file.sh
+
+  sed -i '/^[[:space:]]*$/d' $env_config
+
+  local_vars_flag=false
+  env_vars_flag=false
+  [[ -f $tmp_var_file ]] && rm $tmp_var_file
+  while read line;
+  do
+    key=""
+    value=""
+    if echo $line | grep -qw "local_vars:"
+    then
+ 
+        local_vars_flag=true
+        continue
+    
+    elif echo $line | grep -qw "env_vars:"
+    then
+        local_vars_flag=false
+        env_vars_flag=true
+        continue
+
+    elif echo $line | grep -qw "\-\-\-"
+    then   
+        continue
+    
+    fi
+
+    key=$(echo $line | sed "s/ //g" | cut -d ":" -f 1 | cut -d "-" -f 2)
+    value=$(echo $line | sed "s/ //g" | cut -d ":" -f 2)
+    
+    if [[ $local_vars_flag == true ]]; then
+
+        echo "$key=$value" >> $tmp_var_file
+    
+    elif [[ $env_vars_flag == true ]]; then
+
+        echo "export $key=$value" >> $tmp_var_file
+
+    elif [[ (( $local_vars_flag == false )) && (( $env_vars_flag == false )) ]]; then
+
+        echo "error"
+        return 1
+
+    fi
+
+  done < $env_config
+
+  source $tmp_var_file  
+
+  
+}
+
+function __besman_unset_env_parameters
+{
+  
+  local tmp_var_file=$HOME/tmp_var_file.sh
+
+  sed -i "s/export//g" $tmp_var_file
+
+  unset $(awk -F'=' '{print $1}' $tmp_var_file)
+
+  [[ -f $tmp_var_file ]] && rm $tmp_var_file
+
+}
+
 function __besman_check_input_env_format
 {
   local environment=$1
