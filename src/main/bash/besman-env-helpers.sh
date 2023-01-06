@@ -127,21 +127,7 @@ function __besman_interactive_uninstall
   fi
 }
 
-function __besman_check_ssh_key
-{
-  if [[ ! -f $HOME/besman_ssh || ! -f $HOME/besman_ssh.pub ]]; then
-    __besman_echo_no_colour "No ssh key found."
-    __besman_echo_no_colour ""
-    __besman_echo_no_colour "Follow the instructions in the below link to generate an ssh key and link it with your remote"
-    __besman_echo_no_colour ""
-    __besman_echo_yellow "https://github.com/Be-Secure/BeSman/docs/Generating%20and%20adding%20ssh%20key.md"
-    __besman_echo_no_colour ""
-    __besman_echo_no_colour "Please try again after generating the ssh key."
-    return 1
-  else
-    return 0
-  fi
-}
+
 
 function __besman_create_fork
 {
@@ -172,14 +158,7 @@ function __besman_create_fork
     if [[ -d $BESMAN_NAMESPACE/$environment ]]; then
       rm -rf $BESMAN_NAMESPACE/$environment
     fi
-    # curl -s https://api.github.com/repos/$BESMAN_USER_NAMESPACE/$environment | grep -q "Not Found"
-    # if [[ "$?" == "0" ]]; then
-    #   __besman_echo_red "Could not create fork"
-    #   __besman_echo_red "Please try again"
-    #   __besman_echo_no_colour "Make sure you have given the correct environment name"
-    #   __besman_error_rollback "$environment"
-    #   return 1
-    # fi
+
   else
     
     return 0
