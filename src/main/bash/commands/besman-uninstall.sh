@@ -52,7 +52,8 @@ elif [[ -f $BESMAN_DIR/envs/besman-$environment/current && $version == $(cat $BE
   __besman_interactive_uninstall || return 1
   __besman_echo_no_colour "Uninstalling version $version of $environment"
   __besman_uninstall_$environment "$environment"
-  
+  [[ -f $HOME/besman-$environment.yml && -f $HOME/tmp_var_file.sh ]] && __besman_unset_env_parameters
+
   rm $BESMAN_DIR/envs/besman-$environment/current 
   rm -rf $BESMAN_DIR/envs/besman-$environment/$version 
   
