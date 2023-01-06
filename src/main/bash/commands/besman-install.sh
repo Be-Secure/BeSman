@@ -31,8 +31,10 @@ function __bes_install {
 
 		__besman_echo_no_colour "$version_id" > "$current"
 
-		__besman_echo_white "Sourcing env parameters"
-		__besman_source_env_parameters "$environment_name"
+		if [[ -f $HOME/besman-$environment_name.yml ]]; then
+			__besman_echo_white "Sourcing env parameters"
+			__besman_source_env_parameters "$environment_name"
+		fi
 
 		cp "${BESMAN_DIR}/envs/besman-${environment_name}.sh" ${BESMAN_DIR}/envs/besman-${environment_name}/$version_id/
 		source "${BESMAN_DIR}/envs/besman-${environment_name}/${version_id}/besman-${environment_name}.sh"
@@ -96,12 +98,18 @@ function __besman_get_remote_env
 	# Checks for user level config file for the env. If not found, download the default config file from remote repo.
 	if [[ ! -f $HOME/besman-$environment_name.yml ]]; then
 
-		__besman_echo_white "Using environment level configuration."
-
 		env_config_url="https://raw.githubusercontent.com/${env_repo_namespace}/${env_repo}/master/${ossp_dir}/${version_id}/besman-${environment_name}.yml"
-		__besman_secure_curl "$env_config_url" >> $HOME/besman-${environment_name}.yml
+		
+		if ( curl -o/dev/null -sfI "$env_config_url" ); then
+		
+			__besman_echo_white "Using environment level configuration."
+			__besman_secure_curl "$env_config_url" >> $HOME/besman-${environment_name}.yml
 
-		[[ "$?" -ne "0" ]] && __besman_echo_red "Could not get the env level configuration" && return 1
+		else
+		
+			__besman_echo_yellow "Could not get the env level configuration" 
+		
+		fi
 	
 	else
 
