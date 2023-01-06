@@ -9,20 +9,20 @@ function __besman_check_if_ansible_env_vars_exists
 Please use the below command to set the 
 download path for ansible roles
 
-    $ export BESMAN_ANSIBLE_ROLE_PATH=$BESMAN_USER_HOME/<some_path>
+    $ export BESMAN_ANSIBLE_ROLE_PATH=$HOME/<some_path>
 
 EOF
         return 1
     fi
 
-    if [[ -z $BESMAN_ANSIBLE_GALAXY_ROLES ]]; then
+    if [[ -z $BESMAN_ANSIBLE_ROLES ]]; then
 
         cat <<EOF
 
 Please use the below command to add the
 roles you wish to install
 
-    $ export BESMAN_ANSIBLE_GALAXY_ROLES=<namespace>/<repo_name>:<namespace>/<repo_name>:<namespace>/<repo_name>:....
+    $ export BESMAN_ANSIBLE_ROLES=<namespace>/<repo_name>:<namespace>/<repo_name>:<namespace>/<repo_name>:....
 
 EOF
         return 1
@@ -55,7 +55,7 @@ function __besman_update_requirements_file
     local roles namespace repo_name github_url
 
     github_url=https://github.com
-    roles=$(echo $BESMAN_ANSIBLE_GALAXY_ROLES | sed 's/:/ /g')
+    roles=$(echo $BESMAN_ANSIBLE_ROLES | sed 's/:/ /g')
     [[ ! -f $BESMAN_ANSIBLE_ROLE_PATH/requirements.yml ]] && touch $BESMAN_ANSIBLE_ROLE_PATH/requirements.yml && echo "---" >> $BESMAN_ANSIBLE_ROLE_PATH/requirements.yml 
     for i in ${roles[@]}; do
         namespace=$(echo $i | cut -d "/" -f 1)
@@ -115,7 +115,7 @@ function __besman_create_ansible_playbook
     
 EOF
 
-    roles=$(echo $BESMAN_ANSIBLE_GALAXY_ROLES | sed 's/:/ /g')
+    roles=$(echo $BESMAN_ANSIBLE_ROLES | sed 's/:/ /g')
     for i in ${roles[@]}; do
         repo_name=$(echo $i | cut -d "/" -f 2)
         [[ -z $BESMAN_ANSIBLE_ROLE_PATH/$repo_name ]]  && __besman_echo_white "$repo_name not found" && continue

@@ -66,10 +66,10 @@ Run the following commands on the terminal to manage respective environments.
 
 ### Installing an environment:
 
-         bes install -env [environment_name] -V [version_tag]
+         bes install -env [namespace]/[repo name]/[environment_name] -V [version_tag]
 
         Example   :
-            bes install -env bes-ansibledev-env -V 0.0.1
+            bes install -env Be-Secure/besecure-ce-env-repo/fastjson-RT-env -V 0.0.1
 
 
 ### Uninstalling an environment:
@@ -77,20 +77,23 @@ Run the following commands on the terminal to manage respective environments.
          bes uninstall -env [environment_name] -V [version]
 
         Example   :
-            bes uninstall -env  bes-ansibledev-env -V 0.0.1
+            bes uninstall -env  fastjson-RT-env -V 0.0.1
 
  
 ### Other useful commands:        
 
-	bes --version
-	bes --version -env [environment name]
-	bes list
-	bes status
-	bes help
-	bes list
+        bes --version
+        bes --version -env [environment name]
+        bes list
+        bes status
+        bes help
+        bes list
+        bes pull --playbook
+        bes run
+        bes update              
+        bes validate
 
 
-oah-installer will help to install oah shell.  The oah shell will provide oah commands to spin up different oah virtual machines. The oah-bes-vm is one of the many virtual machine that can be spun up using oah shell. Both installer and shell comes under OAH initiatives. 
 
 ### Demo
 

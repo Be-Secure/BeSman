@@ -1,5 +1,81 @@
 #!/usr/bin/env bash
 
+function __besman_source_env_parameters
+{
+
+  local environment=$1
+
+  local env_config="$HOME/besman-$environment.yml"
+
+  local local_vars_flag env_vars_flag key value line tmp_var_file
+
+  tmp_var_file=$HOME/tmp_var_file.sh
+
+  sed -i '/^[[:space:]]*$/d' $env_config
+
+  local_vars_flag=false
+  env_vars_flag=false
+  [[ -f $tmp_var_file ]] && rm $tmp_var_file
+  while read line;
+  do
+    key=""
+    value=""
+    if echo $line | grep -qw "local_vars:"
+    then
+ 
+        local_vars_flag=true
+        continue
+    
+    elif echo $line | grep -qw "env_vars:"
+    then
+        local_vars_flag=false
+        env_vars_flag=true
+        continue
+
+    elif echo $line | grep -qw "\-\-\-"
+    then   
+        continue
+    
+    fi
+
+    key=$(echo $line | sed "s/ //g" | cut -d ":" -f 1 | cut -d "-" -f 2)
+    value=$(echo $line | sed "s/ //g" | cut -d ":" -f 2)
+    
+    if [[ $local_vars_flag == true ]]; then
+
+        echo "$key=$value" >> $tmp_var_file
+    
+    elif [[ $env_vars_flag == true ]]; then
+
+        echo "export $key=$value" >> $tmp_var_file
+
+    elif [[ (( $local_vars_flag == false )) && (( $env_vars_flag == false )) ]]; then
+
+        echo "error"
+        return 1
+
+    fi
+
+  done < $env_config
+
+  source $tmp_var_file  
+
+  
+}
+
+function __besman_unset_env_parameters
+{
+  
+  local tmp_var_file=$HOME/tmp_var_file.sh
+
+  sed -i "s/export//g" $tmp_var_file
+
+  unset $(awk -F'=' '{print $1}' $tmp_var_file)
+
+  [[ -f $tmp_var_file ]] && rm $tmp_var_file
+
+}
+
 function __besman_check_input_env_format
 {
   local environment=$1
@@ -51,21 +127,7 @@ function __besman_interactive_uninstall
   fi
 }
 
-function __besman_check_ssh_key
-{
-  if [[ ! -f $HOME/besman_ssh || ! -f $HOME/besman_ssh.pub ]]; then
-    __besman_echo_no_colour "No ssh key found."
-    __besman_echo_no_colour ""
-    __besman_echo_no_colour "Follow the instructions in the below link to generate an ssh key and link it with your remote"
-    __besman_echo_no_colour ""
-    __besman_echo_yellow "https://github.com/Be-Secure/BeSman/docs/Generating%20and%20adding%20ssh%20key.md"
-    __besman_echo_no_colour ""
-    __besman_echo_no_colour "Please try again after generating the ssh key."
-    return 1
-  else
-    return 0
-  fi
-}
+
 
 function __besman_create_fork
 {
@@ -96,14 +158,7 @@ function __besman_create_fork
     if [[ -d $BESMAN_NAMESPACE/$environment ]]; then
       rm -rf $BESMAN_NAMESPACE/$environment
     fi
-    # curl -s https://api.github.com/repos/$BESMAN_USER_NAMESPACE/$environment | grep -q "Not Found"
-    # if [[ "$?" == "0" ]]; then
-    #   __besman_echo_red "Could not create fork"
-    #   __besman_echo_red "Please try again"
-    #   __besman_echo_no_colour "Make sure you have given the correct environment name"
-    #   __besman_error_rollback "$environment"
-    #   return 1
-    # fi
+
   else
     
     return 0
