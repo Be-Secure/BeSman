@@ -48,6 +48,9 @@ We will be using [oah-installer](https://github.com/be-secure/oah-installer), a 
 
 ## Install from source
 
+### Pre-requisites
+- <a href="https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html" target="_blank">Ansible</a>
+
 1. Get the latest binary
     
 		curl -L https://raw.githubusercontent.com/Be-Secure/BeSman/dist/dist/get.besman.io | bash
@@ -92,6 +95,7 @@ Run the following commands on the terminal to manage respective environments.
         bes run
         bes update              
         bes validate
+	bes rm
 
 
 
