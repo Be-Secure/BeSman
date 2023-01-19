@@ -50,6 +50,7 @@ We will be using [oah-installer](https://github.com/be-secure/oah-installer), a 
 
 ### Pre-requisites
 - <a href="https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html" target="_blank">Ansible</a>
+- <a href="https://github.com/cli/cli/blob/trunk/docs/install_linux.md" target="_blank">Github CLI</a>
 
 1. Get the latest binary
     
