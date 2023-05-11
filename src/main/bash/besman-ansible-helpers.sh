@@ -57,7 +57,7 @@ function __besman_update_requirements_file
     github_url=https://github.com
     roles=$(echo $BESMAN_ANSIBLE_ROLES | sed 's/:/ /g')
     [[ ! -f $BESMAN_ANSIBLE_ROLE_PATH/requirements.yml ]] && touch $BESMAN_ANSIBLE_ROLE_PATH/requirements.yml && echo "---" >> $BESMAN_ANSIBLE_ROLE_PATH/requirements.yml 
-    for i in ${roles[@]}; do
+    for i in "${roles[@]}"; do
         namespace=$(echo $i | cut -d "/" -f 1)
         repo_name=$(echo $i | cut -d "/" -f 2)
         if ! cat $BESMAN_ANSIBLE_ROLE_PATH/requirements.yml | grep -wq "$github_url/$namespace/$repo_name"
@@ -96,7 +96,7 @@ function __besman_run_ansible_playbook_extra_vars
 function __besman_ansible_galaxy_install_roles_from_requirements
 {
     __besman_echo_white "Installing ansible roles from $BESMAN_ANSIBLE_ROLE_PATH/requirements.yml under $BESMAN_ANSIBLE_ROLE_PATH"
-    ansible-galaxy install -r $BESMAN_ANSIBLE_ROLE_PATH/requirements.yml -p $BESMAN_ANSIBLE_ROLE_PATH
+    ansible-galaxy install -r "$BESMAN_ANSIBLE_ROLE_PATH"/requirements.yml -p "$BESMAN_ANSIBLE_ROLE_PATH"
 }
 
 function __besman_create_ansible_playbook
@@ -116,10 +116,10 @@ function __besman_create_ansible_playbook
 EOF
 
     roles=$(echo $BESMAN_ANSIBLE_ROLES | sed 's/:/ /g')
-    for i in ${roles[@]}; do
-        repo_name=$(echo $i | cut -d "/" -f 2)
-        [[ -z $BESMAN_ANSIBLE_ROLE_PATH/$repo_name ]]  && __besman_echo_white "$repo_name not found" && continue
-        echo "      - '{{ role_path }}/$repo_name'" >> $playbook
+    for i in "${roles[@]}"; do
+        repo_name=$(echo "$i" | cut -d "/" -f 2)
+        [[ ! -d $BESMAN_ANSIBLE_ROLE_PATH/$repo_name ]]  && __besman_echo_white "$repo_name not found" && continue
+        echo "      - '{{ role_path }}/$repo_name'" >> "$playbook"
     done
 
 }
