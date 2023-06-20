@@ -1,79 +1,71 @@
 #!/usr/bin/env bash
 
-function __besman_source_env_parameters
+function __besman_source_env_params
 {
-
-  local environment=$1
-
-  local env_config="$HOME/besman-$environment.yml"
-
-  local local_vars_flag env_vars_flag key value line tmp_var_file
-
-  tmp_var_file=$HOME/tmp_var_file.sh
-
-  sed -i '/^[[:space:]]*$/d' $env_config
-
-  local_vars_flag=false
-  env_vars_flag=false
-  [[ -f $tmp_var_file ]] && rm $tmp_var_file
-  while read line;
-  do
-    key=""
-    value=""
-    if echo $line | grep -qw "local_vars:"
-    then
- 
-        local_vars_flag=true
-        continue
+    local  key value line tmp_var_file environment env_config
+    environment=$1
+    env_config="besman-$environment-config.yaml"
     
-    elif echo $line | grep -qw "env_vars:"
-    then
-        local_vars_flag=false
-        env_vars_flag=true
-        continue
-
-    elif echo $line | grep -qw "\-\-\-"
-    then   
-        continue
+    # checks whether user configuration exists
+    if [[ -f $HOME/$env_config ]]; then
+        
+        export BESMAN_ENV_CONFIG_FILE_PATH=$HOME/$env_config
+        __besman_echo_yellow "Sourcing user config parameters from $BESMAN_ENV_CONFIG_FILE_PATH"
     
+    elif [[ -f $BESMAN_DIR/tmp/$env_config ]]; then
+
+        export BESMAN_ENV_CONFIG_FILE_PATH=$BESMAN_DIR/tmp/$env_config
+        __besman_echo_yellow "Sourcing default config parameters from $BESMAN_ENV_CONFIG_FILE_PATH"
     fi
-
-    key=$(echo $line | sed "s/ //g" | cut -d ":" -f 1 | cut -d "-" -f 2)
-    value=$(echo $line | sed "s/ //g" | cut -d ":" -f 2)
     
-    if [[ $local_vars_flag == true ]]; then
 
-        echo "$key=$value" >> $tmp_var_file
+    # creating a temporary shell script file for exporting variables from config file.
+    # Otherwise the '$' variables inside the config file wont be replaced with the actual value.
+    tmp_var_file="$BESMAN_DIR/tmp/$environment-config.sh"
+    touch "$tmp_var_file"
+    echo "#!/bin/bash" >> "$tmp_var_file"
+    while read -r line; 
+    do
+
+        [[ $line == "---" ]] && continue # To skip the --- from starting of yaml file
+        if echo "$line" | grep -qe "^BESMAN_"; then # Check to export only environment variables starting with BESMAN_
+
+            key=$(echo "$line" | cut -d ":" -f 1) # For getting the var name
+            value=$(echo "$line" | cut -d ":" -f 2 | cut -d " " -f 2) # For getting the value.
+            unset "$key"
+            echo "export $key=$value" >> "$tmp_var_file"
+        else
+            continue
+        fi
+        
+    done < "$BESMAN_ENV_CONFIG_FILE_PATH"
     
-    elif [[ $env_vars_flag == true ]]; then
+    source "$tmp_var_file"
+    [[ -f $tmp_var_file ]] && rm "$tmp_var_file"
 
-        echo "export $key=$value" >> $tmp_var_file
-
-    elif [[ (( $local_vars_flag == false )) && (( $env_vars_flag == false )) ]]; then
-
-        echo "error"
-        return 1
-
-    fi
-
-  done < $env_config
-
-  source $tmp_var_file  
-
-  
 }
 
-function __besman_unset_env_parameters
+function __besman_unset_env_parameters_and_cleanup()
 {
-  
-  local tmp_var_file=$HOME/tmp_var_file.sh
+    local environment ossp 
+    enviroment=$1
+    ossp=$(echo "$enviroment" | cut -d "-" -f 1)
+    while read -r line; 
+    do
 
-  sed -i "s/export//g" $tmp_var_file
+        [[ $line == "---" ]] && continue # To skip the --- from starting of yaml file
+        if echo "$line" | grep -qe "^BESMAN_"; then # Check to export only environment variables starting with BESMAN_
 
-  unset $(awk -F'=' '{print $1}' $tmp_var_file)
+            key=$(echo "$line" | cut -d ":" -f 1) # For getting the var name
+            unset "$key"
+        else
+            continue
+        fi
+        
+    done < "$BESMAN_ENV_CONFIG_FILE_PATH"
 
-  [[ -f $tmp_var_file ]] && rm $tmp_var_file
-
+    [[ -f $BESMAN_DIR/tmp/besman-$enviroment-config.yaml ]] && rm "$BESMAN_ENV_CONFIG_FILE_PATH"
+    [[ -d $BESMAN_DIR/tmp/$ossp ]] && rm -rf "$BESMAN_DIR/tmp/$ossp"
 }
 
 function __besman_check_input_env_format
