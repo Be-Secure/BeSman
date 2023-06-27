@@ -129,7 +129,7 @@ if [[ -z $(which ansible) ]]; then
   echo "Installing ansible"
   sudo apt-add-repository ppa:ansible/ansible
   sudo apt update
-  sudo apt install ansible
+  sudo apt install ansible -y
 fi
 
 if [[ -z $(which gh) ]]; then
