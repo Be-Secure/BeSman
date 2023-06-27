@@ -45,7 +45,7 @@ function bes {
 		[[ -z $environment ]] && environment="${args[1]}"
 		[[ -z $version ]] && version="${args[2]}"
 	fi
-	__besman_check_for_command_file $command || return 1
+	__besman_check_for_command_file "$command" || return 1
 
 	case $command in 
 		install)
@@ -53,6 +53,7 @@ function bes {
 			[[ ${#opts[@]} -ne 2 ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
 			[[ ${#args[@]} -ne 3 ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
 			__besman_validate_environment $environment || return 1
+			# __besman_check_environment_exists "$environment" || return 1
 			__besman_check_if_version_exists $environment $version || return 1
 			__besman_validate_version_format $version || return 1
 			__bes_$command $environment $version
@@ -76,6 +77,21 @@ function bes {
 			[[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
 			[[ "${#opts[@]}" -ne 0 ]] && __besman_echo_red "Incorrect syntax" && return 1
 			__bes_$command
+			;;
+		add)
+			[[ "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
+			[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
+			[[ "${opts[0]}" != "-env" ]] && __besman_echo_red "Expected option -env" && return 1
+			environment="${args[1]}"
+			__bes_$command "$environment"
+			;;
+		set)
+			# [[ "${#args[@]}" -ne 3 ]] && __besman_echo_red "Incorrect syntax" && return 1
+			# [[ "${#opts[@]}" -ne 0 ]] && __besman_echo_red "Incorrect syntax" && return 1
+			local variable value
+			variable=${args[1]}
+			value=${args[2]}
+			__bes_"$command" "$variable" "$value"
 			;;
 		run)
 			if [[ -z "${#opts[1]}" ]]; then
@@ -173,17 +189,16 @@ function bes {
 						ext=${args[i]}
 					fi				
 				done
-				# cve=${args[1]}
-				# vuln=${args[2]}
-				# env=${args[3]}
-				# ext=${args[4]}
-
 				if [[ $assess_flag -eq 1 ]]; then
 					__bes_$command "$type" "$assess_flag" "$purpose" "$vuln" "$env" "$ext" 
 				else
 					__bes_$command "$type" "$assess_flag" "$purpose" "$vuln" "$env" "$ext" 
 				fi
-
+			
+			elif [[ ( -n $type ) && ( $type == --environment || $type == -env ) ]]; then
+				env_name=${args[1]}
+				local template_type=${args[2]}
+				__bes_"$command" "$type" "$env_name" "$template_type"
 			fi
 			unset type purpose vuln env ext
 			;;

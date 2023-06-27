@@ -1,23 +1,28 @@
 #!/bin/bash
 
-#Install: stable
-
-# Global variables
+function quick_install()
+{
+local force
+force=$1
+if [[ ( -n $force ) && ( ( $force == "--force" ) || ( $force == "--F" ) ) ]]; then
+  rm -rf "$HOME/.besman"
+elif [[ ( -n $force ) && ( ( $force != "--force" ) || ( $force != "--F" ) ) ]]; then
+  echo "Usage: ./quick_install [--force|-F]"
+  echo "--force | -F : Removes the existing installation of BeSman"
+  return 
+fi
 BESMAN_PLATFORM=$(uname)
 export BESMAN_SERVICE="https://raw.githubusercontent.com"
 
 
 # BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
 
-BESMAN_NAMESPACE="@BES_NAMESPACE@"
-BESMAN_VERSION="@BES_VERSION@"
+BESMAN_NAMESPACE="Be-Secure"
+BESMAN_VERSION="current_branch_$(git branch --show-current)"
 BESMAN_ENV_REPOS="$BESMAN_NAMESPACE/besecure-ce-env-repo"
-# BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
-
-
 
 if [ -z "$BESMAN_DIR" ]; then
-    BESMAN_DIR="$HOME/.besman"
+    export BESMAN_DIR="$HOME/.besman"
 fi
 
 # variables
@@ -36,9 +41,6 @@ besman_bash_profile="${HOME}/.bash_profile"
 besman_profile="${HOME}/.profile"
 besman_bashrc="${HOME}/.bashrc"
 besman_zshrc="${HOME}/.zshrc"
-
-
-
 
 besman_init_snippet=$( cat << EOF
 #THIS MUST BE AT THE END OF THE FILE FOR BESMAN TO WORK!!!
@@ -67,25 +69,10 @@ case "$(uname)" in
 esac
 
 
-# echo "Looking for figlet..."
-# if [ -z $(which figlet) ]; then
-# 	echo "Not found."
-# 	echo "======================================================================================================"
-# 	echo " so installing figlet on your system "
-# 	sudo apt install -y figlet
-# 	#echo ""
-# 	#echo " Execute  after installing figlet."
-# 	#echo "======================================================================================================"
-# 	#echo ""
-# 	#exit 1
-# fi
-
-
-
 # Sanity checks
 
 echo "Looking for a previous installation of BeSman..."
-if [ -d $BESMAN_DIR/bin ]; then
+if [ -d "$BESMAN_DIR/bin" ]; then
 	echo "BeSman found."
 	echo ""
 	echo "======================================================================================================"
@@ -118,47 +105,35 @@ echo ' BB:::::BBBBBB::::::Be::::::::e         SSSSSSS     S:::::Sm::::m   m::::m
 echo ' B:::::::::::::::::B  e::::::::eeeeeeee S::::::SSSSSS:::::Sm::::m   m::::m   m::::ma:::::aaaa::::::a  n::::n    n::::n '
 echo ' B::::::::::::::::B    ee:::::::::::::e S:::::::::::::::SS m::::m   m::::m   m::::m a::::::::::aa:::a n::::n    n::::n '
 echo ' BBBBBBBBBBBBBBBBB       eeeeeeeeeeeeee  SSSSSSSSSSSSSSS   mmmmmm   mmmmmm   mmmmmm  aaaaaaaaaa  aaaa nnnnnn    nnnnnn '
-echo "Looking for unzip..."
-if [ -z $(which unzip) ]; then
-	echo "Not found."
-	echo "======================================================================================================"
-	echo " so installing unzip on your system "
-	sudo apt install -y unzip
-	#echo " Please install unzip on your system using your favourite package manager."
-	#echo ""
-	#echo " Restart after installing unzip."
-	#echo "======================================================================================================"
-	#echo ""
-	#exit 1
-fi
 
-echo "Looking for zip..."
-if [ -z $(which zip) ]; then
-	echo "Not found."
-	echo "======================================================================================================"
-	echo " so installing zip on your system "
-	sudo apt install -y zip
-	#echo " Please install zip on your system using your favourite package manager."
-	#echo ""
-	#echo " Restart after installing zip."
-	#echo "======================================================================================================"
-	#echo ""
-	#exit 1
-fi
-
-echo "Looking for curl..."
-if [ -z $(which curl) ]; then
-	echo "Not found."
-	echo ""
-	echo "======================================================================================================"
-	echo " so installing curl on your system "
-	sudo apt install -y curl
-	#echo " Please install curl on your system using your favourite package manager."
-	#echo ""
-	#echo " Restart after installing curl."
-	#echo "======================================================================================================"
-	#echo ""
-	#exit 1
+if [[ "$solaris" == true ]]; then
+	echo "Looking for gsed..."
+	if [ -z "$(which gsed)" ]; then
+		echo "Not found."
+		echo ""
+		echo "======================================================================================================"
+		echo " Please install gsed on your solaris system."
+		echo ""
+		echo " BeSman uses gsed extensively."
+		echo ""
+		echo " Restart after installing gsed."
+		echo "======================================================================================================"
+		echo ""
+		exit 1
+	fi
+else
+	echo "Looking for sed..."
+	if [ -z "$(which sed)" ]; then
+		echo "Not found."
+		echo ""
+		echo "======================================================================================================"
+		echo " Please install sed on your system using your favourite package manager."
+		echo ""
+		echo " Restart after installing sed."
+		echo "======================================================================================================"
+		echo ""
+		exit 1
+	fi
 fi
 
 if [[ -z $(which ansible) ]]; then
@@ -177,36 +152,6 @@ if [[ -z $(which gh) ]]; then
   sudo apt update
   sudo apt install gh -y
 
-fi
-
-if [[ "$solaris" == true ]]; then
-	echo "Looking for gsed..."
-	if [ -z $(which gsed) ]; then
-		echo "Not found."
-		echo ""
-		echo "======================================================================================================"
-		echo " Please install gsed on your solaris system."
-		echo ""
-		echo " BeSman uses gsed extensively."
-		echo ""
-		echo " Restart after installing gsed."
-		echo "======================================================================================================"
-		echo ""
-		exit 1
-	fi
-else
-	echo "Looking for sed..."
-	if [ -z $(which sed) ]; then
-		echo "Not found."
-		echo ""
-		echo "======================================================================================================"
-		echo " Please install sed on your system using your favourite package manager."
-		echo ""
-		echo " Restart after installing sed."
-		echo "======================================================================================================"
-		echo ""
-		exit 1
-	fi
 fi
 
 
@@ -255,49 +200,18 @@ touch "$besman_user_config_file"
     echo "BESMAN_GH_TOKEN="
     echo "BESMAN_OFFLINE_MODE=true"
     echo "BESMAN_LOCAL_ENV=False"
-	echo "BESMAN_LIGHT_MODE=False"
+  	echo "BESMAN_LIGHT_MODE=False"
 } >> "$besman_user_config_file"
-echo "Download script archive..."
 
-# once move to besman namespace needs to update besman-latest.zip 
-#curl -sL --location --progress-bar "${BESMAN_SERVICE}/${BESMAN_NAMESPACE}/BESman/dist/dist/besman-latest.zip" > "$besman_zip_file"
-curl -sL --location --progress-bar "${BESMAN_SERVICE}/${BESMAN_NAMESPACE}/BeSman/dist/dist/besman-latest.zip" > "$besman_zip_file"
-#cp "/vagrant/ProEnv/besman-latest.zip"  "$besman_zip_file"
+cp ./src/main/bash/besman-* "$besman_src_folder"
+cp ./src/main/bash/commands/besman-* "$besman_src_folder"
+mv "$besman_src_folder/besman-init.sh" "$besman_bin_folder"
 
-
-ARCHIVE_OK=$(unzip -qt "$besman_zip_file" | grep 'No errors detected in compressed data')
-if [[ -z "$ARCHIVE_OK" ]]; then
-	echo "Downloaded zip archive corrupt. Are you connected to the internet?"
-	echo ""
-	echo "If problems persist, please ask for help on our Github:"
-	echo "* easy sign up: https://github.com/"
-	echo "https://github.com/${BESMAN_NAMESPACE}/BeSman/issues"
-	rm -rf "$BESMAN_DIR"
-	exit 2
-fi
-
-echo "Extract script archive..."
-if [[ "$cygwin" == 'true' ]]; then
-	echo "Cygwin detected - normalizing paths for unzip..."
-	besman_zip_file=$(cygpath -w "$besman_zip_file")
-	besman_stage_folder=$(cygpath -w "$besman_stage_folder")
-fi
-unzip -qo "$besman_zip_file" -d "$besman_stage_folder"
-
-
-echo "Install scripts..."
-
-
-
-mv "${besman_stage_folder}/besman-init.sh" "$besman_bin_folder"
-mv "$besman_stage_folder"/besman-* "$besman_src_folder"
-mv "$besman_stage_folder"/list.txt "$besman_var_folder"
-[[ -d ${besman_stage_folder} ]] && rm -rf ${besman_stage_folder}/*
+touch "$besman_var_folder/list.txt"
 
 echo "Set version to $BESMAN_VERSION ..."
 echo "$BESMAN_VERSION" > "${BESMAN_DIR}/var/version.txt"
 
-#cp "/vagrant/ProEnv/master/besman-BESman.sh" "$BESMAN_DIR"/envs/
 if [[ $darwin == true ]]; then
   touch "$besman_bash_profile"
   echo "Attempt update of login bash profile on OSX..."
@@ -312,14 +226,20 @@ else
       echo -e "\n$besman_init_snippet" >> "$besman_bashrc"
       echo "Added besman init snippet to $besman_bashrc"
   fi
+if [ -f "${besman_profile}" ]; then
+    if [[ -z $(grep 'oah-init.sh' "${besman_profile}") ]]; then
+      echo -e "\n${besman_init_snippet}" >> "${besman_profile}"
+      echo "Updated existing ${besman_profile}"
+    fi
+  fi
 fi
-
 echo "Attempt update of zsh profile..."
 touch "$besman_zshrc"
 if [[ -z $(grep 'besman-init.sh' "$besman_zshrc") ]]; then
     echo -e "\n$besman_init_snippet" >> "$besman_zshrc"
     echo "Updated existing ${besman_zshrc}"
 fi
+source "${BESMAN_DIR}/bin/besman-init.sh"
 
 echo -e "\n\n\nAll done!\n\n"
 
@@ -332,5 +252,5 @@ echo "Then issue the following command:"
 echo ""
 echo "    bes help"
 echo ""
-
-echo "Enjoy!!!"
+}
+quick_install "$1"
