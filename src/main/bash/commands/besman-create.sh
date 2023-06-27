@@ -56,15 +56,21 @@ function __bes_create
     else
         # bes create -env fastjson-RT-env 
         # $1 would be the type - env/playbook
-        local environment_name overwrite template_type env_file
+        local environment_name overwrite template_type env_file version ossp env_file_name
         environment_name=$2
         template_type=$3
-        env_file=$BESMAN_DIR/envs/besman-$environment_name.sh
-        if [[ -f "$BESMAN_DIR/envs/besman-$environment_name.sh" ]]; then
-            __besman_echo_yellow "File exists with the same name under $BESMAN_DIR/envs/"
-            read -p "Do you wish to overwrite (y/n)?: " overwrite
+        version=$4
+        [[ -z $version ]] && version="0.0.1"
+        ossp=$(echo "$environment_name" | cut -d "-" -f 1)
+        env_file_name="besman-$environment_name.sh"
+        env_file_path=$BESMAN_ENV_REPOS/$ossp/$version/$env_file_name
+        __besman_set_variables
+        mkdir -p "$BESMAN_ENV_REPOS/$ossp/$version"
+        if [[ -f "$env_file_path" ]]; then
+            __besman_echo_yellow "File exists with the same name under $env_file_path"
+            read -rp "Do you wish to overwrite (y/n)?: " overwrite
             if [[ ( "$overwrite" == "" ) || ( "$overwrite" == "y" ) || ( "$overwrite" == "Y" ) ]]; then
-                rm "$BESMAN_DIR/envs/besman-$environment_name.sh"
+                rm "$env_file_path"
             else
                 __besman_echo_yellow "Exiting..."
                 return 1
@@ -73,33 +79,61 @@ function __bes_create
         
         if [[ ( -n "$template_type" ) && ( "$template_type" == "basic" ) ]]; then
 
-            __besman_create_env_basic "$environment_name" || return 1
+            __besman_create_env_basic "$env_file_path" || return 1
         elif [[ -z "$template_type" ]]; then
-            __besman_create_env_with_config "$environment_name" 
+            __besman_create_env_with_config "$env_file_path" 
+            __besman_create_env_config "$environment_name" "$version"
 
         fi
 
     fi
-    __besman_update_list "$environment_name" 
-    code "$env_file" 
+    __besman_update_env_dir_list "$environment_name" "$version"
+    code "$env_file_path" 
 }
 
+function __besman_set_variables()
+{
+    local path
+    __bes_set "BESMAN_LOCAL_ENV" "True"
+    while [[ ( -z $path ) || ( ! -d $path )  ]] 
+    do
+        read -rp "Enter the complete path to your local environment directory: " path
+    done
+    __bes_set "BESMAN_ENV_REPOS" "$path"
 
+}
+
+function __besman_create_env_config()
+{
+    local environment_name config_file ossp_name env_type config_file_path version
+    environment_name=$1
+    version=$2
+    ossp_name=$(echo "$environment_name" | cut -d "-" -f 1)
+    env_type=$(echo "$environment_name" | cut -d "-" -f 2)
+    config_file="besman-$ossp_name-$env_type-env-config.yaml"
+    config_file_path=$BESMAN_ENV_REPOS/$ossp/$version/$config_file
+    [[ ! -f $config_file_path ]] && touch "$config_file_path" && __besman_echo_yellow "Creating new config file $config_file_path"
+    cat <<EOF > "$config_file_path"
+---
+BESMAN_ORG: Be-Secure
+BESMAN_OSSP: $ossp_name
+BESMAN_OSSP_CLONE_PATH: \$HOME/\$BESMAN_OSSP
+BESMAN_ANSIBLE_ROLES_PATH: \$BESMAN_DIR/tmp/\$BESMAN_OSSP/roles
+BESMAN_ANSIBLE_ROLES: 
+BESMAN_OSS_TRIGGER_PLAYBOOK_PATH: \$BESMAN_DIR/tmp/\$BESMAN_OSSP
+BESMAN_OSS_TRIGGER_PLAYBOOK: besman-\$BESMAN_OSSP-$env_type-trigger-playbook.yaml
+BESMAN_DISPLAY_SKIPPED_ANSIBLE_HOSTS: false
+# Please add other variables as well as ansible variables here
+EOF
+    code "$config_file_path" 
+}
 
 function __besman_create_env_with_config()
 {
-    local environment_name roles env_file 
-    environment_name=$1
-    env_file="$BESMAN_DIR/envs/besman-$environment_name.sh"
-    # if echo "$environment_name" | grep -q "BT" 
-    # then
-    #     roles=\$BESMAN_BT_ROLES
-    # elif echo "$environment_name" | grep -q "RT" 
-    # then
-    #     roles=\$BESMAN_RT_ROLES
+    local env_file_path
+    env_file_path=$1
 
-    # fi
-    cat <<EOF > "$env_file"
+    cat <<EOF > "$env_file_path"
 #!/bin/bash
 
 function __besman_install_$environment_name
@@ -118,7 +152,7 @@ function __besman_install_$environment_name
     else
         __besman_gh_clone "\$BESMAN_ORG" "\$BESMAN_OSSP" "\$BESMAN_OSSP_CLONE_PATH"
     fi
-
+    # Please add the rest of the code here for installation
 }
 
 function __besman_uninstall_$environment_name
@@ -132,6 +166,8 @@ function __besman_uninstall_$environment_name
     else
         __besman_echo_yellow "Could not find dir \$BESMAN_OSSP_CLONE_PATH"
     fi
+    # Please add the rest of the code here for uninstallation
+
 }
 
 function __besman_update_$environment_name
@@ -139,6 +175,8 @@ function __besman_update_$environment_name
     __besman_check_for_trigger_playbook "\$BESMAN_OSS_TRIGGER_PLAYBOOK_PATH/\$BESMAN_OSS_TRIGGER_PLAYBOOK"
     [[ "\$?" -eq 1 ]] && __besman_create_ansible_playbook
     __besman_run_ansible_playbook_extra_vars "\$BESMAN_OSS_TRIGGER_PLAYBOOK_PATH/\$BESMAN_OSS_TRIGGER_PLAYBOOK" "bes_command=update role_path=\$BESMAN_ANSIBLE_ROLES_PATH" || return 1
+    # Please add the rest of the code here for update
+
 }
 
 function __besman_validate_$environment_name
@@ -146,6 +184,8 @@ function __besman_validate_$environment_name
     __besman_check_for_trigger_playbook "\$BESMAN_OSS_TRIGGER_PLAYBOOK_PATH/\$BESMAN_OSS_TRIGGER_PLAYBOOK"
     [[ "\$?" -eq 1 ]] && __besman_create_ansible_playbook
     __besman_run_ansible_playbook_extra_vars "\$BESMAN_OSS_TRIGGER_PLAYBOOK_PATH/\$BESMAN_OSS_TRIGGER_PLAYBOOK" "bes_command=validate role_path=\$BESMAN_ANSIBLE_ROLES_PATH" || return 1
+    # Please add the rest of the code here for validate
+
 }
 
 function __besman_reset_$environment_name
@@ -153,6 +193,8 @@ function __besman_reset_$environment_name
     __besman_check_for_trigger_playbook "\$BESMAN_OSS_TRIGGER_PLAYBOOK_PATH/\$BESMAN_OSS_TRIGGER_PLAYBOOK"
     [[ "\$?" -eq 1 ]] && __besman_create_ansible_playbook
     __besman_run_ansible_playbook_extra_vars "\$BESMAN_OSS_TRIGGER_PLAYBOOK_PATH/\$BESMAN_OSS_TRIGGER_PLAYBOOK" "bes_command=reset role_path=\$BESMAN_ANSIBLE_ROLES_PATH" || return 1
+    # Please add the rest of the code here for reset
+
 }
 EOF
     __besman_echo_white "Created env file $environment_name under $BESMAN_DIR/envs"
@@ -161,9 +203,8 @@ EOF
 
 function __besman_create_env_basic
 {
-    local environment_name env_file
-    environment_name=$1
-    env_file=$BESMAN_DIR/envs/besman-$environment_name.sh
+    local env_file_path
+    env_file_path=$1
     [[ -f $env_file ]] && __besman_echo_red "Environment file exists" && return 1
     cat <<EOF >> "$env_file"
 #!/bin/bash
@@ -196,15 +237,18 @@ EOF
 __besman_echo_white "Creating env file.."
 }
 
-function __besman_update_list()
+function __besman_update_env_dir_list()
 {
-    local environment_name=$1
-    if grep -qw "Local/Local/$environment_name,0.0.1" $BESMAN_DIR/var/list.txt
+    local environment_name version
+    environment_name=$1
+    version=$2
+
+    if grep -qw "Be-Secure/besecure-ce-env-repo/$environment_name,$version" "$BESMAN_ENV_REPOS/list.txt"
     then
         return 1
     else
         __besman_echo_white "Updating local list"
-        echo "Local/Local/$environment_name,0.0.1" >> $BESMAN_DIR/var/list.txt
+        echo "Be-Secure/besecure-ce-env-repo/$environment_name,$version" >> "$BESMAN_ENV_REPOS/list.txt"
     fi
     
 }
