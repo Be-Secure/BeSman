@@ -127,7 +127,7 @@ fi
 
 if [[ -z $(which ansible) ]]; then
   echo "Installing ansible"
-  sudo apt-add-repository ppa:ansible/ansible
+  sudo apt-add-repository -y ppa:ansible/ansible
   sudo apt update
   sudo apt install ansible -y
 fi
