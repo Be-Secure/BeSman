@@ -188,7 +188,7 @@ touch "$besman_user_config_file"
     echo "BESMAN_PLAYBOOK_REPO=besecure-ce-playbook-repo"
     echo "BESMAN_GH_TOKEN="
     echo "BESMAN_OFFLINE_MODE=true"
-    echo "BESMAN_LOCAL_ENV_DIR="
+    echo "BESMAN_LOCAL_ENV_DIR=True"
 } >> "$besman_user_config_file"
 
 cp ./src/main/bash/besman-* "$besman_src_folder"
