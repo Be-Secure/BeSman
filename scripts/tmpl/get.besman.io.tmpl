@@ -80,9 +80,23 @@ if [ -z $(which figlet) ]; then
 	#exit 1
 fi
 
-figlet Setting up BeSman >> besman.txt
-cat besman.txt
-rm besman.txt
+echo ' BBBBBBBBBBBBBBBBB                         SSSSSSSSSSSSSSS                                                             '
+echo ' B::::::::::::::::B                      SS:::::::::::::::S                                                            '
+echo ' B::::::BBBBBB:::::B                    S:::::SSSSSS::::::S                                                            '
+echo ' BB:::::B     B:::::B                   S:::::S     SSSSSSS                                                            '
+echo '   B::::B     B:::::B    eeeeeeeeeeee   S:::::S               mmmmmmm    mmmmmmm     aaaaaaaaaaaaa  nnnn  nnnnnnnn     '
+echo '   B::::B     B:::::B  ee::::::::::::ee S:::::S             mm:::::::m  m:::::::mm   a::::::::::::a n:::nn::::::::nn   '
+echo '   B::::BBBBBB:::::B  e::::::eeeee:::::eeS::::SSSS         m::::::::::mm::::::::::m  aaaaaaaaa:::::an::::::::::::::nn  '
+echo '   B:::::::::::::BB  e::::::e     e:::::e SS::::::SSSSS    m::::::::::::::::::::::m           a::::ann:::::::::::::::n '
+echo '   B::::BBBBBB:::::B e:::::::eeeee::::::e   SSS::::::::SS  m:::::mmm::::::mmm:::::m    aaaaaaa:::::a  n:::::nnnn:::::n '
+echo '   B::::B     B:::::Be:::::::::::::::::e       SSSSSS::::S m::::m   m::::m   m::::m  aa::::::::::::a  n::::n    n::::n '
+echo '   B::::B     B:::::Be::::::eeeeeeeeeee             S:::::Sm::::m   m::::m   m::::m a::::aaaa::::::a  n::::n    n::::n '
+echo '   B::::B     B:::::Be:::::::e                      S:::::Sm::::m   m::::m   m::::ma::::a    a:::::a  n::::n    n::::n '
+echo ' BB:::::BBBBBB::::::Be::::::::e         SSSSSSS     S:::::Sm::::m   m::::m   m::::ma::::a    a:::::a  n::::n    n::::n '
+echo ' B:::::::::::::::::B  e::::::::eeeeeeee S::::::SSSSSS:::::Sm::::m   m::::m   m::::ma:::::aaaa::::::a  n::::n    n::::n '
+echo ' B::::::::::::::::B    ee:::::::::::::e S:::::::::::::::SS m::::m   m::::m   m::::m a::::::::::aa:::a n::::n    n::::n '
+echo ' BBBBBBBBBBBBBBBBB       eeeeeeeeeeeeee  SSSSSSSSSSSSSSS   mmmmmm   mmmmmm   mmmmmm  aaaaaaaaaa  aaaa nnnnnn    nnnnnn '
+
 # Sanity checks
 
 echo "Looking for a previous installation of BeSman..."
@@ -250,15 +264,7 @@ unzip -qo "$besman_zip_file" -d "$besman_stage_folder"
 echo "Install scripts..."
 
 
-curl -sL "https://raw.githubusercontent.com/${BESMAN_NAMESPACE}/BeSman/master/dist/environments" > tmp.txt
-#echo "BESman" > tmp.txt
-sed -i 's/,/ /g' tmp.txt 
-environments=$(<tmp.txt)
-for i in $environments;
-do
-	mv "$besman_stage_folder"/besman-$i.sh "$besman_env_folder"
-done 
-rm tmp.txt
+
 mv "${besman_stage_folder}/besman-init.sh" "$besman_bin_folder"
 mv "$besman_stage_folder"/besman-* "$besman_src_folder"
 mv "$besman_stage_folder"/list.txt "$besman_var_folder"
