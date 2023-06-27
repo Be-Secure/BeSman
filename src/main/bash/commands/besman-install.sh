@@ -98,7 +98,7 @@ function __besman_manage_install_out {
 function __besman_get_remote_env {
 
 	# This code fetches the environment and its config file from env repo
-	local environment_name env_repo_namespace env_repo ossp env_url default_config_path replace
+	local environment_name env_repo_namespace env_repo ossp env_url default_config_path replace curl_flag
 	env_repo_namespace=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 1)
 	env_repo=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 2)
 	environment_name=$1
@@ -106,19 +106,27 @@ function __besman_get_remote_env {
 	ossp=$(echo "$environment_name" | cut -d "-" -f 1)
 	env_url="https://raw.githubusercontent.com/${env_repo_namespace}/${env_repo}/master/${ossp}/${version_id}/besman-${environment_name}.sh"
 	default_config_path=$BESMAN_DIR/tmp/besman-$environment_name-config.yaml
+	curl_flag=true
 	__besman_secure_curl "$env_url" >>"${BESMAN_DIR}/envs/besman-${environment_name}.sh"
 	[[ "$?" -ne 0 ]] && __besman_echo_red "Failed while trying to get the besman-${environment_name}.sh" && return 1
 	if [[ ( -n $BESMAN_LIGHT_MODE ) && ( $BESMAN_LIGHT_MODE == "False" ) && ( ! -f "$HOME/besman-${ossp}-${env_type}-env-config.yaml" ) ]]; then
 		config_url="https://raw.githubusercontent.com/${env_repo_namespace}/${env_repo}/master/${ossp}/${version_id}/besman-${ossp}-${env_type}-env-config.yaml"
 		if [[ -f $default_config_path ]]; then
 			__besman_echo_yellow "A config file already exists"
-			read -p "Do you wish to replace it(y/n)?: " replace
+			read -rp "Do you wish to replace it(y/n)?: " replace
+			if [[ ( -z $replace ) || ( $replace == 'Y' ) || ( $replace == 'y' ) ]]; then
+				rm "$default_config_path"
+			else
+				curl_flag=false
+			fi
 		fi
-		if [[ ( -z $replace ) || ( $replace == 'Y' ) || ( $replace == 'y' ) ]]; then
-			rm "$default_config_path"
+		if [[ $curl_flag == true ]]; then
 			touch "$default_config_path"
-			__besman_secure_curl "$config_url" >> "$default_config_path"
-			[[ "$?" -ne 0 ]] && __besman_echo_red "Failed while trying to get the besman-${ossp}-${env_type}-env-config.yaml" && return 1
+			if ! __besman_secure_curl "$config_url" >> "$default_config_path";
+			then
+				__besman_echo_red "Failed while trying to get the besman-${ossp}-${env_type}-env-config.yaml" 
+				return 1
+			fi
 		fi
 	fi
 

@@ -1,5 +1,16 @@
 #!/bin/bash
 
+function quick_install()
+{
+local force
+force=$1
+if [[ ( -n $force ) && ( ( $force == "--force" ) || ( $force == "--F" ) ) ]]; then
+  rm -rf "$HOME/.besman"
+elif [[ ( -n $force ) && ( ( $force != "--force" ) || ( $force != "--F" ) ) ]]; then
+  echo "Usage: ./quick_install [--force|-F]"
+  echo "--force | -F : Removes the existing installation of BeSman"
+  return 
+fi
 BESMAN_PLATFORM=$(uname)
 export BESMAN_SERVICE="https://raw.githubusercontent.com"
 
@@ -189,6 +200,7 @@ touch "$besman_user_config_file"
     echo "BESMAN_GH_TOKEN="
     echo "BESMAN_OFFLINE_MODE=true"
     echo "BESMAN_LOCAL_ENV=False"
+  	echo "BESMAN_LIGHT_MODE=False"
 } >> "$besman_user_config_file"
 
 cp ./src/main/bash/besman-* "$besman_src_folder"
@@ -240,3 +252,5 @@ echo "Then issue the following command:"
 echo ""
 echo "    bes help"
 echo ""
+}
+quick_install "$1"
