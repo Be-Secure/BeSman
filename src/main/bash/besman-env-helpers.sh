@@ -52,6 +52,11 @@ function __besman_unset_env_parameters_and_cleanup()
     ossp=$(echo "$enviroment" | cut -d "-" -f 1)
     while read -r line; 
     do
+        # To skip comments
+        if echo "$line" | grep -qe "^#" ; then
+
+          continue
+        fi
 
         [[ $line == "---" ]] && continue # To skip the --- from starting of yaml file
         if echo "$line" | grep -qe "^BESMAN_"; then # Check to export only environment variables starting with BESMAN_
@@ -67,6 +72,15 @@ function __besman_unset_env_parameters_and_cleanup()
     [[ -f $BESMAN_DIR/tmp/besman-$enviroment-config.yaml ]] && rm "$BESMAN_ENV_CONFIG_FILE_PATH"
     [[ -d $BESMAN_DIR/tmp/$ossp ]] && rm -rf "$BESMAN_DIR/tmp/$ossp"
 }
+
+function __besman_check_environment_exists()
+{
+  local input_environment environment_name
+  input_environment=$1
+  environment_name=$(echo "$input_environment" | cut -d "/" -f 3)
+  [[ ! -f $BESMAN_DIR/envs/besman-$environment_name.sh ]] && __besman_echo_red "Environment $environment_name does not exist" && return 1
+}
+
 
 function __besman_check_input_env_format
 {
@@ -173,10 +187,11 @@ function __besman_open_file
 
 function __besman_validate_environment
 {
-	local environment_name=$1
-	echo ${environment_name} > $BESMAN_DIR/var/current
-	cat $BESMAN_DIR/var/list.txt | grep -w "$environment_name" > /dev/null	
-	if [ "$?" != "0" ]; then
+	local environment_name input_environment_name namespace repo
+  environment_name=$1
+
+	if ! grep -q "${environment_name}" "$BESMAN_DIR/var/list.txt"
+  then
 
 		__besman_echo_debug "Environment $environment_name does not exist"
 		return 1
