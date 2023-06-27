@@ -91,32 +91,3 @@ fi
 } 
 
 
-function __besman_unset_env_parameters_and_cleanup()
-{
-	local enviroment ossp
-	enviroment=$1
-	ossp=$(echo "$enviroment" | cut -d "-" -f 1)
-	__besman_echo_yellow "Unset env vars"
-	while read -r line; do
-		[[ "$line" == "---" ]] && continue
-		if echo "$line" | grep -qe "^BESMAN_"  # For only exporting env variables starting with BESMAN_
-		then
-			var=$(echo "$line" | cut -d ":" -f "1")
-			unset "$var"
-		else
-			continue
-		fi
-	done < "$BESMAN_ENV_CONFIG_FILE_PATH"
-
-	if [[ -f $BESMAN_DIR/tmp/besman-$enviroment-config.yaml ]]; then
-
-		__besman_echo_yellow "Removing env config file"
-		rm "$BESMAN_DIR/tmp/besman-$enviroment-config.yaml"
-	
-	fi
-
-	[[ -d $BESMAN_DIR/tmp/$ossp ]] && __besman_echo_yellow "Removing roles and role configurations.." && rm -rf $BESMAN_DIR/tmp/$ossp
-
-	unset enviroment ossp
-    
-}
