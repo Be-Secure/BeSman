@@ -10,7 +10,7 @@ export BESMAN_SERVICE="https://raw.githubusercontent.com"
 # BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
 
 BESMAN_NAMESPACE="Be-Secure"
-BESMAN_VERSION="0.0.3"
+BESMAN_VERSION="0.0.5"
 BESMAN_ENV_REPOS="$BESMAN_NAMESPACE/besecure-ce-env-repo"
 # BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
 
@@ -67,22 +67,21 @@ case "$(uname)" in
 esac
 
 
-echo "Looking for figlet..."
-if [ -z $(which figlet) ]; then
-	echo "Not found."
-	echo "======================================================================================================"
-	echo " so installing figlet on your system "
-	sudo apt install -y figlet
-	#echo ""
-	#echo " Execute  after installing figlet."
-	#echo "======================================================================================================"
-	#echo ""
-	#exit 1
-fi
+# echo "Looking for figlet..."
+# if [ -z $(which figlet) ]; then
+# 	echo "Not found."
+# 	echo "======================================================================================================"
+# 	echo " so installing figlet on your system "
+# 	sudo apt install -y figlet
+# 	#echo ""
+# 	#echo " Execute  after installing figlet."
+# 	#echo "======================================================================================================"
+# 	#echo ""
+# 	#exit 1
+# fi
 
-figlet Setting up BeSman >> besman.txt
-cat besman.txt
-rm besman.txt
+
+
 # Sanity checks
 
 echo "Looking for a previous installation of BeSman..."
@@ -103,7 +102,22 @@ if [ -d $BESMAN_DIR/bin ]; then
 	echo ""
 	exit 0
 fi
-
+echo ' BBBBBBBBBBBBBBBBB                         SSSSSSSSSSSSSSS                                                             '
+echo ' B::::::::::::::::B                      SS:::::::::::::::S                                                            '
+echo ' B::::::BBBBBB:::::B                    S:::::SSSSSS::::::S                                                            '
+echo ' BB:::::B     B:::::B                   S:::::S     SSSSSSS                                                            '
+echo '   B::::B     B:::::B    eeeeeeeeeeee   S:::::S               mmmmmmm    mmmmmmm     aaaaaaaaaaaaa  nnnn  nnnnnnnn     '
+echo '   B::::B     B:::::B  ee::::::::::::ee S:::::S             mm:::::::m  m:::::::mm   a::::::::::::a n:::nn::::::::nn   '
+echo '   B::::BBBBBB:::::B  e::::::eeeee:::::eeS::::SSSS         m::::::::::mm::::::::::m  aaaaaaaaa:::::an::::::::::::::nn  '
+echo '   B:::::::::::::BB  e::::::e     e:::::e SS::::::SSSSS    m::::::::::::::::::::::m           a::::ann:::::::::::::::n '
+echo '   B::::BBBBBB:::::B e:::::::eeeee::::::e   SSS::::::::SS  m:::::mmm::::::mmm:::::m    aaaaaaa:::::a  n:::::nnnn:::::n '
+echo '   B::::B     B:::::Be:::::::::::::::::e       SSSSSS::::S m::::m   m::::m   m::::m  aa::::::::::::a  n::::n    n::::n '
+echo '   B::::B     B:::::Be::::::eeeeeeeeeee             S:::::Sm::::m   m::::m   m::::m a::::aaaa::::::a  n::::n    n::::n '
+echo '   B::::B     B:::::Be:::::::e                      S:::::Sm::::m   m::::m   m::::ma::::a    a:::::a  n::::n    n::::n '
+echo ' BB:::::BBBBBB::::::Be::::::::e         SSSSSSS     S:::::Sm::::m   m::::m   m::::ma::::a    a:::::a  n::::n    n::::n '
+echo ' B:::::::::::::::::B  e::::::::eeeeeeee S::::::SSSSSS:::::Sm::::m   m::::m   m::::ma:::::aaaa::::::a  n::::n    n::::n '
+echo ' B::::::::::::::::B    ee:::::::::::::e S:::::::::::::::SS m::::m   m::::m   m::::m a::::::::::aa:::a n::::n    n::::n '
+echo ' BBBBBBBBBBBBBBBBB       eeeeeeeeeeeeee  SSSSSSSSSSSSSSS   mmmmmm   mmmmmm   mmmmmm  aaaaaaaaaa  aaaa nnnnnn    nnnnnn '
 echo "Looking for unzip..."
 if [ -z $(which unzip) ]; then
 	echo "Not found."
@@ -145,6 +159,24 @@ if [ -z $(which curl) ]; then
 	#echo "======================================================================================================"
 	#echo ""
 	#exit 1
+fi
+
+if [[ -z $(which ansible) ]]; then
+  echo "Installing ansible"
+  sudo apt-add-repository -y ppa:ansible/ansible
+  sudo apt update
+  sudo apt install ansible -y
+fi
+
+if [[ -z $(which gh) ]]; then
+  echo "Installing GitHub Cli"
+  type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
+  curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg 
+  sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null 
+  sudo apt update
+  sudo apt install gh -y
+
 fi
 
 if [[ "$solaris" == true ]]; then
@@ -198,27 +230,33 @@ echo "Prime the config file..."
 echo "config selfupdate/debug_mode = true"
 
 touch "$besman_config_file"
-echo "besman_auto_answer=false" >> "$besman_config_file"
-echo "besman_auto_selfupdate=false" >> "$besman_config_file"
-echo "besman_insecure_ssl=false" >> "$besman_config_file"
-echo "besman_curl_connect_timeout=7" >> "$besman_config_file"
-echo "besman_curl_max_time=10" >> "$besman_config_file"
-echo "besman_beta_channel=false" >> "$besman_config_file"
-echo "besman_debug_mode=true" >> "$besman_config_file"
-echo "besman_colour_enable=true" >> "$besman_config_file"
+{
+    echo "besman_auto_answer=false" 
+    echo "besman_auto_selfupdate=false" 
+    echo "besman_insecure_ssl=false" 
+    echo "besman_curl_connect_timeout=7" 
+    echo "besman_curl_max_time=10" 
+    echo "besman_beta_channel=false" 
+    echo "besman_debug_mode=true" 
+    echo "besman_colour_enable=true"
+} >> "$besman_config_file"
 
 echo "Setting up user configs"
 touch "$besman_user_config_file"
-echo "BESMAN_VERSION=$BESMAN_VERSION" >> "$besman_user_config_file"
-echo "BESMAN_USER_NAMESPACE=" >> "$besman_user_config_file"
-echo "BESMAN_ENV_ROOT=$HOME/BeSman_env" >> "$besman_user_config_file"
-echo "BESMAN_NAMESPACE=$BESMAN_NAMESPACE" >> "$besman_user_config_file"
-echo "BESMAN_INTERACTIVE_USER_MODE=true" >> "$besman_user_config_file"
-echo "BESMAN_DIR=$HOME/.besman" >> "$besman_user_config_file"
-echo "BESMAN_ENV_REPOS=$BESMAN_ENV_REPOS" >> "$besman_user_config_file"
-echo "BESMAN_PLAYBOOK_REPO=besecure-ce-playbook-repo" >> "$besman_user_config_file"
-echo "BESMAN_GH_TOKEN=" >> "$besman_user_config_file"
-echo "BESMAN_PLAYBOOK_DIR=$BESMAN_DIR/playbook" >> "$besman_user_config_file"
+{
+    echo "BESMAN_VERSION=$BESMAN_VERSION"
+    echo "BESMAN_USER_NAMESPACE="
+    echo "BESMAN_ENV_ROOT=$HOME/BeSman_env"
+    echo "BESMAN_NAMESPACE=$BESMAN_NAMESPACE"
+    echo "BESMAN_INTERACTIVE_USER_MODE=true"
+    echo "BESMAN_DIR=$HOME/.besman"
+    echo "BESMAN_ENV_REPOS=$BESMAN_ENV_REPOS"
+    echo "BESMAN_PLAYBOOK_REPO=besecure-ce-playbook-repo"
+    echo "BESMAN_GH_TOKEN="
+    echo "BESMAN_OFFLINE_MODE=true"
+    echo "BESMAN_LOCAL_ENV=False"
+	echo "BESMAN_LIGHT_MODE=False"
+} >> "$besman_user_config_file"
 echo "Download script archive..."
 
 # once move to besman namespace needs to update besman-latest.zip 
@@ -250,15 +288,7 @@ unzip -qo "$besman_zip_file" -d "$besman_stage_folder"
 echo "Install scripts..."
 
 
-curl -sL "https://raw.githubusercontent.com/${BESMAN_NAMESPACE}/BeSman/master/dist/environments" > tmp.txt
-#echo "BESman" > tmp.txt
-sed -i 's/,/ /g' tmp.txt 
-environments=$(<tmp.txt)
-for i in $environments;
-do
-	mv "$besman_stage_folder"/besman-$i.sh "$besman_env_folder"
-done 
-rm tmp.txt
+
 mv "${besman_stage_folder}/besman-init.sh" "$besman_bin_folder"
 mv "$besman_stage_folder"/besman-* "$besman_src_folder"
 mv "$besman_stage_folder"/list.txt "$besman_var_folder"
