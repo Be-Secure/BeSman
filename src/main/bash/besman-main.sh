@@ -45,7 +45,7 @@ function bes {
 		[[ -z $environment ]] && environment="${args[1]}"
 		[[ -z $version ]] && version="${args[2]}"
 	fi
-	__besman_check_for_command_file $command || return 1
+	__besman_check_for_command_file "$command" || return 1
 
 	case $command in 
 		install)
@@ -53,6 +53,7 @@ function bes {
 			[[ ${#opts[@]} -ne 2 ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
 			[[ ${#args[@]} -ne 3 ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
 			__besman_validate_environment $environment || return 1
+			# __besman_check_environment_exists "$environment" || return 1
 			__besman_check_if_version_exists $environment $version || return 1
 			__besman_validate_version_format $version || return 1
 			__bes_$command $environment $version
@@ -83,6 +84,14 @@ function bes {
 			[[ "${opts[0]}" != "-env" ]] && __besman_echo_red "Expected option -env" && return 1
 			environment="${args[1]}"
 			__bes_$command "$environment"
+			;;
+		set)
+			# [[ "${#args[@]}" -ne 3 ]] && __besman_echo_red "Incorrect syntax" && return 1
+			# [[ "${#opts[@]}" -ne 0 ]] && __besman_echo_red "Incorrect syntax" && return 1
+			local variable value
+			variable=${args[1]}
+			value=${args[2]}
+			__bes_"$command" "$variable" "$value"
 			;;
 		run)
 			if [[ -z "${#opts[1]}" ]]; then
