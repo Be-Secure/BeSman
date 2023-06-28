@@ -215,7 +215,7 @@ function __besman_create_env_basic
 {
     local env_file_path
     env_file_path=$1
-    [[ -f $env_file ]] && __besman_echo_red "Environment file exists" && return 1
+    [[ -f $env_file_path ]] && __besman_echo_red "Environment file exists" && return 1
     touch "$env_file_path"
     cat <<EOF > "$env_file_path"
 #!/bin/bash
