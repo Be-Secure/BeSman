@@ -197,8 +197,9 @@ function bes {
 			
 			elif [[ ( -n $type ) && ( $type == --environment || $type == -env ) ]]; then
 				env_name=${args[1]}
-				local template_type=${args[2]}
-				__bes_"$command" "$type" "$env_name" "$template_type"
+				local env_version=${args[2]}
+				local template_type=${args[3]}
+				__bes_"$command" "$type" "$env_name" "$env_version" "$template_type" 
 			fi
 			unset type purpose vuln env ext
 			;;

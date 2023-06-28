@@ -58,8 +58,8 @@ function __besman_get_local_env()
 	version=$2
 	ossp=$(echo "$environment" | cut -d "-" -f 1)
 	default_config_path=$BESMAN_DIR/tmp/besman-$environment_name-config.yaml
-	[[ ! -d $BESMAN_ENV_REPOS ]] && __besman_echo_red "Could not find dir $BESMAN_ENV_REPOS" && return 1
-	cp "$BESMAN_ENV_REPOS/$ossp/$version/besman-$environment.sh" "$BESMAN_DIR/envs/"
+	[[ ! -d $BESMAN_LOCAL_ENV_DIR ]] && __besman_echo_red "Could not find dir $BESMAN_LOCAL_ENV_DIR" && return 1
+	cp "$BESMAN_LOCAL_ENV_DIR/$ossp/$version/besman-$environment.sh" "$BESMAN_DIR/envs/"
 	if [[ ( -n $BESMAN_LIGHT_MODE ) && ( $BESMAN_LIGHT_MODE == "False" ) && ( ! -f "$HOME/besman-$environment-config.yaml" ) ]]; then
 		
 		if [[ -f $default_config_path ]]; then
@@ -69,8 +69,8 @@ function __besman_get_local_env()
 		if [[ ( -z $replace ) || ( $replace == 'Y' ) || ( $replace == 'y' ) ]]; then
 			rm "$default_config_path"
 			touch "$default_config_path"
-			[[ ! -f "$BESMAN_ENV_REPOS/$ossp/$version/besman-$environment-config.yaml" ]] && __besman_echo_red "Could not find config file in the path $BESMAN_ENV_REPOS/$ossp/$version/" && return 1
-			cp "$BESMAN_ENV_REPOS/$ossp/$version/besman-$environment-config.yaml" "$default_config_path"
+			[[ ! -f "$BESMAN_LOCAL_ENV_DIR/$ossp/$version/besman-$environment-config.yaml" ]] && __besman_echo_red "Could not find config file in the path $BESMAN_LOCAL_ENV_DIR/$ossp/$version/" && return 1
+			cp "$BESMAN_LOCAL_ENV_DIR/$ossp/$version/besman-$environment-config.yaml" "$default_config_path"
 		fi
 	fi
 	

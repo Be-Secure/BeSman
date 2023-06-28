@@ -58,14 +58,14 @@ function __bes_create
         # $1 would be the type - env/playbook
         local environment_name overwrite template_type env_file version ossp env_file_name
         environment_name=$2
-        template_type=$3
-        version=$4
+        version=$3
+        template_type=$4
         [[ -z $version ]] && version="0.0.1"
         ossp=$(echo "$environment_name" | cut -d "-" -f 1)
         env_file_name="besman-$environment_name.sh"
-        env_file_path=$BESMAN_ENV_REPOS/$ossp/$version/$env_file_name
         __besman_set_variables
-        mkdir -p "$BESMAN_ENV_REPOS/$ossp/$version"
+        env_file_path=$BESMAN_LOCAL_ENV_DIR/$ossp/$version/$env_file_name
+        mkdir -p "$BESMAN_LOCAL_ENV_DIR/$ossp/$version"
         if [[ -f "$env_file_path" ]]; then
             __besman_echo_yellow "File exists with the same name under $env_file_path"
             read -rp "Do you wish to overwrite (y/n)?: " overwrite
@@ -95,23 +95,33 @@ function __besman_set_variables()
 {
     local path
     __bes_set "BESMAN_LOCAL_ENV" "True"
+    [[ -n $BESMAN_LOCAL_ENV_DIR ]] && return 0
     while [[ ( -z $path ) || ( ! -d $path )  ]] 
     do
         read -rp "Enter the complete path to your local environment directory: " path
     done
-    __bes_set "BESMAN_ENV_REPOS" "$path"
+    __bes_set "BESMAN_LOCAL_ENV_DIR" "$path"
 
 }
 
 function __besman_create_env_config()
 {
-    local environment_name config_file ossp_name env_type config_file_path version
+    local environment_name config_file ossp_name env_type config_file_path version overwrite
     environment_name=$1
     version=$2
     ossp_name=$(echo "$environment_name" | cut -d "-" -f 1)
     env_type=$(echo "$environment_name" | cut -d "-" -f 2)
     config_file="besman-$ossp_name-$env_type-env-config.yaml"
-    config_file_path=$BESMAN_ENV_REPOS/$ossp/$version/$config_file
+    config_file_path=$BESMAN_LOCAL_ENV_DIR/$ossp/$version/$config_file
+    if [[ -f $config_file_path ]]; then
+        __besman_echo_yellow "Config file $config_file exists under $BESMAN_LOCAL_ENV_DIR/$ossp/$version"
+        read -rp " Do you wish to replace?(y/n): " overwrite
+        if [[ ( "$overwrite" == "" ) || ( "$overwrite" == "y" ) || ( "$overwrite" == "Y" ) ]]; then
+            rm "$config_file_path"
+        else
+            return 
+        fi
+    fi
     [[ ! -f $config_file_path ]] && touch "$config_file_path" && __besman_echo_yellow "Creating new config file $config_file_path"
     cat <<EOF > "$config_file_path"
 ---
@@ -205,8 +215,9 @@ function __besman_create_env_basic
 {
     local env_file_path
     env_file_path=$1
-    [[ -f $env_file ]] && __besman_echo_red "Environment file exists" && return 1
-    cat <<EOF >> "$env_file"
+    [[ -f $env_file_path ]] && __besman_echo_red "Environment file exists" && return 1
+    touch "$env_file_path"
+    cat <<EOF > "$env_file_path"
 #!/bin/bash
 
 function __besman_install_$environment_name
@@ -243,12 +254,12 @@ function __besman_update_env_dir_list()
     environment_name=$1
     version=$2
 
-    if grep -qw "Be-Secure/besecure-ce-env-repo/$environment_name,$version" "$BESMAN_ENV_REPOS/list.txt"
+    if grep -qw "Be-Secure/besecure-ce-env-repo/$environment_name,$version" "$BESMAN_LOCAL_ENV_DIR/list.txt"
     then
         return 1
     else
         __besman_echo_white "Updating local list"
-        echo "Be-Secure/besecure-ce-env-repo/$environment_name,$version" >> "$BESMAN_ENV_REPOS/list.txt"
+        echo "Be-Secure/besecure-ce-env-repo/$environment_name,$version" >> "$BESMAN_LOCAL_ENV_DIR/list.txt"
     fi
     
 }
