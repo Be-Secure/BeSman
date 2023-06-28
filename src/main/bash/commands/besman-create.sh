@@ -56,7 +56,7 @@ function __bes_create
     else
         # bes create -env fastjson-RT-env 
         # $1 would be the type - env/playbook
-        local environment_name overwrite template_type env_file version ossp env_file_name
+        local environment_name overwrite template_type version ossp env_file_name 
         environment_name=$2
         version=$3
         template_type=$4
@@ -65,6 +65,7 @@ function __bes_create
         env_file_name="besman-$environment_name.sh"
         __besman_set_variables
         env_file_path=$BESMAN_LOCAL_ENV_DIR/$ossp/$version/$env_file_name
+        config_file_path=$BESMAN_LOCAL_ENV_DIR/$ossp/$version/besman-$environment_name-config.yaml
         mkdir -p "$BESMAN_LOCAL_ENV_DIR/$ossp/$version"
         if [[ -f "$env_file_path" ]]; then
             __besman_echo_yellow "File exists with the same name under $env_file_path"
@@ -88,9 +89,29 @@ function __bes_create
 
     fi
     __besman_update_env_dir_list "$environment_name" "$version"
-    code "$env_file_path" 
-}
+    __besman_echo_no_colour ""
+    __besman_open_file_vscode "$env_file_path" "$config_file_path" || return 1
 
+    
+}
+function __besman_open_file_vscode() {
+    if [[ -z $(which code) ]]; then
+        return 1
+    fi
+    local env_file config_file response
+    env_file=$1
+    config_file=$2
+    read -rp "Do you wish to open the files in vscode?(y/n): " response
+    if [[ ( "$response" == "" ) || ( "$response" == "y" ) || ( "$response" == "Y" ) ]]; then
+
+        __besman_echo_no_colour ""
+        __besman_echo_white "Opening files in vscode"
+        code "$env_file" "$config_file"
+    else
+        return 1
+    fi
+    
+}
 function __besman_set_variables()
 {
     local path
@@ -135,7 +156,6 @@ BESMAN_OSS_TRIGGER_PLAYBOOK: besman-\$BESMAN_OSSP-$env_type-trigger-playbook.yam
 BESMAN_DISPLAY_SKIPPED_ANSIBLE_HOSTS: false
 # Please add other variables as well as ansible variables here
 EOF
-    code "$config_file_path" 
 }
 
 function __besman_create_env_with_config()
