@@ -10,7 +10,7 @@ export BESMAN_SERVICE="https://raw.githubusercontent.com"
 # BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
 
 BESMAN_NAMESPACE="Be-Secure"
-BESMAN_VERSION="0.0.5"
+BESMAN_VERSION="0.0.6"
 BESMAN_ENV_REPOS="$BESMAN_NAMESPACE/besecure-ce-env-repo"
 # BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
 
@@ -256,6 +256,7 @@ touch "$besman_user_config_file"
     echo "BESMAN_OFFLINE_MODE=true"
     echo "BESMAN_LOCAL_ENV=False"
 	echo "BESMAN_LIGHT_MODE=False"
+	echo "BESMAN_LOCAL_ENV_DIR="
 } >> "$besman_user_config_file"
 echo "Download script archive..."
 
