@@ -3,7 +3,7 @@
 function __bes_list {
 
 local flag=$1
-local env
+local env sorted_list
 
 # For listing playbooks
 if [[ ( -n $flag ) && ( $flag == "--playbook" ) ]]; then
@@ -31,19 +31,16 @@ else
 
     
     sed -i '/^$/d' "$BESMAN_DIR/var/list.txt"
+    sorted_list=$(sort "$BESMAN_DIR/var/list.txt")
+    echo "$sorted_list" > "$BESMAN_DIR/var/list.txt"
     OLD_IFS=$IFS
     IFS="/"
       
     while read -r line; 
     do 
-
-
         converted_line=$(echo "$line" | sed 's|,|/|g')
         read -r org repo env version <<< "$converted_line"
-        printf "%-14s %-32s %-25s %-8s\n" "$org" "$repo" "$env" "$version"
-
-
-       
+        printf "%-14s %-32s %-25s %-8s\n" "$org" "$repo" "$env" "$version"     
         
     done < "$BESMAN_DIR/var/list.txt"
     IFS=$OLD_IFS
@@ -54,7 +51,7 @@ else
 
     if [[ $BESMAN_LOCAL_ENV == "True" ]]; then
 
-        __besman_echo_yellow "Pointing to local dir $BESMAN_ENV_REPOS"
+        __besman_echo_yellow "Pointing to local dir $BESMAN_LOCAL_ENV_DIR"
         __besman_echo_no_colour ""
         __besman_echo_white "If you wish to change, run the below command"
         __besman_echo_yellow "$ bes set BESMAN_LOCAL_ENV False"
@@ -69,6 +66,7 @@ fi
 function __besman_check_repo_exist()
 {
     local namespace repo response repo_url
+    [[ $BESMAN_LOCAL_ENV == "True" ]] && return 0
     namespace=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 1)
     repo=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 2)
     repo_url="https://api.github.com/repos/$namespace/$repo"
@@ -87,10 +85,10 @@ function __besman_update_list()
     local bes_list
     if [[ ( -n $BESMAN_LOCAL_ENV ) && ( $BESMAN_LOCAL_ENV == "True" )]]; then
         local env_dir_list bes_list
-        [[ -z $BESMAN_ENV_REPOS ]] && __besman_echo_red "Please set the local env dir first" && return 1
-        [[ ! -d $BESMAN_ENV_REPOS ]] && __besman_echo_red "Could not find dir $BESMAN_ENV_REPOS" && return 1
+        [[ -z $BESMAN_LOCAL_ENV_DIR ]] && __besman_echo_red "Please set the local env dir first" && return 1
+        [[ ! -d $BESMAN_LOCAL_ENV_DIR ]] && __besman_echo_red "Could not find dir $BESMAN_LOCAL_ENV_DIR" && return 1
 
-        env_dir_list=$(< "$BESMAN_ENV_REPOS/list.txt")
+        env_dir_list=$(< "$BESMAN_LOCAL_ENV_DIR/list.txt")
         bes_list=$BESMAN_DIR/var/list.txt
         echo "$env_dir_list" > "$bes_list"
     else
