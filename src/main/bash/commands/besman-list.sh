@@ -114,7 +114,7 @@ function __besman_update_list()
 }
 
 # Function to extract repository names from a JSON response
-function extract_repo_names()
+function __besman_extract_repo_names()
 {
   echo "$1" | grep -oP '"full_name": "\K[^"]+'
 }
@@ -130,7 +130,7 @@ function __besman_list_roles()
     repo_names=$(curl -s -H "Authorization: token $BESMAN_GH_TOKEN" "$api_url")
 
     # Extract repository names from the first page
-    all_repo_names=$(extract_repo_names "$repo_names")
+    all_repo_names=$(__besman_extract_repo_names "$repo_names")
     page_num=1
     # Check if there are more pages and continue fetching if needed
     while [ "$(echo "$repo_names" | grep -c '"full_name"')" -eq 100 ]; do
@@ -138,7 +138,7 @@ function __besman_list_roles()
         api_url="https://api.github.com/orgs/$BESMAN_NAMESPACE/repos?per_page=100&page=$page_num"
         repo_names=$(curl -s -H "Authorization: token $BESMAN_GH_TOKEN" "$api_url")
         all_repo_names="$all_repo_names
-        $(extract_repo_names "$repo_names")"
+        $(__besman_extract_repo_names "$repo_names")"
     done
 
     ansible_roles=$(echo "$all_repo_names" | grep "ansible-role-*")
