@@ -18,6 +18,16 @@ if [[ ( -n $flag ) && ( $flag == "--playbook" ) ]]; then
     __besman_echo_white "No playbook available"
     fi
 
+elif [[ ( -n $flag ) && ( $flag == "--roles" ) ]]; then
+    if [[ -z "$BESMAN_GH_TOKEN" ]]; then
+        __besman_echo_yellow "Github token missing. Please use the below command to export the token"
+        __besman_echo_no_colour ""
+        __besman_echo_no_colour "$ bes set BESMAN_GH_TOKEN <copied token>"
+        __besman_echo_no_colour ""
+        return 1
+    fi
+    __besman_list_roles
+
 else
     __besman_check_repo_exist || return 1
     __besman_update_list
@@ -101,7 +111,46 @@ function __besman_update_list()
         __besman_secure_curl "$path" > "$bes_list"
     fi
 
+}
+
+# Function to extract repository names from a JSON response
+function extract_repo_names()
+{
+  echo "$1" | grep -oP '"full_name": "\K[^"]+'
+}
 
 
+function __besman_list_roles()
+{
+    local api_url repo_names all_repo_names page_num ansible_roles
+
+    api_url="https://api.github.com/orgs/$BESMAN_NAMESPACE/repos?per_page=100&page=1"
+
+    # Get the first page of repository names
+    repo_names=$(curl -s -H "Authorization: token $BESMAN_GH_TOKEN" "$api_url")
+
+    # Extract repository names from the first page
+    all_repo_names=$(extract_repo_names "$repo_names")
+    page_num=1
+    # Check if there are more pages and continue fetching if needed
+    while [ "$(echo "$repo_names" | grep -c '"full_name"')" -eq 100 ]; do
+        page_num=$((page_num + 1))
+        api_url="https://api.github.com/orgs/$BESMAN_NAMESPACE/repos?per_page=100&page=$page_num"
+        repo_names=$(curl -s -H "Authorization: token $BESMAN_GH_TOKEN" "$api_url")
+        all_repo_names="$all_repo_names
+        $(extract_repo_names "$repo_names")"
+    done
+
+    ansible_roles=$(echo "$all_repo_names" | grep "ansible-role-*")
+    
+    printf "%-14s %10s \n" "Github Org" "Repo"
+    __besman_echo_no_colour "-----------------------------------"
+    for i in $ansible_roles
+    do
+        converted_i=$(echo "$i" | sed "s|/| |g")
+        read -r org repo <<< "$converted_i"
+        printf "%-14s %-32s \n" "$org" "$repo"
+    done
+    
 
 }
