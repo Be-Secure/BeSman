@@ -7,16 +7,8 @@ local env sorted_list
 
 # For listing playbooks
 if [[ ( -n $flag ) && ( $flag == "--playbook" ) ]]; then
-    if [[ -d $BESMAN_DIR/playbook  ]]; then
-        [[ -z $(ls $BESMAN_DIR/playbook | grep -v "README.md") ]] && __besman_echo_white "No playbook available" && return 1
-        ls $BESMAN_DIR/playbook >> $HOME/temp.txt
-        __besman_echo_no_colour "Available playbooks"
-        __besman_echo_no_colour "-------------------"
-        cat $HOME/temp.txt | grep -v "README.md"
-        [[ -f $HOME/temp.txt ]] && rm $HOME/temp.txt
-    else
-    __besman_echo_white "No playbook available"
-    fi
+
+    __besman_list_playbooks
 
 elif [[ ( -n $flag ) && ( $flag == "--roles" ) ]]; then
     if [[ -z "$BESMAN_GH_TOKEN" ]]; then
@@ -27,8 +19,16 @@ elif [[ ( -n $flag ) && ( $flag == "--roles" ) ]]; then
         return 1
     fi
     __besman_list_roles
-
 else
+    __besman_start_spinner &
+    local spinner_pid=$!
+    __besman_list_envs 
+    __besman_stop_spinner "$spinner_pid"
+
+fi
+}
+function __besman_list_envs()
+{
     __besman_check_repo_exist || return 1
     __besman_update_list
     # __besman_echo_no_colour "Github Org    Repo                             Environment     Version"
@@ -71,7 +71,6 @@ else
         __besman_echo_yellow "If you wish to change the repo run the below command"
         __besman_echo_yellow "$ bes set BESMAN_ENV_REPOS <GitHub Org>"
     fi
-fi
 }
 function __besman_check_repo_exist()
 {
@@ -153,4 +152,18 @@ function __besman_list_roles()
     done
     
 
+}
+
+function __besman_list_playbooks()
+{
+    if [[ -d $BESMAN_DIR/playbook  ]]; then
+        [[ -z $(ls $BESMAN_DIR/playbook | grep -v "README.md") ]] && __besman_echo_white "No playbook available" && return 1
+        ls $BESMAN_DIR/playbook >> $HOME/temp.txt
+        __besman_echo_no_colour "Available playbooks"
+        __besman_echo_no_colour "-------------------"
+        cat $HOME/temp.txt | grep -v "README.md"
+        [[ -f $HOME/temp.txt ]] && rm $HOME/temp.txt
+    else
+    __besman_echo_white "No playbook available"
+    fi
 }
