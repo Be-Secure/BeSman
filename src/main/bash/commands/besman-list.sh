@@ -20,10 +20,7 @@ elif [[ ( -n $flag ) && ( $flag == "--roles" ) ]]; then
     fi
     __besman_list_roles
 else
-    __besman_start_spinner &
-    local spinner_pid=$!
     __besman_list_envs 
-    __besman_stop_spinner "$spinner_pid"
 
 fi
 }
