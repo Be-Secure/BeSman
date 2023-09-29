@@ -4,9 +4,9 @@ function quick_install()
 {
 local force
 force=$1
-if [[ ( -n $force ) && ( ( $force == "--force" ) || ( $force == "--F" ) ) ]]; then
+if [[ ( -n $force ) && ( ( $force == "--force" ) || ( $force == "-F" ) ) ]]; then
   rm -rf "$HOME/.besman"
-elif [[ ( -n $force ) && ( ( $force != "--force" ) || ( $force != "--F" ) ) ]]; then
+elif [[ ( -n $force ) && ( ( $force != "--force" ) || ( $force != "-F" ) ) ]]; then
   echo "Usage: ./quick_install [--force|-F]"
   echo "--force | -F : Removes the existing installation of BeSman"
   return 
