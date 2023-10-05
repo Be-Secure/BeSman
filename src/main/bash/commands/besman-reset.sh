@@ -6,7 +6,9 @@ function __bes_reset
 	local roles_config_file=$BESMAN_OSS_TRIGGER_PLAYBOOK_PATH/$BESMAN_OSSP-roles-config.yml
     environment=$1
     env_config="besman-$environment-config.yaml"
-
+    if [[ ! -d "$BESMAN_DIR/envs/besman-$environment" ]]; then
+        __besman_echo_red "Please install the environment first"
+    fi
     if [[ -f "$HOME/$env_config" ]]; then
         
         env_config_path="$HOME/$env_config"
