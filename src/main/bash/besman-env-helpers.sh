@@ -48,8 +48,8 @@ function __besman_source_env_params
 function __besman_unset_env_parameters_and_cleanup()
 {
     local environment ossp 
-    enviroment=$1
-    ossp=$(echo "$enviroment" | cut -d "-" -f 1)
+    environment=$1
+    ossp=$(echo "$environment" | cut -d "-" -f 1)
     while read -r line; 
     do
         # To skip comments
@@ -69,7 +69,7 @@ function __besman_unset_env_parameters_and_cleanup()
         
     done < "$BESMAN_ENV_CONFIG_FILE_PATH"
 
-    [[ -f $BESMAN_DIR/tmp/besman-$enviroment-config.yaml ]] && rm "$BESMAN_ENV_CONFIG_FILE_PATH"
+    [[ -f $BESMAN_DIR/tmp/besman-$environment-config.yaml ]] && rm "$BESMAN_ENV_CONFIG_FILE_PATH"
     [[ -d $BESMAN_DIR/tmp/$ossp ]] && rm -rf "$BESMAN_DIR/tmp/$ossp"
 }
 
