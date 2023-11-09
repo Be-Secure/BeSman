@@ -20,3 +20,4 @@ out/
 sdkman-cli.iml
 target/
 bin/test
+.DS_Store
