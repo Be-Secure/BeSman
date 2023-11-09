@@ -1,4 +1,4 @@
-## Overview
+![BeSman](./BeSman-logo-horizontal.png)
 
 BeSman or Be-Secure Manager is a command line utility for provisioning customized security environments. This utility comes under the Be-Secure project which is an umbrella  of open source security projects, tools, sandbox environments to perform security assessments and secure open source technology stacks.
 <br>
