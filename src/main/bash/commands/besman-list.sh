@@ -164,16 +164,7 @@ function __besman_get_playbook_details()
 
 function __besman_list_playbooks()
 {
-    # if [[ -d $BESMAN_DIR/playbook  ]]; then
-    #     [[ -z $(ls $BESMAN_DIR/playbook | grep -v "README.md") ]] && __besman_echo_white "No playbook available" && return 1
-    #     ls $BESMAN_DIR/playbook >> $HOME/temp.txt
-    #     __besman_echo_no_colour "Available playbooks"
-    #     __besman_echo_no_colour "-------------------"
-    #     cat $HOME/temp.txt | grep -v "README.md"
-    #     [[ -f $HOME/temp.txt ]] && rm $HOME/temp.txt
-    # else
-    # __besman_echo_white "No playbook available"
-    # fi
+
 
     local playbook_details_file playbook_details
 
@@ -199,5 +190,7 @@ function __besman_list_playbooks()
         
     done < "$playbook_details_file"
     IFS=$OLD_IFS
+
+    [[ -f $playbook_details_file ]] && rm "$playbook_details_file"
 
 }
