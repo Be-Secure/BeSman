@@ -87,3 +87,25 @@ function __besman_link_candidate_version() {
 
 	ln -s "${version}" "${BESMAN_CANDIDATES_DIR}/${candidate}/current"
 }
+
+function __besman_check_url_valid()
+{
+	local url response
+
+	url="$1"
+	response=$(curl --head --silent --output /dev/null --write-out "%{http_code}" "$url")
+
+	if [[ $response -eq 200 ]]; then
+		
+		unset url response
+		return 0
+
+	else
+
+    	__besman_echo_red "URL $url returned $response"
+		unset url response
+		return 1
+	fi
+	
+
+}
