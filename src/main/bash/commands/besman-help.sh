@@ -157,3 +157,172 @@ __besman_echo_no_colour '  '
 __besman_echo_no_colour ' $ bes run --playbook [playbook name] --input [input arguments] '
 
 }
+
+function __bes_help_install {
+    __besman_echo_yellow ' install - To install a RT/BT environment '
+    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' $ bes install -env <environment> -V <version> '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' Eg: bes install -env tomcat-BT-env -V 0.0.1 '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+}
+
+function __bes_help_uninstall {
+    __besman_echo_yellow ' uninstall - To uninstall the environment '
+    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' $ bes uninstall -env <environment> '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour '         or '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' $ bes uninstall -env <environment> -V <version> '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+}
+
+function __bes_help_list {
+    __besman_echo_yellow ' list - To list the available environments and playbooks '
+    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' $ bes list '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' $ bes list --playbook '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+}
+
+function __bes_help_status {
+    __besman_echo_yellow ' status - To show the installed environments '
+    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' $ bes status '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' ~ - Shows the recently installed environment '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+}
+
+function __bes_help_set {
+    __besman_echo_yellow ' set - To set the BeSman environment variables '
+    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' $ bes set <variable> <value> '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' To show the available list of variables run  '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' $ bes set  '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+}
+
+function __bes_help_create {
+    __besman_echo_yellow ' create - To create an environment or playbook '
+    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' To create a environment '
+    __besman_echo_no_colour ' ----------------------------------------- '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' For environments which relies on ansible role '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' $ bes create -env <environment>  <version>'
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' For environments with only the skeletal code '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' $ bes create -env <environment> <version> basic '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' To create a playbook '
+    __besman_echo_no_colour ' ----------------------------------------- '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' $ bes create --playbook <options> <arguments> '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' <options>: '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour '     -cve : To pass CVE details.  '
+    __besman_echo_no_colour '             $ bes create --playbook -cve CVE-2018-2019 '
+    __besman_echo_no_colour '     -vuln : To pass the vulnerability category. '
+    __besman_echo_no_colour '             $ bes create --playbook -vuln xss '
+    __besman_echo_no_colour '     -env :	To pass the environment name. '
+    __besman_echo_no_colour '             $ bes create --playbook -env drupal '
+    __besman_echo_no_colour '     -ext : To pass the extension of the playbook. '
+    __besman_echo_no_colour '             $ bes create --playbook -ext py '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' NOTE: If any of the above values are not passed, default value "untitled" will be assigned in its place except for -ext.  '
+    __besman_echo_no_colour '         If -ext is not passed, the default value will be "md". '
+    __besman_echo_no_colour '      '
+    __besman_echo_no_colour ' Eg: $ bes create --playbook -cve CVE-2018-2019 -vuln rce -env drupal -ext php '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+}
+
+function __bes_help_upgrade {
+    __besman_echo_yellow ' upgrade - Upgrades BeSman to the latest version '
+    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' $ bes upgrade '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+    __besman_echo_no_colour '  '
+    __besman_echo_yellow ' update - Runs the update function of the environment script '
+    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' $ bes update -env <environment> '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+}
+
+function __bes_help_help {
+    __besman_echo_yellow ' help - Displays the BeSman commands '
+    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' $ bes help '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+}
+
+function __bes_help_version {
+    __besman_echo_yellow ' version - Displays the version of BeSmand or an environment script '
+    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' Version of BeSman Utility '
+    __besman_echo_no_colour ' ------------------------------ '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' $ bes -V  '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' $ bes --version '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' Version of an Environment '
+    __besman_echo_no_colour ' ------------------------------ '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' $ bes -V -env [env_name] '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+}
+
+function __bes_help_remove {
+    __besman_echo_yellow ' remove - To uninstall the BeSman utility '
+    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' $ bes rm '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+}
+
+function __bes_help_pull {
+    __besman_echo_yellow ' pull - To pull the playbooks from repo '
+    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' $ bes pull --playbook '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+}
+
+function __bes_help_run {
+    __besman_echo_yellow ' run - To execute a playbook '
+    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' $ bes run --playbook [playbook name] --input [input arguments] '
+}

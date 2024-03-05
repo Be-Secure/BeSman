@@ -46,7 +46,9 @@ function bes {
 		[[ -z $version ]] && version="${args[2]}"
 	fi
 	__besman_check_for_command_file "$command" || return 1
-
+	echo "test1"
+	echo $command
+	echo ${args[1]}
 	case $command in 
 		install)
 			
@@ -73,10 +75,61 @@ function bes {
 			__besman_validate_version_format $version || return 1
 			__bes_$command $environment $version
 			;;
-		help | status | upgrade | remove)
+		status | upgrade | remove)
+			echo "test2"
 			[[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
 			[[ "${#opts[@]}" -ne 0 ]] && __besman_echo_red "Incorrect syntax" && return 1
 			__bes_$command
+			;;
+		help)
+			echo "under help"
+			[[ "${#args[@]}" -ne 1 && "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
+			[[ "${#opts[@]}" -ne 0 ]] && __besman_echo_red "Incorrect syntax" && return 1
+			if [[ "${#args[@]}" -eq 1 ]]; then
+				__bes_$command
+			elif [[ "${#args[@]}" -eq 2 ]]; then
+				case ${args[1]} in 
+					install)
+						__bes_help_install
+					;;
+					uninstall)
+						__bes_help_uninstall
+					;;
+					list)
+						__bes_help_list
+					;;
+					status)
+						__bes_help_status
+					;;
+					set)
+						__bes_help_set
+					;;
+					create)
+						__bes_help_create
+					;;
+					upgrade)
+						__bes_help_upgrade
+					;;
+					help)
+						__bes_help_help
+					;;
+					version)
+						__bes_help_version
+					;;
+					rm)
+						__bes_help_remove
+					;;
+					pull)
+						__bes_help_pull
+					;;
+					run)
+						__bes_help_run
+					;;
+					*)
+					__besman_echo_red "Unrecognized argument: ${args[1]}" && return 1
+					;;
+				esac
+			fi
 			;;
 		add)
 			[[ "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
