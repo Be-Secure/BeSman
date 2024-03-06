@@ -46,9 +46,9 @@ function bes {
 		[[ -z $version ]] && version="${args[2]}"
 	fi
 	__besman_check_for_command_file "$command" || return 1
-	echo "test1"
-	echo $command
-	echo ${args[1]}
+	#echo "test1"
+	#echo $command
+	#echo ${args[1]}
 	case $command in 
 		install)
 			
@@ -76,13 +76,13 @@ function bes {
 			__bes_$command $environment $version
 			;;
 		status | upgrade | remove)
-			echo "test2"
+			#echo "test2"
 			[[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
 			[[ "${#opts[@]}" -ne 0 ]] && __besman_echo_red "Incorrect syntax" && return 1
 			__bes_$command
 			;;
 		help)
-			echo "under help"
+			#echo "under help"
 			[[ "${#args[@]}" -ne 1 && "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
 			[[ "${#opts[@]}" -ne 0 ]] && __besman_echo_red "Incorrect syntax" && return 1
 			if [[ "${#args[@]}" -eq 1 ]]; then
@@ -110,6 +110,9 @@ function bes {
 					upgrade)
 						__bes_help_upgrade
 					;;
+					update)
+						__bes_help_update
+					;;
 					help)
 						__bes_help_help
 					;;
@@ -124,6 +127,12 @@ function bes {
 					;;
 					run)
 						__bes_help_run
+					;;
+					validate)
+						__bes_help_validate
+					;;
+					reset)
+						__bes_help_reset
 					;;
 					*)
 					__besman_echo_red "Unrecognized argument: ${args[1]}" && return 1

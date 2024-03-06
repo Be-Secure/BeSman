@@ -155,7 +155,20 @@ __besman_echo_yellow ' run - To execute a playbook '
 __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
 __besman_echo_no_colour '  '
 __besman_echo_no_colour ' $ bes run --playbook [playbook name] --input [input arguments] '
-
+__besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+__besman_echo_no_colour '  '
+__besman_echo_yellow ' validate - To validate the installation/uninstalltion of an environment '
+__besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+__besman_echo_no_colour '  '
+__besman_echo_no_colour ' $ bes validate -env <environment name> '
+__besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+__besman_echo_no_colour '  '
+__besman_echo_yellow ' reset - To reset the configurations to default'
+__besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+__besman_echo_no_colour '  '
+__besman_echo_no_colour ' $ bes reset -env <environment name> '
+__besman_echo_no_colour '  '
+__besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
 }
 
 function __bes_help_install {
@@ -166,6 +179,10 @@ function __bes_help_install {
     __besman_echo_no_colour '  '
     __besman_echo_no_colour ' Eg: bes install -env tomcat-BT-env -V 0.0.1 '
     __besman_echo_no_colour '  '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour 'You can install and environment by running the above command. Make sure the environment is listed when running the bes list command.'
+    __besman_echo_no_colour 'The default configuration file for the environment will be residing next to the environment script inside the remote repo or the local directory.'
+    __besman_echo_no_colour 'If you wish to override any default values have a copy of the configuration file in your user home dir and make the changes.'
     __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
 }
 
@@ -189,8 +206,6 @@ function __bes_help_list {
     __besman_echo_no_colour ' $ bes list '
     __besman_echo_no_colour '  '
     __besman_echo_no_colour ' $ bes list --playbook '
-    __besman_echo_no_colour '  '
-    __besman_echo_no_colour '  '
     __besman_echo_no_colour '  '
     __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
 }
@@ -265,13 +280,6 @@ function __bes_help_upgrade {
     __besman_echo_no_colour ' $ bes upgrade '
     __besman_echo_no_colour '  '
     __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
-    __besman_echo_no_colour '  '
-    __besman_echo_yellow ' update - Runs the update function of the environment script '
-    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
-    __besman_echo_no_colour '  '
-    __besman_echo_no_colour ' $ bes update -env <environment> '
-    __besman_echo_no_colour '  '
-    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
 }
 
 function __bes_help_help {
@@ -325,4 +333,34 @@ function __bes_help_run {
     __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
     __besman_echo_no_colour '  '
     __besman_echo_no_colour ' $ bes run --playbook [playbook name] --input [input arguments] '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
 }
+
+function __bes_help_validate {
+    __besman_echo_yellow ' validate - To validate the installation/uninstalltion of an environment '
+    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' $ bes validate -env <environment name> '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+}
+
+function __bes_help_update {
+    __besman_echo_yellow ' update - Runs the update function of the environment script '
+    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' $ bes update -env <environment> '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+}
+
+function __bes_help_reset {
+    __besman_echo_yellow ' reset - To reset the configurations to default'
+    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' $ bes reset -env <environment name> '
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour ' -------------------------------------------------------------------------------------- '
+}
+
