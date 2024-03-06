@@ -1,40 +1,76 @@
 ![BeSman](./BeSman-logo-horizontal.png)
 
-BeSman or Be-Secure Manager is a command line utility for provisioning customized security environments. This utility comes under the Be-Secure project which is an umbrella  of open source security projects, tools, sandbox environments to perform security assessments and secure open source technology stacks.
-<br>
+BeSman (pronounced as ‘B-e-S-man’) is a command-line utility designed for provisioning customized security environments. It helps security professionals streamline the project setup phase, enabling them to focus on their specific tasks.
 
-## Installing BeSman using oah-shell
+BeSman can also be used to run [BeS playbooks](https://github.com/Be-Secure/besecure-playbooks-store).
 
-We will be using [oah-installer](https://github.com/be-secure/oah-installer), a component of [**OpenAppHack(OAH)**](https://openapphack.github.io/OAH/), to install [oah-shell](https://github.com/be-secure/oah-shell) in the local system and using it to bring up [oah-bes-vm](https://github.com/be-secure/oah-bes-vm) with BeSman installed.<br> OpenAppHack (OAH) is built on top of opensource DevOps tools. Its a vendor neutral environment provisioning approach that enables rapid development and prototyping of open source solution. For more details about oah-installar, please visit [github page](https://github.com/Be-Secure/oah-installer/blob/master/README.md) and for oah shell info, use [readme](https://github.com/Be-Secure/oah-shell/blob/master/README.md) for the same.
-<br>
+# What is an environment script
 
+An environment script is a script which contains the instructions to install all the tools and utilities required for a security professional to work on a specific project. The BeS environment scripts are stored in this [repo](https://github.com/Be-Secure/besecure-ce-env-repo).
 
+Each environment script contains the following life cycle functions -
 
-## Install using OAH
+- **install**: Installs the required tools.
+- **uninstall**: Removes the installed tools.
+- **validate**: Checks whether all the tools are installed and required configurations are met.
+- **update**: Update configurations of the tools.
+- **reset**: Reset the environment to the default state.
 
-### Pre-requisites 
+There are two types of enviornment script - **Red Team(RT) environment script** & **Blue Team(RT) environment script**
+
+## RT env
+
+The RT env would contain the instruction to install/manage the tools required for a security professional to perform RT activities on a project such as vulnerability assessment and exploit creation.
+
+## BT env
+
+The RT env would contain the instruction to install/manage the tools required for a security professional to perform BT activities such as vulnerability remediation and patching.
+
+# What is a BeS Playbook
+
+A playbook in Be-Secure ecosystem refers to a set of instructions for completing a routine task. Not to be confused with an Ansible playbook. There can be automated(.sh), interactive(.ipynb) & manual(\*.md) playbooks. It helps the security analyst who works in a BeSLab instance to carry out routine tasks in a consistent way.
+
+The playbooks are stored in this [repo](https://github.com/Be-Secure/besecure-playbooks-store).
+
+Each playbook file contains the following lifecycle functions,
+
+- **init**: Initializes variables and other configuraitons to perform the activity and publish the report.
+- **execute**: Performs the intended activity.
+- **prepare**: Filters data from detailed report to generate OSAR.
+- **publish**: Publishes the detailed report as well as OSAR.
+- **cleanup**: Does clean up of variables and files created during run time.
+- **launch**: Trigger function which calls all the above functions.
+
+The playbooks are stored in this [repo](https://github.com/Be-Secure/besecure-playbooks-store).
+
+# Installation
+
+## For Windows
+
+BeSman only works with linux machines. So, if you are a windows user, you can use [oah-installer](https://github.com/be-secure/oah-installer), a component of [**OpenAppHack(OAH)**](https://openapphack.github.io/OAH/), to install [oah-shell](https://github.com/be-secure/oah-shell) in the local system and using it to bring up [oah-bes-vm](https://github.com/be-secure/oah-bes-vm) with BeSman installed.
+
+### Pre-requisites
 
 - <a href="https://www.virtualbox.org/" target="_blank">Virtual Box</a>
 - <a href="https://www.vagrantup.com/" target="_blank">Vagrant</a>
 - <a href="https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html" target="_blank">Ansible</a>
+- <a href="https://gitforwindows.org/" target="_blank">Git Bash</a>
 
-`NOTE: Use Gitbash with mingw, if the base OS is Windows`
+1.  Open your git bash
 
-1. Open your terminal 
+2.  Execute the below command to set the correct namespace
 
-2. Execute the below command to set the correct namespace
+        export BES_NAMESPACE=Be-Secure
 
-        export BES_NAMESPACE=be-secure
+3.  Install oah-shell
 
-3. Install oah-shell
+    curl -s https://raw.githubusercontent.com/Be-Secure/oah-installer/master/install.sh | bash
 
-       curl -s https://raw.githubusercontent.com/Be-Secure/oah-installer/master/install.sh | bash
-
-4. Confirm the installation oah-shell by executing the below command which would list various oah commands
+4.  Confirm the installation oah-shell by executing the below command which would list various oah commands
 
         oah
 
-5. Execute the below command to get the list of environments 
+5.  Execute the below command to get the list of environments
 
         oah list
 
@@ -42,64 +78,47 @@ We will be using [oah-installer](https://github.com/be-secure/oah-installer), a 
 
          source ${OAH_DIR}/bin/oah-init
 
-6. Setup oah-bes-vm for BeSman by executing the below command.
+6.  Setup oah-bes-vm for BeSman by executing the below command.
 
         oah install -v oah-bes-vm
 
-## Install from source
+## For Linux
 
 ### Pre-requisites
+
 - <a href="https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html" target="_blank">Ansible</a>
 - <a href="https://github.com/cli/cli/blob/trunk/docs/install_linux.md" target="_blank">Github CLI</a>
 
-1. Get the latest binary
-    
-		curl -L https://raw.githubusercontent.com/Be-Secure/BeSman/dist/dist/get.besman.io | bash
+1.  Download the latest binary
 
-2. Source the files into memory
-   
-		source $HOME/.besman/bin/besman-init.sh
+        curl -L https://raw.githubusercontent.com/Be-Secure/BeSman/dist/dist/get.besman.io | bash
 
-3. Run the below command to confirm installation
+2.  Source the files into memory
 
-		bes help
+        source $HOME/.besman/bin/besman-init.sh
 
-## BeSman commands
+3.  Run the below command to confirm installation
 
-Run the following commands on the terminal to manage respective environments.
-
-### Installing an environment:
-
-         bes install -env [namespace]/[repo name]/[environment_name] -V [version_tag]
-
-        Example   :
-            bes install -env Be-Secure/besecure-ce-env-repo/fastjson-RT-env -V 0.0.1
-
-
-### Uninstalling an environment:
-
-         bes uninstall -env [environment_name] -V [version]
-
-        Example   :
-            bes uninstall -env  fastjson-RT-env -V 0.0.1
-
- 
-### Other useful commands:        
-
-        bes --version
-        bes --version -env [environment name]
-        bes list
-        bes status
         bes help
+
+# Usage
+
+## List all environments
+
         bes list
-        bes pull --playbook
-        bes run
-        bes update              
-        bes validate
-	bes rm
 
+## Installing an environment:
 
+        bes install -env <environment name> -V <Version>
 
-### Demo
+        Eg: $ bes install -env fastjson-BT-env -V 0.0.1
 
-<a href="https://vimeo.com/570839886/50aeb9d751" target="_blank">BeSman execution Demo</a>
+## Uninstalling an environment:
+
+        $ bes uninstall -env <environment name> -V <version>
+
+        Eg: $ bes uninstall -env  fastjson-RT-env -V 0.0.1
+
+## Other commands
+
+You can get the other command from the BeSman [webpage](https://be-secure.github.io/Be-Secure/bes-besman-details/)
