@@ -20,9 +20,9 @@ function bes {
 	args=()
 	local command environment version assess_flag purpose type
 	while [[ -n "$1" ]]; do
+		
 		case "$1" in 
 			rm | remove)
-				command=remove
 				args=("${args[@]}" "$1")
 			;;
 			-env | -V | --environment | --version | --playbook | -P | -cve | -vuln | -ext | -assess | --input | --roles)         opts=("${opts[@]}" "$1");; ## -env | -V 
@@ -30,25 +30,24 @@ function bes {
     	esac
     	shift
 	done
-	
+
 	[[ ${#args[@]} -gt 6 ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
 	
 	[[ ${#opts[@]} -gt 6 ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
+	
 	if [[ -z $command && ("${opts[0]}" == "-V" || "${opts[0]}" == "--version") ]]; then
 		command=version
 		environment="${args[0]}" 
 		local opt_environment="${opts[1]}"
 	fi
-
+	
 	[[ -z $command ]] && command="${args[0]}"
 	if [[ ( ${opts[0]} != "--playbook" ) && ( ${opts[0]} != "-P" ) ]]; then
 		[[ -z $environment ]] && environment="${args[1]}"
 		[[ -z $version ]] && version="${args[2]}"
 	fi
+	[[ "$command" == "rm" ]] && command="remove"
 	__besman_check_for_command_file "$command" || return 1
-	#echo "test1"
-	#echo $command
-	#echo ${args[1]}
 	case $command in 
 		install)
 			
@@ -76,13 +75,11 @@ function bes {
 			__bes_$command $environment $version
 			;;
 		status | upgrade | remove)
-			#echo "test2"
 			[[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
 			[[ "${#opts[@]}" -ne 0 ]] && __besman_echo_red "Incorrect syntax" && return 1
 			__bes_$command
 			;;
 		help)
-			#echo "under help"
 			[[ "${#args[@]}" -ne 1 && "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
 			[[ "${#opts[@]}" -ne 0 ]] && __besman_echo_red "Incorrect syntax" && return 1
 			if [[ "${#args[@]}" -eq 1 ]]; then
@@ -119,7 +116,7 @@ function bes {
 					version)
 						__bes_help_version
 					;;
-					rm)
+					rm | remove)
 						__bes_help_remove
 					;;
 					pull)
