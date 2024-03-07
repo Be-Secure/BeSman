@@ -58,7 +58,6 @@ BeSman only works with linux machines. So, if you are a windows user, you can us
 
 - <a href="https://www.virtualbox.org/" target="_blank">Virtual Box</a>
 - <a href="https://www.vagrantup.com/" target="_blank">Vagrant</a>
-- <a href="https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html" target="_blank">Ansible</a>
 - <a href="https://gitforwindows.org/" target="_blank">Git Bash</a>
 
 1.  Open your git bash
