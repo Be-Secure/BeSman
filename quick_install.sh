@@ -41,6 +41,7 @@ besman_bash_profile="${HOME}/.bash_profile"
 besman_profile="${HOME}/.profile"
 besman_bashrc="${HOME}/.bashrc"
 besman_zshrc="${HOME}/.zshrc"
+besman_scripts_folder="$BESMAN_DIR/scripts"
 
 besman_init_snippet=$( cat << EOF
 #THIS MUST BE AT THE END OF THE FILE FOR BESMAN TO WORK!!!
@@ -168,6 +169,7 @@ mkdir -p "$besman_stage_folder"
 mkdir -p "$besman_env_folder"
 mkdir -p "$besman_etc_folder"
 mkdir -p "$besman_var_folder"
+mkdir -p "$besman_scripts_folder"
 
 
 
@@ -206,6 +208,7 @@ touch "$besman_user_config_file"
 
 cp ./src/main/bash/besman-* "$besman_src_folder"
 cp ./src/main/bash/commands/besman-* "$besman_src_folder"
+cp ./src/main/bash/scripts/besman-* "$besman_scripts_folder"
 mv "$besman_src_folder/besman-init.sh" "$besman_bin_folder"
 
 touch "$besman_var_folder/list.txt"
@@ -240,7 +243,6 @@ if [[ -z $(grep 'besman-init.sh' "$besman_zshrc") ]]; then
     echo -e "\n$besman_init_snippet" >> "$besman_zshrc"
     echo "Updated existing ${besman_zshrc}"
 fi
-source "${BESMAN_DIR}/bin/besman-init.sh"
 
 echo -e "\n\n\nAll done!\n\n"
 

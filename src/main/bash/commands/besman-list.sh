@@ -151,16 +151,46 @@ function __besman_list_roles()
 
 }
 
+function __besman_get_playbook_details()
+{
+    local scripts_file
+
+    scripts_file="$BESMAN_DIR/scripts/besman-get-playbook-details.py"
+
+    [[ ! -f "$scripts_file" ]] && __besman_echo_red "Could not find $scripts_file" && return 1
+
+    python3 "$scripts_file"
+}
+
 function __besman_list_playbooks()
 {
-    if [[ -d $BESMAN_DIR/playbook  ]]; then
-        [[ -z $(ls $BESMAN_DIR/playbook | grep -v "README.md") ]] && __besman_echo_white "No playbook available" && return 1
-        ls $BESMAN_DIR/playbook >> $HOME/temp.txt
-        __besman_echo_no_colour "Available playbooks"
-        __besman_echo_no_colour "-------------------"
-        cat $HOME/temp.txt | grep -v "README.md"
-        [[ -f $HOME/temp.txt ]] && rm $HOME/temp.txt
-    else
-    __besman_echo_white "No playbook available"
-    fi
+
+
+    local playbook_details_file playbook_details
+
+    playbook_details_file="$BESMAN_DIR/tmp/playbook_details.txt"
+
+    __besman_get_playbook_details || return 1
+
+    playbook_details=$(cat "$playbook_details_file")
+
+    [[ ( ! -f "$playbook_details_file" ) || ( -z $playbook_details ) ]] && __besman_echo_red "Could not find playbook details" && return 1
+
+    printf "%-14s %-10s %-15s %-8s\n" "Name" "Version" "Type" "Author"
+    __besman_echo_no_colour "----------------------------------------------------------------------"
+
+    OLD_IFS=$IFS
+    IFS=" "
+      
+    while read -r line; 
+    do 
+        # converted_line=$(echo "$line" | sed 's|,|/|g')
+        read -r name version type author <<< "$line"
+        printf "%-14s %-10s %-15s %-8s\n" "$name" "$version" "$type" "$author"     
+        
+    done < "$playbook_details_file"
+    IFS=$OLD_IFS
+
+    [[ -f $playbook_details_file ]] && rm "$playbook_details_file"
+
 }
