@@ -119,9 +119,6 @@ function bes {
 					rm | remove)
 						__bes_help_remove
 					;;
-					pull)
-						__bes_help_pull
-					;;
 					run)
 						__bes_help_run
 					;;
