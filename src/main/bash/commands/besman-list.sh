@@ -188,7 +188,7 @@ function __besman_list_playbooks()
         read -r name version type author <<< "$line"
         printf "%-14s %-10s %-15s %-8s\n" "$name" "$version" "$type" "$author"     
         
-    done < "$playbook_details_file"
+    done <<< "$playbook_details"
     IFS=$OLD_IFS
 
     [[ -f $playbook_details_file ]] && rm "$playbook_details_file"
