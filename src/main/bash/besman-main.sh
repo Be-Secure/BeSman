@@ -94,16 +94,14 @@ function bes {
 			__bes_"$command" "$variable" "$value"
 			;;
 		run)
-			# bes run sbom 0.0.1
-			# if [[ -z "${#opts[1]}" ]]; then
+			# bes run --playbook sbom -V 0.0.1
 
 				[[ "${#args[@]}" -ne 3 ]] && __besman_echo_red "Incorrect syntax" && return 1
+				[[ "${#opts[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
+
 				# [[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
 				__bes_"$command" "${args[1]}" "${args[2]}"
-			# else
 				
-				# __bes_$command "${args[@]}" 
-			# fi
 			;;
 		list)
 			if [[ -z ${opts[0]} ]]; then
