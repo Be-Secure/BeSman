@@ -107,22 +107,29 @@ BeSman is designed to work with linux machines. So, if you are a windows user, y
 
 # Usage
 
-## List all environments
+        bes [command] [options] [ [environment name] | [playbook name] | [version] ]
 
-        bes list
+        Commands
+        -----------------------------------
+        help: Display the help command
+        list: List available environments, playbooks, roles.
+        install: Install available environments.
+        uninstall: Uninstall the installed environment.
+        update: Update the configurations of the installed environment.
+        validate: Validate the installtion of the environment.
+        reset: Reset the environment to default configurations.
+        create: Create environment script.
+        set: Change the BeSman config variables.
+        pull: Fetches the playbook from remote to local.
+        run: Execute available playbooks.
+        upgrade: Upgrade BeSman to the latest version
 
-## Installing an environment:
+        Options
+        -------------------------------------
+        -env | --environment: For passing the name of the environment script.
+        -V | --version: For passing the version number.
+        -P | --playbook: For passing the playbook name
+        --roles: To list the role names
 
-        bes install -env <environment name> -V <Version>
 
-        Eg: $ bes install -env fastjson-BT-env -V 0.0.1
-
-## Uninstalling an environment:
-
-        $ bes uninstall -env <environment name> -V <version>
-
-        Eg: $ bes uninstall -env  fastjson-RT-env -V 0.0.1
-
-## Other commands
-
-You can get the other command from the BeSman [webpage](https://be-secure.github.io/Be-Secure/bes-besman-details/)
+You can find more details of the command from the BeSman [webpage](https://be-secure.github.io/Be-Secure/bes-besman-details/)
