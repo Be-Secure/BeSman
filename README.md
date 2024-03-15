@@ -123,6 +123,7 @@ BeSman is designed to work with linux machines. So, if you are a windows user, y
         pull: Fetches the playbook from remote to local.
         run: Execute available playbooks.
         upgrade: Upgrade BeSman to the latest version
+        rm | remove: Remove BeSman from machine.
 
         Options
         -------------------------------------
