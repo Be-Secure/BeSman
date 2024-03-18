@@ -146,18 +146,10 @@ function bes {
 		pull)
 			[[ "${#args[@]}" -ne 3 ]] && __besman_echo_red "Incorrect syntax" && return 1
 			[[ "${#opts[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
-			
-			if [[ 
-				( ( ${opts[0]} == "--playbook" ) || ( ${opts[0]} == "-P" ) )
-				&& ( ( ${opts[1]} == "-V" ) || ( ${opts[1]} == "--version" ) )
-			]]; then
-				type=playbook
+		
 				playbook_name=${args[1]}	
 				version=${args[2]}
-				__bes_$command $type $playbook_name $version
-			else
-				__besman_echo_red "Not a valid command."
-			fi
+				__bes_"$command" "$playbook_name" "$version"
 			unset type playbook_name version
 			;;
 		create)
