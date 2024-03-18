@@ -144,19 +144,13 @@ function bes {
 				__bes_$command $environment 
 			;;
 		pull)
-			[[ "${#args[@]}" -gt 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
-			[[ "${#opts[@]}" -gt 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
-			if [[ ( ${opts[0]} == "--playbook" ) || ( ${opts[0]} == "-P" ) ]]; then
-				type=playbook
-				namespace="${args[1]}"
-			
-			else
-				type=environment
-				__besman_check_input_env_format "$environment" || return 1
-
-			fi
-			__bes_$command $type $namespace
-			unset type namespace
+			[[ "${#args[@]}" -ne 3 ]] && __besman_echo_red "Incorrect syntax" && return 1
+			[[ "${#opts[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
+		
+				playbook_name=${args[1]}	
+				version=${args[2]}
+				__bes_"$command" "$playbook_name" "$version"
+			unset type playbook_name version
 			;;
 		create)
 			# bes create --playbook -cve <cve-details> -vuln <vulnerability> -env <env name> -ext <extension>
