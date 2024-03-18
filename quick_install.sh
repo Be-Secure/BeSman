@@ -42,6 +42,7 @@ besman_profile="${HOME}/.profile"
 besman_bashrc="${HOME}/.bashrc"
 besman_zshrc="${HOME}/.zshrc"
 besman_scripts_folder="$BESMAN_DIR/scripts"
+besman_playbook_dir="$BESMAN_DIR/playbooks"
 
 besman_init_snippet=$( cat << EOF
 #THIS MUST BE AT THE END OF THE FILE FOR BESMAN TO WORK!!!
@@ -170,6 +171,7 @@ mkdir -p "$besman_env_folder"
 mkdir -p "$besman_etc_folder"
 mkdir -p "$besman_var_folder"
 mkdir -p "$besman_scripts_folder"
+mkdir -p "$besman_playbook_dir"
 
 
 
@@ -198,12 +200,13 @@ touch "$besman_user_config_file"
     echo "BESMAN_INTERACTIVE_USER_MODE=true"
     echo "BESMAN_DIR=$HOME/.besman"
     echo "BESMAN_ENV_REPOS=$BESMAN_ENV_REPOS"
-    echo "BESMAN_PLAYBOOK_REPO=besecure-ce-playbook-repo"
+    echo "BESMAN_PLAYBOOK_REPO=besecure-playbooks-store"
     echo "BESMAN_GH_TOKEN="
     echo "BESMAN_OFFLINE_MODE=true"
     echo "BESMAN_LOCAL_ENV=False"
   	echo "BESMAN_LIGHT_MODE=False"
     echo "BESMAN_LOCAL_ENV_DIR="
+    echo "BESMAN_PLAYBOOK_DIR=$besman_playbook_dir"
 } >> "$besman_user_config_file"
 
 cp ./src/main/bash/besman-* "$besman_src_folder"
