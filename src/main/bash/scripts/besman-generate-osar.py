@@ -90,9 +90,8 @@ def write_json_data(osar_data, osar_file_path):
     with open(osar_file_path, 'w') as f:
         json.dump(osar_data, f, indent=4)
 
-    # Define a dictionary mapping tool names to processing functions
 
-
+# Define a dictionary mapping tool names to processing functions
 # Add more tools and their corresponding processing functions here
 tool_processors = {
     "sonarqube": sonar_parser,
@@ -105,18 +104,12 @@ tool_processors = {
 
 
 def main():
-    """
-
-    (file_path_arg, tool_name_arg, tool_type_arg, tool_version_arg, playbook_arg, execution_type_arg,
-     execution_id_arg, duration_arg, output_path_arg, type_arg, name_arg, version_arg,
-     url_arg, environment_arg) = sys.argv[1:]
-    """
     # Define a list of required environment variables
     required_env_variables = [
-        "BESMAN_ASSET_TYPE",
-        "BESMAN_ASSET_NAME",
-        "BESMAN_ASSET_VERSION",
-        "BESMAN_ASSET_URL",
+        "BESMAN_ARTIFACT_TYPE",
+        "BESMAN_ARTIFACT_NAME",
+        "BESMAN_ARTIFACT_VERSION",
+        "BESMAN_ARTIFACT_URL",
         "BESMAN_ENV_NAME",
 
         "ASSESSMENT_TOOL_NAME",
@@ -131,7 +124,7 @@ def main():
         "EXECUTION_DURATION",
         "DETAILED_REPORT_PATH",
 
-        "OSAR_REPORT_PATH"
+        "OSAR_PATH"
     ]
 
     # Validate if all required environment variables are set
@@ -139,10 +132,10 @@ def main():
         sys.exit(1)
 
     # Retrieve values from environment variables
-    asset_type = os.environ.get("BESMAN_ASSET_TYPE")
-    asset_name = os.environ.get("BESMAN_ASSET_NAME")
-    asset_version = os.environ.get("BESMAN_ASSET_VERSION")
-    asset_url = os.environ.get("BESMAN_ASSET_URL")
+    asset_type = os.environ.get("BESMAN_ARTIFACT_TYPE")
+    asset_name = os.environ.get("BESMAN_ARTIFACT_NAME")
+    asset_version = os.environ.get("BESMAN_ARTIFACT_VERSION")
+    asset_url = os.environ.get("BESMAN_ARTIFACT_URL")
     environment = os.environ.get("BESMAN_ENV_NAME")
 
     tool_name = os.environ.get("ASSESSMENT_TOOL_NAME")
@@ -157,7 +150,7 @@ def main():
     execution_duration = os.environ.get("EXECUTION_DURATION")
     report_output_path = os.environ.get("DETAILED_REPORT_PATH")
 
-    osar_path = os.environ.get("OSAR_REPORT_PATH")
+    osar_path = os.environ.get("OSAR_PATH")
 
     # Read and parse the JSON file(user data e.g. sonar-scan-json, snyk, sbom etc...) specified by report_output_path
     output_json_data = read_json_file(report_output_path)
