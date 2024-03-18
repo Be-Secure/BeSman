@@ -26,7 +26,7 @@ fi
 }
 function __besman_list_envs()
 {
-    local current_version current_env local_annotation remote_annotation
+    local current_version current_env installed_annotation remote_annotation
     __besman_check_repo_exist || return 1
     __besman_update_list
     # __besman_echo_no_colour "Github Org    Repo                             Environment     Version"
@@ -169,11 +169,22 @@ function __besman_list_roles()
 
 }
 
+function __besman_get_playbook_details()
+{
+    local scripts_file
+
+    scripts_file="$BESMAN_DIR/scripts/besman-get-playbook-details.py"
+
+    [[ ! -f "$scripts_file" ]] && __besman_echo_red "Could not find $scripts_file" && return 1
+
+    python3 "$scripts_file"
+}
+
 function __besman_list_playbooks()
 {
 
 
-    local playbook_details_file playbook_details
+    local playbook_details_file playbook_details local_annotation remote_annotation
 
     playbook_details_file="$BESMAN_DIR/tmp/playbook_details.txt"
 
@@ -183,6 +194,9 @@ function __besman_list_playbooks()
 
     [[ ( ! -f "$playbook_details_file" ) || ( -z $playbook_details ) ]] && __besman_echo_red "Could not find playbook details" && return 1
 
+    local_annotation=$(__besman_echo_red "+")
+    remote_annotation=$(__besman_echo_yellow "^")
+    
     printf "%-14s %-10s %-15s %-8s\n" "Name" "Version" "Type" "Author"
     __besman_echo_no_colour "----------------------------------------------------------------------"
 
@@ -193,10 +207,24 @@ function __besman_list_playbooks()
     do 
         # converted_line=$(echo "$line" | sed 's|,|/|g')
         read -r name version type author <<< "$line"
-        printf "%-14s %-10s %-15s %-8s\n" "$name" "$version" "$type" "$author"     
+        if [[ -f "$BESMAN_PLAYBOOK_DIR/besman-$name-$version-playbook.sh" ]] 
+        then
+            
+            printf "%-14s %-10s %-15s %-8s\n" "$name" "$version" "$type" "$author$local_annotation"
+        else
+            printf "%-14s %-10s %-15s %-8s\n" "$name" "$version" "$type" "$author$remote_annotation"
+
+        fi
         
     done <<< "$playbook_details"
     IFS=$OLD_IFS
+
+    __besman_echo_no_colour ""
+    __besman_echo_no_colour "======================================================================="
+    __besman_echo_no_colour "$remote_annotation - remote playbook"
+    __besman_echo_no_colour "$local_annotation - local playbook"
+    __besman_echo_no_colour "======================================================================="
+    __besman_echo_no_colour ""
 
     [[ -f $playbook_details_file ]] && rm "$playbook_details_file"
 
