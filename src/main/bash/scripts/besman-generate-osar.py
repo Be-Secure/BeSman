@@ -119,6 +119,7 @@ def main():
         "EXECUTION_TIMESTAMP",
         "EXECUTION_DURATION",
         "DETAILED_REPORT_PATH",
+        "BESLAB_ASSESSMENT_DATASTORE_URL",
 
         "OSAR_PATH"
     ]
@@ -145,6 +146,7 @@ def main():
     execution_timestamp = os.environ.get("EXECUTION_TIMESTAMP")
     execution_duration = os.environ.get("EXECUTION_DURATION")
     report_output_path = os.environ.get("DETAILED_REPORT_PATH")
+    beslab_assessment_datastore_url = os.environ.get("BESLAB_ASSESSMENT_DATASTORE_URL")
 
     osar_path = os.environ.get("OSAR_PATH")
 
@@ -163,6 +165,16 @@ def main():
         print(f"Unsupported tool_name. Available tools support : {available_tools}")
         sys.exit(1)
 
+    # Find the index of "besecure-assessment-datastore"
+    index = report_output_path.find("besecure-assessment-datastore")
+    # Extract the portion of the path after "besecure-assessment-datastore"
+    if index != -1:
+        remaining_path = report_output_path[index + len("besecure-assessment-datastore") + 1:]
+    else:
+        print(f"Wrong DETAILED_REPORT_PATH. Please pass the correct path to besecure-assessment-datastore")
+        sys.exit(1)
+    output_path = os.path.join(beslab_assessment_datastore_url, remaining_path)
+
     new_assessment = {
         "tool": {
             "name": tool_name,
@@ -176,7 +188,7 @@ def main():
             "status": execution_status,
             "timestamp": execution_timestamp,
             "duration": f"{execution_duration} sec",
-            "output_path": report_output_path
+            "output_path": output_path
         },
         "results": user_data
     }
