@@ -141,7 +141,7 @@ def main():
 
     execution_type = os.environ.get("BESLAB_OWNER_TYPE")
     execution_id = os.environ.get("BESLAB_OWNER_NAME")
-    execution_status = os.environ.get("BESLAB_OWNER_NAME")
+    execution_status = os.environ.get("PLAYBOOK_EXECUTION_STATUS")
     execution_timestamp = os.environ.get("EXECUTION_TIMESTAMP")
     execution_duration = os.environ.get("EXECUTION_DURATION")
     report_output_path = os.environ.get("DETAILED_REPORT_PATH")
@@ -175,7 +175,7 @@ def main():
             "id": execution_id,
             "status": execution_status,
             "timestamp": execution_timestamp,
-            "duration": execution_duration,
+            "duration": f"{execution_duration} sec",
             "output_path": report_output_path
         },
         "results": user_data
