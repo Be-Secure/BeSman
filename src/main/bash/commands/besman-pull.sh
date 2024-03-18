@@ -2,16 +2,11 @@
 
 function __bes_pull
 {   
-    __besman_check_for_gh || return 1
     __besman_check_github_id $BESMAN_USER_NAMESPACE || return 1
-    __besman_gh_auth $BESMAN_USER_NAMESPACE
     local type repo dir remote branch return_val namespace
-    type=$1
     playbook_name=$2
     playbook_version=$3
-    if [[ $type == "playbook" ]]; then
-        dir=$BESMAN_DIR/playbooks
-    fi
+    dir=$BESMAN_DIR/playbooks
     __besman_echo_white "Fetching playbooks..." 
     if [[ -d $dir ]]; then
         cd $dir
@@ -22,7 +17,7 @@ function __bes_pull
         __besman_fetch_playbook $playbook_name $playbook_version
         cd $HOME
     fi
-    unset type dir return_val playbook_name playbook_version
+    unset dir playbook_name playbook_version
 }
 
 function __besman_fetch_playbook() {
@@ -51,25 +46,4 @@ function __besman_fetch_playbook() {
     unset lifecycle_file lifecyle_file_url playbook_name playbook_version
 }
 
-function __besman_check_url_valid() {
-    local url=$1
-    local response_code
-
-    if command -v curl &> /dev/null; then
-        response_code=$(curl -s -o /dev/null -w "%{http_code}" "$url")
-    elif command -v wget &> /dev/null; then
-        response_code=$(wget --spider -S "$url" 2>&1 | grep "HTTP/" | awk '{print $2}')
-    else
-        __besman_echo_red "Neither curl nor wget found."
-        return 1
-    fi
-
-    if [[ $response_code -eq 200 ]]; then
-        return 0
-    else
-        __besman_echo_red "playbook_name or playbook_version or BESMAN_NAMESPACE not valid."
-        return 1
-    fi
-    unset response_code
-}
 
