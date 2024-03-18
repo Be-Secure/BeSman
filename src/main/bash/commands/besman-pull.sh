@@ -1,47 +1,47 @@
 #!/bin/bash
 
 function __bes_pull
-{   __besman_check_for_gh || return 1
+{   
     __besman_check_github_id $BESMAN_USER_NAMESPACE || return 1
-    __besman_gh_auth $BESMAN_USER_NAMESPACE
-    local type repo dir remote branch return_val namespace
-    type=$1
-    namespace=$2
-    if [[ $type == "playbook" ]]; then
-        [[ -z $namespace ]] && namespace=$BESMAN_NAMESPACE
-        repo=$BESMAN_PLAYBOOK_REPO
-        dir=$BESMAN_DIR/playbook
-    elif [[ $type == "environment" ]]; then
-        repo=besecure-ce-env-repo
-        dir=$BESMAN_DIR/envs
-    fi
-    if [[ $namespace == $BESMAN_NAMESPACE ]]; then
-        remote=upstream
-    else
-        remote=origin
-    fi
-    branch=main
-    if [[ -d $dir ]]; then
-        cd $dir
-        __besman_echo_white "Checking for updates..."
-        __besman_git_pull $remote $branch
-        return_val=$?
-        # echo "return value:"$return_val
-
-        if [[ $return_val == "1" ]]; then
-            __besman_echo_red "Could not pull playbooks"
-        elif [[ $return_val == "2" ]]; then
-            __besman_echo_white "Playbooks already upto date"
-        elif [[ $return_val == "0" ]]; then
-            __besman_echo_green "Playbooks updated/added successsfully."
-        fi
+    playbook_name=$2
+    playbook_version=$3
+    __besman_echo_white "Fetching playbooks..." 
+    if [[ -d $BESMAN_PLAYBOOK_DIR ]]; then
+        cd $BESMAN_PLAYBOOK_DIR
+        __besman_fetch_playbook $playbook_name $playbook_version
         cd $HOME
     else
-        mkdir -p $dir 
-        __besman_echo_white "Fetching playbooks..." 
-        __besman_gh_quiet_clone $namespace $repo $dir
-        [[ "$?" -eq 1 ]] && __besman_echo_red "Something went wrong" && rm -rf $dir &&return 1
-        __besman_echo_green "Playbooks added successfully"
+        mkdir -p $BESMAN_PLAYBOOK_DIR 
+        __besman_fetch_playbook $playbook_name $playbook_version
+        cd $HOME
     fi
-    unset type repo dir remote branch return_val namespace
+    unset playbook_name playbook_version
 }
+
+function __besman_fetch_playbook() {
+    local lifecycle_file lifecyle_file_url
+    playbook_name="$1"
+    playbook_version="$2"
+    lifecycle_file="$BESMAN_PLAYBOOK_DIR/besman-$playbook_name-$playbook_version-playbook.sh"
+    lifecyle_file_url="https://raw.githubusercontent.com/$BESMAN_NAMESPACE/$BESMAN_PLAYBOOK_REPO/main/playbooks/besman-$playbook_name-$playbook_version-playbook.sh"
+
+    if [[ -f $lifecycle_file ]]; then
+        __besman_echo_yellow "Playbook $playbook_name $playbook_version exist."
+        read -rp "Do you wish to overwrite(y/n):" overwrite
+        if [[ "$overwrite" == "y" ]]; then
+            rm "$lifecycle_file"
+            __besman_check_url_valid "$lifecyle_file_url" || return 1
+            touch "$lifecycle_file"
+            __besman_secure_curl "$lifecyle_file_url" >>"$lifecycle_file"
+            __besman_echo_green "Playbook $playbook_name $playbook_version updated successsfully."
+        fi
+    else
+        __besman_check_url_valid "$lifecyle_file_url" || return 1
+        touch "$lifecycle_file"
+        __besman_secure_curl "$lifecyle_file_url" >>"$lifecycle_file"
+        __besman_echo_green "Playbook $playbook_name $playbook_version added successsfully."
+    fi
+    unset lifecycle_file lifecyle_file_url playbook_name playbook_version
+}
+
+
