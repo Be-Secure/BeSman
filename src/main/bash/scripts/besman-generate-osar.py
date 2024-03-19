@@ -113,13 +113,13 @@ def main():
         "ASSESSMENT_TOOL_VERSION",
         "ASSESSMENT_TOOL_PLAYBOOK",
 
-        "BESLAB_OWNER_TYPE",
-        "BESLAB_OWNER_NAME",
+        "BESMAN_LAB_OWNER_TYPE",
+        "BESMAN_LAB_OWNER_NAME",
         "PLAYBOOK_EXECUTION_STATUS",
         "EXECUTION_TIMESTAMP",
         "EXECUTION_DURATION",
         "DETAILED_REPORT_PATH",
-        "BESLAB_ASSESSMENT_DATASTORE_URL",
+        "BESMAN_ASSESSMENT_DATASTORE_URL",
 
         "OSAR_PATH"
     ]
@@ -140,13 +140,13 @@ def main():
     tool_version = os.environ.get("ASSESSMENT_TOOL_VERSION")
     playbook = os.environ.get("ASSESSMENT_TOOL_PLAYBOOK")
 
-    execution_type = os.environ.get("BESLAB_OWNER_TYPE")
-    execution_id = os.environ.get("BESLAB_OWNER_NAME")
+    execution_type = os.environ.get("BESMAN_LAB_OWNER_TYPE")
+    execution_id = os.environ.get("BESMAN_LAB_OWNER_NAME")
     execution_status = os.environ.get("PLAYBOOK_EXECUTION_STATUS")
     execution_timestamp = os.environ.get("EXECUTION_TIMESTAMP")
     execution_duration = os.environ.get("EXECUTION_DURATION")
     report_output_path = os.environ.get("DETAILED_REPORT_PATH")
-    beslab_assessment_datastore_url = os.environ.get("BESLAB_ASSESSMENT_DATASTORE_URL")
+    BESMAN_ASSESSMENT_DATASTORE_URL = os.environ.get("BESMAN_ASSESSMENT_DATASTORE_URL")
 
     osar_path = os.environ.get("OSAR_PATH")
 
@@ -173,7 +173,7 @@ def main():
     else:
         print(f"Wrong DETAILED_REPORT_PATH. Please pass the correct path to besecure-assessment-datastore")
         sys.exit(1)
-    output_path = os.path.join(beslab_assessment_datastore_url, remaining_path)
+    output_path = os.path.join(BESMAN_ASSESSMENT_DATASTORE_URL, remaining_path)
 
     new_assessment = {
         "tool": {

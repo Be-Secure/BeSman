@@ -3,7 +3,7 @@
 function __bes_reset
 {
     local environment 
-	local roles_config_file=$BESMAN_OSS_TRIGGER_PLAYBOOK_PATH/$BESMAN_OSSP-roles-config.yml
+	local roles_config_file=$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH/$BESMAN_ARTIFACT_NAME-roles-config.yml
     environment=$1
     env_config="besman-$environment-config.yaml"
     if [[ ! -d "$BESMAN_DIR/envs/besman-$environment" ]]; then

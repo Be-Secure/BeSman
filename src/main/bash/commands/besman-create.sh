@@ -146,15 +146,76 @@ function __besman_create_env_config()
     [[ ! -f $config_file_path ]] && touch "$config_file_path" && __besman_echo_yellow "Creating new config file $config_file_path"
     cat <<EOF > "$config_file_path"
 ---
-BESMAN_ORG: Be-Secure
-BESMAN_OSSP: $ossp_name
-BESMAN_OSSP_CLONE_PATH: \$HOME/\$BESMAN_OSSP
-BESMAN_ANSIBLE_ROLES_PATH: \$BESMAN_DIR/tmp/\$BESMAN_OSSP/roles
-BESMAN_ANSIBLE_ROLES: 
-BESMAN_OSS_TRIGGER_PLAYBOOK_PATH: \$BESMAN_DIR/tmp/\$BESMAN_OSSP
-BESMAN_OSS_TRIGGER_PLAYBOOK: besman-\$BESMAN_OSSP-$env_type-trigger-playbook.yaml
-BESMAN_DISPLAY_SKIPPED_ANSIBLE_HOSTS: false
-# Please add other variables as well as ansible variables here
+# If you wish to update the default configuration values, copy this file and place it under your home dir, under the same name.
+# These variables are used to drive the installation of the environment script.
+# The variables that start with BESMAN_ are converted to environment vars.
+# If you wish to add any other vars that should be used globally, add the var using the below format.
+# BESMAN_<var name>: <value>
+# If you are not using any particular value, remove it or comment it(#).
+#*** - These variables should not be removed, nor left empty.
+# BESMAN_ORG - used to mention where you should clone the repo from, default value is Be-Secure
+BESMAN_ORG: Be-Secure #***
+
+# BESMAN_ARTIFACT_TYPE - project/ml model/training dataset
+BESMAN_ARTIFACT_TYPE: # project/ml model/training dataset #***
+
+# BESMAN_ARTIFACT_NAME - name of the artifact under assessment.
+BESMAN_ARTIFACT_NAME: $ossp_name #***
+
+# BESMAN_ARTIFACT_VERSION - version of the artifact under assessment.
+BESMAN_ARTIFACT_VERSION: #Enter the version of the artifact here. #***
+
+# BESMAN_ARTIFACT_URL - Source code url of the artifact under assessment.
+BESMAN_ARTIFACT_URL: https://github.com/Be-Secure/$ossp_name #***
+
+#BESMAN_ENV_NAME - This variable stores the name of the environment file.
+BESMAN_ENV_NAME: $environment_name #***
+
+# BESMAN_ARTIFACT_DIR - The path where you wish to clone the source code of the artifact under assessment.
+# If you wish to change the clone path, provide the complete path.
+BESMAN_ARTIFACT_DIR: \$HOME/\$BESMAN_ARTIFACT_NAME #***
+
+# BESMAN_TOOL_PATH - The path where we download the assessment and other required tools during installation.
+BESMAN_TOOL_PATH: /opt #***
+
+# BESMAN_LAB_OWNER_TYPE - Organization/lab/individual.
+BESMAN_LAB_OWNER_TYPE: Organization #***
+
+# BESMAN_LAB_OWNER_NAME - Name of the owner of the lab. Default is Be-Secure.
+BESMAN_LAB_OWNER_NAME: Be-Secure #***
+
+# BESMAN_ASSESSMENT_DATASTORE_DIR - This is the local dir where we store the assessment reports. Default is home.
+BESMAN_ASSESSMENT_DATASTORE_DIR: \$HOME/besecure-assessment-datastore #***
+
+# BESMAN_ASSESSMENT_DATASTORE_URL - The remote repo where we store the assessment reports.
+BESMAN_ASSESSMENT_DATASTORE_URL: https://github.com/Be-Secure/besecure-assessment-datastore #***
+
+# BESMAN_ANSIBLE_ROLES_PATH - The path where we download the ansible role of the assessment tools and other utilities
+BESMAN_ANSIBLE_ROLES_PATH: \$BESMAN_DIR/tmp/\$BESMAN_ARTIFACT_NAME/roles #***
+
+# BESMAN_ANSIBLE_ROLES - The list of tools you wish to install. The tools are installed using ansible roles.
+# To get the list of ansible roles run 
+#   $ bes list --roles
+BESMAN_ANSIBLE_ROLES: #add the roles here. format - <Github id>/<repo name>,<Github id>/<repo name>,<Github id>/<repo name>,... #***
+
+# BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH - sets the path of the playbook with which we run the ansible roles.
+# Default path is ~/.besman/tmp/<artifact name dir>/
+BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH: \$BESMAN_DIR/tmp/\$BESMAN_ARTIFACT_NAME #***
+
+#BESMAN_ARTIFACT_TRIGGER_PLAYBOOK - Name of the trigger playbook which runs the ansible roles.
+BESMAN_ARTIFACT_TRIGGER_PLAYBOOK: besman-\$BESMAN_ARTIFACT_NAME-$env_type-trigger-playbook.yaml #***
+
+# BESMAN_DISPLAY_SKIPPED_ANSIBLE_HOSTS - If the users likes to display all the skipped steps, set it to true.
+# Default value is false
+BESMAN_DISPLAY_SKIPPED_ANSIBLE_HOSTS: false #***
+
+
+# The default values of the ansible roles will be present in their respective repos.
+# You can go to https://github.com/Be-Secure/<repo of the ansible role>/blob/main/defaults/main.yml.
+# If you wish to change the default values copy the variable from the https://github.com/Be-Secure/<repo of the ansible role>/blob/main/defaults/main.yml
+# and paste it here and change the value.
+# Format is <variable name>: <value> 
+# Eg: openjdk_version: 11
 EOF
 }
 
@@ -168,33 +229,39 @@ function __besman_create_env_with_config()
 
 function __besman_install_$environment_name
 {
+    __besman_check_for_gh || return 1 # Checks if GitHub CLI is present or not.
+    __besman_check_github_id || return 1 # checks whether the user github id has been populated or not under BESMAN_USER_NAMESPACE 
+    __besman_check_for_ansible || return 1 # Checks if ansible is installed or not.
     
-    __besman_check_for_gh || return 1
-    __besman_check_github_id || return 1
-    __besman_check_for_ansible || return 1
-    __besman_update_requirements_file
-    __besman_ansible_galaxy_install_roles_from_requirements
-    __besman_check_for_trigger_playbook "\$BESMAN_OSS_TRIGGER_PLAYBOOK_PATH/\$BESMAN_OSS_TRIGGER_PLAYBOOK"
-    [[ "\$?" -eq 1 ]] && __besman_create_ansible_playbook
-    __besman_run_ansible_playbook_extra_vars "\$BESMAN_OSS_TRIGGER_PLAYBOOK_PATH/\$BESMAN_OSS_TRIGGER_PLAYBOOK" "bes_command=install role_path=\$BESMAN_ANSIBLE_ROLES_PATH" || return 1
-    if [[ -d \$BESMAN_OSSP_CLONE_PATH ]]; then
-        __besman_echo_white "The clone path already contains dir names \$BESMAN_OSSP"
+    # Requirements file is used to list the required ansible roles. The data for requirements file comes from BESMAN_ANSIBLE_ROLES env var.
+    # This function updates the requirements file from BESMAN_ANSIBLE_ROLES env var.
+    __besman_update_requirements_file 
+    __besman_ansible_galaxy_install_roles_from_requirements # Downloads the ansible roles mentioned in BESMAN_ANSIBLE_ROLES to BESMAN_ANSIBLE_ROLES_PATH
+    # This function checks for the playbook BESMAN_ARTIFACT_TRIGGER_PLAYBOOK under BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH.
+    # The trigger playbook is used to run the ansible roles.
+    __besman_check_for_trigger_playbook "\$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH/\$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK"
+    [[ "\$?" -eq 1 ]] && __besman_create_ansible_playbook # Creates the trigger playbook if not present.
+    # Runs the trigger playbook. We are also passing these variables - bes_command=install; role_path=\$BESMAN_ANSIBLE_ROLES_PATH
+    __besman_run_ansible_playbook_extra_vars "\$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH/\$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK" "bes_command=install role_path=\$BESMAN_ANSIBLE_ROLES_PATH" || return 1
+    # Clones the source code repo.
+    if [[ -d \$BESMAN_ARTIFACT_DIR ]]; then
+        __besman_echo_white "The clone path already contains dir names \$BESMAN_ARTIFACT_NAME"
     else
-        __besman_gh_clone "\$BESMAN_ORG" "\$BESMAN_OSSP" "\$BESMAN_OSSP_CLONE_PATH"
+        __besman_gh_clone "\$BESMAN_ORG" "\$BESMAN_ARTIFACT_NAME" "\$BESMAN_ARTIFACT_DIR"
     fi
     # Please add the rest of the code here for installation
 }
 
 function __besman_uninstall_$environment_name
 {
-    __besman_check_for_trigger_playbook "\$BESMAN_OSS_TRIGGER_PLAYBOOK_PATH/\$BESMAN_OSS_TRIGGER_PLAYBOOK"
+    __besman_check_for_trigger_playbook "\$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH/\$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK"
     [[ "\$?" -eq 1 ]] && __besman_create_ansible_playbook
-    __besman_run_ansible_playbook_extra_vars "\$BESMAN_OSS_TRIGGER_PLAYBOOK_PATH/\$BESMAN_OSS_TRIGGER_PLAYBOOK" "bes_command=remove role_path=\$BESMAN_ANSIBLE_ROLES_PATH" || return 1
-    if [[ -d \$BESMAN_OSSP_CLONE_PATH ]]; then
-        __besman_echo_white "Removing \$BESMAN_OSSP_CLONE_PATH..."
-        rm -rf "\$BESMAN_OSSP_CLONE_PATH"
+    __besman_run_ansible_playbook_extra_vars "\$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH/\$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK" "bes_command=remove role_path=\$BESMAN_ANSIBLE_ROLES_PATH" || return 1
+    if [[ -d \$BESMAN_ARTIFACT_DIR ]]; then
+        __besman_echo_white "Removing \$BESMAN_ARTIFACT_DIR..."
+        rm -rf "\$BESMAN_ARTIFACT_DIR"
     else
-        __besman_echo_yellow "Could not find dir \$BESMAN_OSSP_CLONE_PATH"
+        __besman_echo_yellow "Could not find dir \$BESMAN_ARTIFACT_DIR"
     fi
     # Please add the rest of the code here for uninstallation
 
@@ -202,27 +269,27 @@ function __besman_uninstall_$environment_name
 
 function __besman_update_$environment_name
 {
-    __besman_check_for_trigger_playbook "\$BESMAN_OSS_TRIGGER_PLAYBOOK_PATH/\$BESMAN_OSS_TRIGGER_PLAYBOOK"
+    __besman_check_for_trigger_playbook "\$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH/\$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK"
     [[ "\$?" -eq 1 ]] && __besman_create_ansible_playbook
-    __besman_run_ansible_playbook_extra_vars "\$BESMAN_OSS_TRIGGER_PLAYBOOK_PATH/\$BESMAN_OSS_TRIGGER_PLAYBOOK" "bes_command=update role_path=\$BESMAN_ANSIBLE_ROLES_PATH" || return 1
+    __besman_run_ansible_playbook_extra_vars "\$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH/\$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK" "bes_command=update role_path=\$BESMAN_ANSIBLE_ROLES_PATH" || return 1
     # Please add the rest of the code here for update
 
 }
 
 function __besman_validate_$environment_name
 {
-    __besman_check_for_trigger_playbook "\$BESMAN_OSS_TRIGGER_PLAYBOOK_PATH/\$BESMAN_OSS_TRIGGER_PLAYBOOK"
+    __besman_check_for_trigger_playbook "\$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH/\$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK"
     [[ "\$?" -eq 1 ]] && __besman_create_ansible_playbook
-    __besman_run_ansible_playbook_extra_vars "\$BESMAN_OSS_TRIGGER_PLAYBOOK_PATH/\$BESMAN_OSS_TRIGGER_PLAYBOOK" "bes_command=validate role_path=\$BESMAN_ANSIBLE_ROLES_PATH" || return 1
+    __besman_run_ansible_playbook_extra_vars "\$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH/\$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK" "bes_command=validate role_path=\$BESMAN_ANSIBLE_ROLES_PATH" || return 1
     # Please add the rest of the code here for validate
 
 }
 
 function __besman_reset_$environment_name
 {
-    __besman_check_for_trigger_playbook "\$BESMAN_OSS_TRIGGER_PLAYBOOK_PATH/\$BESMAN_OSS_TRIGGER_PLAYBOOK"
+    __besman_check_for_trigger_playbook "\$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH/\$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK"
     [[ "\$?" -eq 1 ]] && __besman_create_ansible_playbook
-    __besman_run_ansible_playbook_extra_vars "\$BESMAN_OSS_TRIGGER_PLAYBOOK_PATH/\$BESMAN_OSS_TRIGGER_PLAYBOOK" "bes_command=reset role_path=\$BESMAN_ANSIBLE_ROLES_PATH" || return 1
+    __besman_run_ansible_playbook_extra_vars "\$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH/\$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK" "bes_command=reset role_path=\$BESMAN_ANSIBLE_ROLES_PATH" || return 1
     # Please add the rest of the code here for reset
 
 }
