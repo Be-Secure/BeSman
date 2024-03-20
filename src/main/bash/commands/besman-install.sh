@@ -147,9 +147,10 @@ function __besman_show_lab_association_prompt()
 		if [[ $user_input == "y" ]] 
 		then	
 		__besman_echo_no_colour ""
-		__besman_echo_no_colour "Download the config file from, https://github.com/$BESMAN_NAMESPACE/besecure-ce-env-repo/blob/master/$ossp/$version/besman-$environment_name-config.yaml"
-		__besman_echo_no_colour "Paste it in $HOME"
-		__besman_echo_white "Edit the variables - BESMAN_LAB_OWNER_NAME and BESMAN_LAB_OWNER_TYPE"
+		__besman_echo_no_colour "1. Run the below command"
+		__besman_echo_no_colour "		wget -P \$HOME https://raw.githubusercontent.com/$BESMAN_NAMESPACE/besecure-ce-env-repo/master/$ossp/$version/besman-$environment_name-env-config.yaml"
+		__besman_echo_no_colour "2. Open the file $HOME/besman-$environment_name-config.yaml in an editor"
+		__besman_echo_white "3. Edit the variables - BESMAN_LAB_OWNER_NAME and BESMAN_LAB_OWNER_TYPE"
 		__besman_error_rollback "$environment_name"
 		return 1
 		fi		
