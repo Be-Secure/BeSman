@@ -2,7 +2,7 @@
 
 function __bes_update {
 	local environment=$1
-	local roles_config_file=$BESMAN_OSS_TRIGGER_PLAYBOOK_PATH/$BESMAN_OSSP-roles-config.yml
+	local roles_config_file=$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH/$BESMAN_ARTIFACT_NAME-roles-config.yml
 
 	if [[ -n $environment ]]; then
 		if [[ ! -d "$BESMAN_DIR/envs/besman-$environment" ]]; then

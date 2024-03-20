@@ -11,17 +11,26 @@ if [[ ( -n $flag ) && ( $flag == "--playbook" ) ]]; then
     __besman_list_playbooks
 
 elif [[ ( -n $flag ) && ( $flag == "--roles" ) ]]; then
-    if [[ -z "$BESMAN_GH_TOKEN" ]]; then
-        __besman_echo_yellow "Github token missing. Please use the below command to export the token"
-        __besman_echo_no_colour ""
-        __besman_echo_no_colour "$ bes set BESMAN_GH_TOKEN <copied token>"
-        __besman_echo_no_colour ""
-        return 1
-    fi
-    __besman_list_roles
-else
-    __besman_list_envs 
 
+    __besman_list_roles
+elif [[ ( -n $flag ) && ( ( $flag == "--environment" ) || ( $flag == "-env" ) ) ]]; then
+
+    __besman_list_envs
+
+else
+    
+    __besman_echo_white "---------------------------ENVIRONMENTS-----------------------------------------------"
+    __besman_echo_no_colour ""
+    __besman_list_envs
+    __besman_echo_no_colour ""
+    __besman_echo_white "---------------------------PLAYBOOKS--------------------------------------------------"
+    __besman_echo_no_colour ""
+    __besman_list_playbooks
+    __besman_echo_no_colour ""
+    __besman_echo_white "---------------------------ROLES------------------------------------------------------"
+    __besman_echo_no_colour ""
+    __besman_list_roles
+    __besman_echo_no_colour ""
 fi
 }
 function __besman_list_envs()
@@ -138,6 +147,14 @@ function __besman_list_roles()
 {
     local api_url repo_names all_repo_names page_num ansible_roles
 
+        if [[ -z "$BESMAN_GH_TOKEN" ]]; then
+        __besman_echo_yellow "Github token missing. Please use the below command to export the token"
+        __besman_echo_no_colour ""
+        __besman_echo_no_colour "$ bes set BESMAN_GH_TOKEN <copied token>"
+        __besman_echo_no_colour ""
+        return 1
+    fi
+
     api_url="https://api.github.com/orgs/$BESMAN_NAMESPACE/repos?per_page=100&page=1"
 
     # Get the first page of repository names
@@ -197,7 +214,7 @@ function __besman_list_playbooks()
     local_annotation=$(__besman_echo_red "+")
     remote_annotation=$(__besman_echo_yellow "^")
     
-    printf "%-14s %-10s %-15s %-8s\n" "Name" "Version" "Type" "Author"
+    printf "%-25s %-10s %-15s %-8s\n" "Name" "Version" "Type" "Author"
     __besman_echo_no_colour "----------------------------------------------------------------------"
 
     OLD_IFS=$IFS
@@ -210,9 +227,9 @@ function __besman_list_playbooks()
         if [[ -f "$BESMAN_PLAYBOOK_DIR/besman-$name-$version-playbook.sh" ]] 
         then
             
-            printf "%-14s %-10s %-15s %-8s\n" "$name" "$version" "$type" "$author$local_annotation"
+            printf "%-25s %-10s %-15s %-8s\n" "$name" "$version" "$type" "$author$local_annotation"
         else
-            printf "%-14s %-10s %-15s %-8s\n" "$name" "$version" "$type" "$author$remote_annotation"
+            printf "%-25s %-10s %-15s %-8s\n" "$name" "$version" "$type" "$author$remote_annotation"
 
         fi
         

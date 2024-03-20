@@ -57,13 +57,13 @@ function __besman_update_requirements_file
     github_url=https://github.com
     readarray -d ',' -t roles <<< "$BESMAN_ANSIBLE_ROLES"
     [[ ! -d $BESMAN_ANSIBLE_ROLES_PATH ]] && mkdir -p "$BESMAN_ANSIBLE_ROLES_PATH"
-    [[ ! -f $BESMAN_DIR/tmp/$BESMAN_OSSP/requirements.yaml ]] && touch "$BESMAN_DIR/tmp/$BESMAN_OSSP/requirements.yaml" && echo "---" >> "$BESMAN_DIR/tmp/$BESMAN_OSSP/requirements.yaml"
+    [[ ! -f $BESMAN_DIR/tmp/$BESMAN_ARTIFACT_NAME/requirements.yaml ]] && touch "$BESMAN_DIR/tmp/$BESMAN_ARTIFACT_NAME/requirements.yaml" && echo "---" >> "$BESMAN_DIR/tmp/$BESMAN_ARTIFACT_NAME/requirements.yaml"
     for role in "${roles[@]}"; do
         namespace=$(echo "$role" | cut -d "/" -f 1)
         repo_name=$(echo "$role" | cut -d "/" -f 2)
-        if ! grep -wq "$github_url/$namespace/$repo_name" "$BESMAN_DIR/tmp/$BESMAN_OSSP/requirements.yaml"
+        if ! grep -wq "$github_url/$namespace/$repo_name" "$BESMAN_DIR/tmp/$BESMAN_ARTIFACT_NAME/requirements.yaml"
         then
-            echo "- src: $github_url/$namespace/$repo_name" >> "$BESMAN_DIR/tmp/$BESMAN_OSSP/requirements.yaml"
+            echo "- src: $github_url/$namespace/$repo_name" >> "$BESMAN_DIR/tmp/$BESMAN_ARTIFACT_NAME/requirements.yaml"
             continue
         else
             __besman_echo_no_colour "Ignoring role $github_url/$namespace/$repo_name as it is already present in requirements.yml"
@@ -106,9 +106,9 @@ function __besman_run_ansible_playbook_extra_vars
 function __besman_create_roles_config_file()
 {
     local env_config_file roles_config_file
-    [[ ! -d $BESMAN_OSS_TRIGGER_PLAYBOOK_PATH ]] && mkdir -p "$BESMAN_OSS_TRIGGER_PLAYBOOK_PATH"
+    [[ ! -d $BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH ]] && mkdir -p "$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH"
     env_config_file=$BESMAN_ENV_CONFIG_FILE_PATH # BESMAN_ENV_CONFIG_FILE_PATH is set from env-helpers:__besman_source_env_params()
-    roles_config_file=$BESMAN_OSS_TRIGGER_PLAYBOOK_PATH/$BESMAN_OSSP-roles-config.yml
+    roles_config_file=$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH/$BESMAN_ARTIFACT_NAME-roles-config.yml
     touch "$roles_config_file"
     echo "---" > "$roles_config_file"
     while read -r line; do
@@ -125,19 +125,19 @@ function __besman_create_roles_config_file()
 
 function __besman_ansible_galaxy_install_roles_from_requirements
 {
-    __besman_echo_white "Installing ansible roles from $BESMAN_DIR/tmp/$BESMAN_OSSP/requirements.yaml under $BESMAN_ANSIBLE_ROLES_PATH"
-    ansible-galaxy install -r "$BESMAN_DIR/tmp/$BESMAN_OSSP/requirements.yaml" -p "$BESMAN_ANSIBLE_ROLES_PATH"
+    __besman_echo_white "Installing ansible roles from $BESMAN_DIR/tmp/$BESMAN_ARTIFACT_NAME/requirements.yaml under $BESMAN_ANSIBLE_ROLES_PATH"
+    ansible-galaxy install -r "$BESMAN_DIR/tmp/$BESMAN_ARTIFACT_NAME/requirements.yaml" -p "$BESMAN_ANSIBLE_ROLES_PATH"
 }
 
 function __besman_create_ansible_playbook
 {
 
-    cat <<EOF >> "$BESMAN_OSS_TRIGGER_PLAYBOOK_PATH/$BESMAN_OSS_TRIGGER_PLAYBOOK"
+    cat <<EOF >> "$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH/$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK"
 ---
 - name: Triggering roles
   hosts: localhost || all
   vars_files:
-    - ./$BESMAN_OSSP-roles-config.yml
+    - ./$BESMAN_ARTIFACT_NAME-roles-config.yml
   vars:
     - home_dir: lookup('env','HOME')
     - oah_command: '{{ bes_command }}'
@@ -149,7 +149,7 @@ EOF
     for i in "${roles[@]}"; do
         repo_name=$(echo "$i" | cut -d "/" -f 2)
         [[ ! -d $BESMAN_ANSIBLE_ROLES_PATH/$repo_name ]]  && __besman_echo_white "$repo_name not found" && continue
-        echo "      - $repo_name" >> "$BESMAN_OSS_TRIGGER_PLAYBOOK_PATH/$BESMAN_OSS_TRIGGER_PLAYBOOK"
+        echo "      - $repo_name" >> "$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH/$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK"
     done
 
 }

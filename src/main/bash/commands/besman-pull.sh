@@ -18,7 +18,7 @@ function __bes_pull {
 
     case $fetch_result in
         0)
-            __besman_echo_green "Playbook $playbook_name $playbook_version updated successfully."
+            __besman_echo_green "Playbook $playbook_name $playbook_version added successfully."
             ;;
         1)
             __besman_echo_red "Failed to fetch playbook $playbook_name $playbook_version."
