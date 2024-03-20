@@ -6,7 +6,7 @@ local flag=$1
 local env sorted_list
 
 # For listing playbooks
-if [[ ( -n $flag ) && ( $flag == "--playbook" ) ]]; then
+if [[ ( -n $flag ) && ( ( $flag == "--playbook" ) || ( $flag == "-P" ) ) ]]; then
 
     __besman_list_playbooks
 
