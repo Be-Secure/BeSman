@@ -14,7 +14,6 @@ fi
 BESMAN_PLATFORM=$(uname)
 export BESMAN_SERVICE="https://raw.githubusercontent.com"
 
-
 # BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
 
 BESMAN_NAMESPACE="Be-Secure"
@@ -23,6 +22,15 @@ BESMAN_ENV_REPOS="$BESMAN_NAMESPACE/besecure-ce-env-repo"
 
 if [ -z "$BESMAN_DIR" ]; then
     export BESMAN_DIR="$HOME/.besman"
+fi
+
+if [[ -z "$BESMAN_CODE_COLLAB_URL" ]]
+	export BESMAN_CODE_COLLAB_URL="https://github.com"
+fi
+
+if [[ -z "$BESMAN_VCS" ]]
+then
+	export BESMAN_VCS="git"
 fi
 
 # variables
@@ -195,6 +203,8 @@ touch "$besman_user_config_file"
 {
     echo "BESMAN_VERSION=$BESMAN_VERSION"
     echo "BESMAN_USER_NAMESPACE="
+	  echo "BESMAN_CODE_COLLAB_URL=$BESMAN_CODE_COLLAB_URL"
+	  echo "BESMAN_VCS=$BESMAN_VCS"
     echo "BESMAN_ENV_ROOT=$HOME/BeSman_env"
     echo "BESMAN_NAMESPACE=$BESMAN_NAMESPACE"
     echo "BESMAN_INTERACTIVE_USER_MODE=true"
