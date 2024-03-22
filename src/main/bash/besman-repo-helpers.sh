@@ -50,10 +50,13 @@ function __besman_git_auth()
 
     if [[ -z "$username" ]]
     then
-        __besman_echo_yellow "git user not authenticated"
-        __besman_echo_no_colour "Please authenticate first and try again"
+        __besman_echo_yellow "git user not configured"
+        __besman_echo_no_colour "Please use the below command to configure git"
+        __besman_echo_no_colour ""
+        __besman_echo_yellow "git config --global user.name "Your Name""
+        __besman_echo_yellow "git config --global user.email "you@example.com""
         return 1
-    elif [[ ( -n "$username" ) && ( "$usename" != "$BESMAN_USER_NAMESPACE" ) ]]
+    elif [[ ( -n "$username" ) && ( "$username" != "$BESMAN_USER_NAMESPACE" ) ]]
     then
         __besman_echo_red "git user not authenticated as $BESMAN_USER_NAMESPACE"
         return 1
