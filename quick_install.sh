@@ -154,8 +154,6 @@ if [[ -z $(which ansible) ]]; then
   sudo apt install ansible -y
 fi
 
-if [[ $BESMAN_VCS == "gh"]]
-then
 
   if [[ -z $(which gh) ]]; then
     echo "Installing GitHub Cli"
@@ -167,7 +165,6 @@ then
     sudo apt install gh -y
 
   fi
-fi
 
 echo "Installing BeSMAN scripts..."
 
