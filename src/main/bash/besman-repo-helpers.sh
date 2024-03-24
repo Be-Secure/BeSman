@@ -1,5 +1,27 @@
 #!/bin/bash
 
+function __besman_check_vcs_exist()
+{
+    if [[ "$BESMAN_VCS"="git" ]]
+    then
+        __besman_check_for_git || return 1
+    elif [[ "$BESMAN_VCS"="gh" ]]
+    then
+        __besman_check_for_gh || return 1
+    fi
+}
+
+function __besman_check_for_git()
+{
+    if [[ -z $(which git) ]]; then
+        __besman_echo_red "git not found. Please install and try again"
+        return 1
+    else
+        return 0
+    fi
+
+}
+
 function __besman_check_for_gh
 {
     if [[ -z $(which gh) ]]; then
@@ -10,6 +32,36 @@ function __besman_check_for_gh
     fi
 }
 
+function __besman_check_vcs_auth
+{
+    if [[ "$BESMAN_VCS"="git" ]]
+    then
+        __besman_git_auth || return 1
+    elif [[ "$BESMAN_VCS"="gh" ]]
+    then
+        __besman_gh_auth || return 1
+    fi
+}
+
+function __besman_git_auth()
+{
+    local username
+    username=$(git config -l | grep "user.name" | cut -d "=" -f 2)
+
+    if [[ -z "$username" ]]
+    then
+        __besman_echo_yellow "git user not configured"
+        __besman_echo_no_colour "Please use the below command to configure git"
+        __besman_echo_no_colour ""
+        __besman_echo_yellow "git config --global user.name "Your Name""
+        __besman_echo_yellow "git config --global user.email "you@example.com""
+        return 1
+    elif [[ ( -n "$username" ) && ( "$username" != "$BESMAN_USER_NAMESPACE" ) ]]
+    then
+        __besman_echo_red "git user not authenticated as $BESMAN_USER_NAMESPACE"
+        return 1
+    fi
+}
 
 function __besman_gh_auth
 {
@@ -39,6 +91,22 @@ EOF
     fi
    
 }
+function __besman_gh_auth_status 
+{
+    local namespace=$1
+    gh auth status &>> $HOME/gh_auth_out.txt
+    if cat $HOME/gh_auth_out.txt | grep -q "$namespace"
+    then
+        [[ -f $HOME/gh_auth_out.txt ]] && rm $HOME/gh_auth_out.txt
+        return 0
+    else
+        [[ -f $HOME/gh_auth_out.txt ]] && rm $HOME/gh_auth_out.txt
+        return 1
+    fi
+    
+}
+
+
 function __besman_git_pull
 {   
     [[ ! -d .git ]] && __besman_echo_red "Not a git repo" && return 1
@@ -63,19 +131,30 @@ function __besman_git_pull
 
     unset remote branch out_flag
 }
-function __besman_gh_auth_status 
+
+function __besman_repo_clone()
 {
-    local namespace=$1
-    gh auth status &>> $HOME/gh_auth_out.txt
-    if cat $HOME/gh_auth_out.txt | grep -q "$namespace"
+    local namespace repo path
+    namespace=$1
+    repo=$2
+    path=$3
+    if [[ "$BESMAN_VCS" == "git" ]]
     then
-        [[ -f $HOME/gh_auth_out.txt ]] && rm $HOME/gh_auth_out.txt
-        return 0
-    else
-        [[ -f $HOME/gh_auth_out.txt ]] && rm $HOME/gh_auth_out.txt
-        return 1
+        __besman_git_clone "$namespace" "$repo" "$path" || return 1
+    elif [[ "$BESMAN_VCS" == "gh" ]]
+    then
+        __besman_gh_clone "$namespace" "$repo" "$path" || return 1
     fi
     
+}
+
+function __besman_git_clone()
+{
+    local namespace repo path
+    namespace=$1
+    repo=$2
+    path=$3
+    git clone "$BESMAN_CODE_COLLAB_URL/$namespace/$repo" "$path"
 }
 
 function __besman_gh_clone
