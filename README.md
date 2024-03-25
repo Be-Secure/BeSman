@@ -130,7 +130,7 @@ BeSman is designed to work with linux machines. So, if you are a windows user, y
         -env | --environment: For passing the name of the environment script.
         -V | --version: For passing the version number.
         -P | --playbook: For passing the playbook name
-        --roles: To list the role names
+        --role: To list the role names
 
 
 You can find more details of the command from the BeSman [webpage](https://be-secure.github.io/Be-Secure/bes-besman-details/)

@@ -7,7 +7,7 @@ function bes {
 	{
 		local command=$1
 		if [[ ! -f $BESMAN_DIR/src/besman-$command.sh ]]; then
-		        __besman_echo_red "Wrong Command Format"
+			__besman_echo_red "Wrong Command Format"
 			__besman_echo_red "Could not find file besman-$environment.sh"
 			__besman_echo_white "Make sure you have given the correct command name"		
 			__besman_echo_white "If the issue persists, re-install BESman and try again"	
@@ -25,8 +25,12 @@ function bes {
 				command=remove
 				args=("${args[@]}" "$1")
 			;;
-			-env | -V | --environment | --version | --playbook | -P | -cve | -vuln | -ext | -assess | --input | --roles)         opts=("${opts[@]}" "$1");; ## -env | -V 
-        	*)          args=("${args[@]}" "$1");; ## command | env_name | version_tag
+			-env | -V | --environment | --version | --playbook | -P | --role)         
+				opts=("${opts[@]}" "$1") ## -env | -V 
+			;; 
+        	*)
+				args=("${args[@]}" "$1") ## command | env_name | version_tag
+			;; 
     	esac
     	shift
 	done
