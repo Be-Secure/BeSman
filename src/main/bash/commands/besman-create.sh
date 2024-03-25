@@ -195,7 +195,7 @@ BESMAN_ANSIBLE_ROLES_PATH: \$BESMAN_DIR/tmp/\$BESMAN_ARTIFACT_NAME/roles #***
 
 # BESMAN_ANSIBLE_ROLES - The list of tools you wish to install. The tools are installed using ansible roles.
 # To get the list of ansible roles run 
-#   $ bes list --roles
+#   $ bes list --role
 BESMAN_ANSIBLE_ROLES: #add the roles here. format - <Github id>/<repo name>,<Github id>/<repo name>,<Github id>/<repo name>,... #***
 
 # BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH - sets the path of the playbook with which we run the ansible roles.

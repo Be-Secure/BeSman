@@ -33,5 +33,5 @@ __besman_echo_white ' OPTIONS '
 __besman_echo_no_colour '   -env | --environment: For passing the name of the environment script. '
 __besman_echo_no_colour '   -V | --version: For passing the version number. '
 __besman_echo_no_colour '   -P | --playbook: For passing the playbook name '
-__besman_echo_no_colour '   --roles: To list the role names '
+__besman_echo_no_colour '   --role: To list the role names '
 }

@@ -10,7 +10,7 @@ if [[ ( -n $flag ) && ( ( $flag == "--playbook" ) || ( $flag == "-P" ) ) ]]; the
 
     __besman_list_playbooks
 
-elif [[ ( -n $flag ) && ( $flag == "--roles" ) ]]; then
+elif [[ ( -n $flag ) && ( $flag == "--role" ) ]]; then
 
     __besman_list_roles
 elif [[ ( -n $flag ) && ( ( $flag == "--environment" ) || ( $flag == "-env" ) ) ]]; then
