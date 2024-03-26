@@ -26,12 +26,15 @@ function __besman_source_env_params
     echo "#!/bin/bash" >> "$tmp_var_file"
     while read -r line; 
     do
-
         [[ $line == "---" ]] && continue # To skip the --- from starting of yaml file
+        if echo "$line" | grep -qe "^#" 
+        then
+          continue 
+        fi
         if echo "$line" | grep -qe "^BESMAN_"; then # Check to export only environment variables starting with BESMAN_
 
             key=$(echo "$line" | cut -d ":" -f 1) # For getting the var name
-            value=$(echo "$line" | cut -d ":" -f 2 | cut -d " " -f 2) # For getting the value.
+            value=$(echo "$line" | cut -d ":" -f 2- | cut -d " " -f 2) # For getting the value.
             unset "$key"
             echo "export $key=$value" >> "$tmp_var_file"
         else

@@ -6,32 +6,47 @@ local flag=$1
 local env sorted_list
 
 # For listing playbooks
-if [[ ( -n $flag ) && ( $flag == "--playbook" ) ]]; then
+if [[ ( -n $flag ) && ( ( $flag == "--playbook" ) || ( $flag == "-P" ) ) ]]; then
 
     __besman_list_playbooks
 
-elif [[ ( -n $flag ) && ( $flag == "--roles" ) ]]; then
-    if [[ -z "$BESMAN_GH_TOKEN" ]]; then
-        __besman_echo_yellow "Github token missing. Please use the below command to export the token"
-        __besman_echo_no_colour ""
-        __besman_echo_no_colour "$ bes set BESMAN_GH_TOKEN <copied token>"
-        __besman_echo_no_colour ""
-        return 1
-    fi
-    __besman_list_roles
-else
-    __besman_list_envs 
+elif [[ ( -n $flag ) && ( $flag == "--role" ) ]]; then
 
+    __besman_list_roles
+elif [[ ( -n $flag ) && ( ( $flag == "--environment" ) || ( $flag == "-env" ) ) ]]; then
+
+    __besman_list_envs
+
+else
+    
+    __besman_echo_white "---------------------------ENVIRONMENTS-----------------------------------------------"
+    __besman_echo_no_colour ""
+    __besman_list_envs
+    __besman_echo_no_colour ""
+    __besman_echo_white "---------------------------PLAYBOOKS--------------------------------------------------"
+    __besman_echo_no_colour ""
+    __besman_list_playbooks
+    __besman_echo_no_colour ""
+    __besman_echo_white "---------------------------ROLES------------------------------------------------------"
+    __besman_echo_no_colour ""
+    __besman_list_roles
+    __besman_echo_no_colour ""
 fi
 }
 function __besman_list_envs()
 {
+    local current_version current_env installed_annotation remote_annotation
     __besman_check_repo_exist || return 1
     __besman_update_list
     # __besman_echo_no_colour "Github Org    Repo                             Environment     Version"
     # __besman_echo_no_colour "-----------------------------------------------------------------------------------"
 
+    [[ -f "$BESMAN_DIR/var/current" ]] &&  current_env=$(cat "$BESMAN_DIR/var/current")
+    [[ -f "$BESMAN_DIR/envs/besman-$current_env/current" ]] && current_version=$(cat "$BESMAN_DIR/envs/besman-$current_env/current")
 
+    installed_annotation=$(__besman_echo_red "*")
+    remote_annotation=$(__besman_echo_yellow "^")
+    
     # For listing environments
     printf "%-14s %-32s %-25s %-8s\n" "Github Org" "Repo" "Environment" "Version"
     __besman_echo_no_colour "-----------------------------------------------------------------------------------"
@@ -47,11 +62,23 @@ function __besman_list_envs()
     do 
         converted_line=$(echo "$line" | sed 's|,|/|g')
         read -r org repo env version <<< "$converted_line"
-        printf "%-14s %-32s %-25s %-8s\n" "$org" "$repo" "$env" "$version"     
+        if [[ ("$env" == "$current_env") && ("$version" == "$current_version") ]] 
+        then
+            printf "%-14s %-32s %-25s %-8s\n" "$org" "$repo" "$env" "$version$installed_annotation"
+        else
+            printf "%-14s %-32s %-25s %-8s\n" "$org" "$repo" "$env" "$version$remote_annotation"
+            
+        fi
         
     done < "$BESMAN_DIR/var/list.txt"
     IFS=$OLD_IFS
 
+    __besman_echo_no_colour ""
+
+    __besman_echo_no_colour "==================================================================================="
+    __besman_echo_no_colour "$remote_annotation - remote environment"
+    __besman_echo_no_colour "$installed_annotation - installed environment"
+    __besman_echo_no_colour "==================================================================================="
     __besman_echo_no_colour ""
 
     unset flag arr env list
@@ -120,6 +147,14 @@ function __besman_list_roles()
 {
     local api_url repo_names all_repo_names page_num ansible_roles
 
+        if [[ -z "$BESMAN_GH_TOKEN" ]]; then
+        __besman_echo_yellow "Github token missing. Please use the below command to export the token"
+        __besman_echo_no_colour ""
+        __besman_echo_no_colour "$ bes set BESMAN_GH_TOKEN <copied token>"
+        __besman_echo_no_colour ""
+        return 1
+    fi
+
     api_url="https://api.github.com/orgs/$BESMAN_NAMESPACE/repos?per_page=100&page=1"
 
     # Get the first page of repository names
@@ -166,7 +201,7 @@ function __besman_list_playbooks()
 {
 
 
-    local playbook_details_file playbook_details
+    local playbook_details_file playbook_details local_annotation remote_annotation
 
     playbook_details_file="$BESMAN_DIR/tmp/playbook_details.txt"
 
@@ -176,7 +211,10 @@ function __besman_list_playbooks()
 
     [[ ( ! -f "$playbook_details_file" ) || ( -z $playbook_details ) ]] && __besman_echo_red "Could not find playbook details" && return 1
 
-    printf "%-14s %-10s %-15s %-8s\n" "Name" "Version" "Type" "Author"
+    local_annotation=$(__besman_echo_red "+")
+    remote_annotation=$(__besman_echo_yellow "^")
+    
+    printf "%-25s %-10s %-15s %-8s\n" "Name" "Version" "Type" "Author"
     __besman_echo_no_colour "----------------------------------------------------------------------"
 
     OLD_IFS=$IFS
@@ -186,10 +224,24 @@ function __besman_list_playbooks()
     do 
         # converted_line=$(echo "$line" | sed 's|,|/|g')
         read -r name version type author <<< "$line"
-        printf "%-14s %-10s %-15s %-8s\n" "$name" "$version" "$type" "$author"     
+        if [[ -f "$BESMAN_PLAYBOOK_DIR/besman-$name-$version-playbook.sh" ]] 
+        then
+            
+            printf "%-25s %-10s %-15s %-8s\n" "$name" "$version" "$type" "$author$local_annotation"
+        else
+            printf "%-25s %-10s %-15s %-8s\n" "$name" "$version" "$type" "$author$remote_annotation"
+
+        fi
         
-    done < "$playbook_details_file"
+    done <<< "$playbook_details"
     IFS=$OLD_IFS
+
+    __besman_echo_no_colour ""
+    __besman_echo_no_colour "======================================================================="
+    __besman_echo_no_colour "$remote_annotation - remote playbook"
+    __besman_echo_no_colour "$local_annotation - local playbook"
+    __besman_echo_no_colour "======================================================================="
+    __besman_echo_no_colour ""
 
     [[ -f $playbook_details_file ]] && rm "$playbook_details_file"
 

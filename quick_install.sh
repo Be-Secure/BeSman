@@ -14,7 +14,6 @@ fi
 BESMAN_PLATFORM=$(uname)
 export BESMAN_SERVICE="https://raw.githubusercontent.com"
 
-
 # BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
 
 BESMAN_NAMESPACE="Be-Secure"
@@ -23,6 +22,16 @@ BESMAN_ENV_REPOS="$BESMAN_NAMESPACE/besecure-ce-env-repo"
 
 if [ -z "$BESMAN_DIR" ]; then
     export BESMAN_DIR="$HOME/.besman"
+fi
+
+if [[ -z "$BESMAN_CODE_COLLAB_URL" ]]
+then
+	export BESMAN_CODE_COLLAB_URL="https://github.com"
+fi
+
+if [[ -z "$BESMAN_VCS" ]]
+then
+	export BESMAN_VCS="git"
 fi
 
 # variables
@@ -42,6 +51,7 @@ besman_profile="${HOME}/.profile"
 besman_bashrc="${HOME}/.bashrc"
 besman_zshrc="${HOME}/.zshrc"
 besman_scripts_folder="$BESMAN_DIR/scripts"
+besman_playbook_dir="$BESMAN_DIR/playbooks"
 
 besman_init_snippet=$( cat << EOF
 #THIS MUST BE AT THE END OF THE FILE FOR BESMAN TO WORK!!!
@@ -144,17 +154,17 @@ if [[ -z $(which ansible) ]]; then
   sudo apt install ansible -y
 fi
 
-if [[ -z $(which gh) ]]; then
-  echo "Installing GitHub Cli"
-  type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
-  curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg 
-  sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
-  echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null 
-  sudo apt update
-  sudo apt install gh -y
 
-fi
+  if [[ -z $(which gh) ]]; then
+    echo "Installing GitHub Cli"
+    type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
+    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg 
+    sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null 
+    sudo apt update
+    sudo apt install gh -y
 
+  fi
 
 echo "Installing BeSMAN scripts..."
 
@@ -170,6 +180,7 @@ mkdir -p "$besman_env_folder"
 mkdir -p "$besman_etc_folder"
 mkdir -p "$besman_var_folder"
 mkdir -p "$besman_scripts_folder"
+mkdir -p "$besman_playbook_dir"
 
 
 
@@ -193,17 +204,20 @@ touch "$besman_user_config_file"
 {
     echo "BESMAN_VERSION=$BESMAN_VERSION"
     echo "BESMAN_USER_NAMESPACE="
+	  echo "BESMAN_CODE_COLLAB_URL=$BESMAN_CODE_COLLAB_URL"
+	  echo "BESMAN_VCS=$BESMAN_VCS"
     echo "BESMAN_ENV_ROOT=$HOME/BeSman_env"
     echo "BESMAN_NAMESPACE=$BESMAN_NAMESPACE"
     echo "BESMAN_INTERACTIVE_USER_MODE=true"
     echo "BESMAN_DIR=$HOME/.besman"
     echo "BESMAN_ENV_REPOS=$BESMAN_ENV_REPOS"
-    echo "BESMAN_PLAYBOOK_REPO=besecure-ce-playbook-repo"
+    echo "BESMAN_PLAYBOOK_REPO=besecure-playbooks-store"
     echo "BESMAN_GH_TOKEN="
     echo "BESMAN_OFFLINE_MODE=true"
     echo "BESMAN_LOCAL_ENV=False"
   	echo "BESMAN_LIGHT_MODE=False"
     echo "BESMAN_LOCAL_ENV_DIR="
+    echo "BESMAN_PLAYBOOK_DIR=$besman_playbook_dir"
 } >> "$besman_user_config_file"
 
 cp ./src/main/bash/besman-* "$besman_src_folder"

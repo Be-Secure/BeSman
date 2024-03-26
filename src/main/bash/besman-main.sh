@@ -7,7 +7,7 @@ function bes {
 	{
 		local command=$1
 		if [[ ! -f $BESMAN_DIR/src/besman-$command.sh ]]; then
-		        __besman_echo_red "Wrong Command Format"
+			__besman_echo_red "Wrong Command Format"
 			__besman_echo_red "Could not find file besman-$environment.sh"
 			__besman_echo_white "Make sure you have given the correct command name"		
 			__besman_echo_white "If the issue persists, re-install BESman and try again"	
@@ -25,8 +25,12 @@ function bes {
 			rm | remove)
 				args=("${args[@]}" "$1")
 			;;
-			-env | -V | --environment | --version | --playbook | -P | -cve | -vuln | -ext | -assess | --input | --roles)         opts=("${opts[@]}" "$1");; ## -env | -V 
-        	*)          args=("${args[@]}" "$1");; ## command | env_name | version_tag
+			-env | -V | --environment | --version | --playbook | -P | --role)         
+				opts=("${opts[@]}" "$1") ## -env | -V 
+			;; 
+        	*)
+				args=("${args[@]}" "$1") ## command | env_name | version_tag
+			;; 
     	esac
     	shift
 	done
@@ -150,15 +154,14 @@ function bes {
 			__bes_"$command" "$variable" "$value"
 			;;
 		run)
-			if [[ -z "${#opts[1]}" ]]; then
+			# bes run --playbook sbom -V 0.0.1
 
-				[[ "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
-				[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
-				__bes_$command ${args[1]}
-			else
+				[[ "${#args[@]}" -ne 3 ]] && __besman_echo_red "Incorrect syntax" && return 1
+				[[ "${#opts[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
+
+				# [[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
+				__bes_"$command" "${args[1]}" "${args[2]}"
 				
-				__bes_$command "${args[@]}" 
-			fi
 			;;
 		list)
 			if [[ -z ${opts[0]} ]]; then
@@ -201,19 +204,13 @@ function bes {
 				__bes_$command $environment 
 			;;
 		pull)
-			[[ "${#args[@]}" -gt 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
-			[[ "${#opts[@]}" -gt 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
-			if [[ ( ${opts[0]} == "--playbook" ) || ( ${opts[0]} == "-P" ) ]]; then
-				type=playbook
-				namespace="${args[1]}"
-			
-			else
-				type=environment
-				__besman_check_input_env_format "$environment" || return 1
-
-			fi
-			__bes_$command $type $namespace
-			unset type namespace
+			[[ "${#args[@]}" -ne 3 ]] && __besman_echo_red "Incorrect syntax" && return 1
+			[[ "${#opts[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
+		
+				playbook_name=${args[1]}	
+				version=${args[2]}
+				__bes_"$command" "$playbook_name" "$version"
+			unset type playbook_name version
 			;;
 		create)
 			# bes create --playbook -cve <cve-details> -vuln <vulnerability> -env <env name> -ext <extension>
