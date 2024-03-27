@@ -106,7 +106,7 @@ function __bes_help_list {
 function __bes_help_status {
     __besman_echo_no_colour '  '
     __besman_echo_white 'NAME'
-    __besman_echo_no_colour '   status - To show the installed environments '
+    __besman_echo_no_colour '   status - To show the list installed environments and its current version'
     __besman_echo_no_colour '  '
     __besman_echo_white 'SYNOPSIS  '
     __besman_echo_yellow '    $ bes status'
@@ -134,25 +134,21 @@ function __bes_help_set {
     __besman_echo_white 'EXAMPLE'
     __besman_echo_no_colour '  $ bes set BESMAN_NAMESPACE Be-Secure'
     __besman_echo_no_colour '   '
-    __besman_echo_white 'LIST OF BESMAN CONFIG VARIABLES'
-    __besman_echo_no_colour '   BESMAN_VERSION - Release version of BeSman.'
-    __besman_echo_no_colour '   BESMAN_USER_NAMESPACE - '
-    __besman_echo_no_colour '   BESMAN_CODE_COLLAB_URL - '
-    __besman_echo_no_colour '   BESMAN_VCS - '
-    __besman_echo_no_colour '   BESMAN_ENV_ROOT - '
-    __besman_echo_no_colour '   BESMAN_NAMESPACE - '
-    __besman_echo_no_colour '   BESMAN_INTERACTIVE_USER_MODE - '
-    __besman_echo_no_colour '   BESMAN_DIR - '
-    __besman_echo_no_colour '   BESMAN_ENV_REPOS - '
-    __besman_echo_no_colour '   BESMAN_PLAYBOOK_REPO - '
-    __besman_echo_no_colour '   BESMAN_GH_TOKEN - '
-    __besman_echo_no_colour '   BESMAN_OFFLINE_MODE - '
-    __besman_echo_no_colour '   BESMAN_LOCAL_ENV - '
-    __besman_echo_no_colour '   BESMAN_LIGHT_MODE - '
-    __besman_echo_no_colour '   BESMAN_LOCAL_ENV_DIR - '
-    __besman_echo_no_colour '   BESMAN_PLAYBOOK_DIR - '
-    __besman_echo_no_colour '   '
 
+    __besman_echo_white "-----------------------------------------------------BESMAN CONFIG VARIABLES-------------------------------------------------------"
+    printf "%-25s %-70s %-25s\n" "Variable" "Usage" "Expected Input"
+    __besman_echo_white "-----------------------------------------------------------------------------------------------------------------------------------"
+
+    printf "%-25s %-70s %-25s\n" "BESMAN_USER_NAMESPACE" "Namespace to clone repo during env scripts installation" "GitHub or GitLab namespace"
+    printf "%-25s %-70s %-25s\n" "BESMAN_CODE_COLLAB_URL" "URL of the code collab platform" "https://github.com or GitLab URL"
+    printf "%-25s %-70s %-25s\n" "BESMAN_VCS" "Version control system used for repo management" "Git or GH"
+    printf "%-25s %-70s %-25s\n" "BESMAN_NAMESPACE" "Namepace for BeS operations" "GitHub or GitLab namespace"
+    printf "%-25s %-70s %-25s\n" "BESMAN_ENV_REPOS" "Repo from which user install env scripts" "namespace/repo_name"
+    printf "%-25s %-70s %-25s\n" "BESMAN_PLAYBOOK_REPO" "Repo from which user pull playbooks" "repo_name"
+    printf "%-25s %-70s %-25s\n" "BESMAN_LOCAL_ENV_DIR" "Local env dir from which user can install env scripts" "complete path to dir"
+    printf "%-25s %-70s %-25s\n" "BESMAN_LOCAL_ENV" "If value is true, env is installed from BESMAN_LOCAL_ENV_DIR" "true or false"
+    
+    __besman_echo_white "-----------------------------------------------------------------------------------------------------------------------------------"
 }
 
 function __bes_help_create {
