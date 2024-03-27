@@ -5,13 +5,13 @@ function __bes_install {
 	environment_name=$1
 	version_id=$2
 
-	if [[ ( -n $BESMAN_LOCAL_ENV ) && ( $BESMAN_LOCAL_ENV == "True" ) ]]; then
+	if [[ ( -n $BESMAN_LOCAL_ENV ) && ( $BESMAN_LOCAL_ENV == "true" ) ]]; then
 		__besman_get_local_env "$environment_name" "$version_id" || return 1
 	fi
 	# If environmnet not installed.
 	if [[ ! -d "${BESMAN_DIR}/envs/besman-${environment_name}/$version_id" ]]; then
 
-		if [[ ( -n $BESMAN_LOCAL_ENV ) && ( $BESMAN_LOCAL_ENV == "False" ) ]]; then
+		if [[ ( -n $BESMAN_LOCAL_ENV ) && ( $BESMAN_LOCAL_ENV == "false" ) ]]; then
 			__besman_get_remote_env "$environment_name" || return 1
 		fi
 		mkdir -p "${BESMAN_DIR}/envs/besman-${environment_name}"
@@ -23,11 +23,11 @@ function __bes_install {
 
 		__besman_echo_no_colour "$version_id" >"$current"
 		
-		cp "${BESMAN_DIR}/envs/besman-${environment_name}.sh" "${BESMAN_DIR}/envs/besman-${environment_name}/$version_id/"
+		mv "${BESMAN_DIR}/envs/besman-${environment_name}.sh" "${BESMAN_DIR}/envs/besman-${environment_name}/$version_id/"
+		source "${BESMAN_DIR}/envs/besman-${environment_name}/${version_id}/besman-${environment_name}.sh"
 		[[ ( -n $BESMAN_LIGHT_MODE ) && ( $BESMAN_LIGHT_MODE == "False" ) ]] && __besman_source_env_params "$environment_name"
 		__besman_show_lab_association_prompt "$environment_name" "$version_id" || return 1
 		[[ ( -n $BESMAN_LIGHT_MODE ) && ( $BESMAN_LIGHT_MODE == "False" ) ]] && __besman_create_roles_config_file 
-		source "${BESMAN_DIR}/envs/besman-${environment_name}/${version_id}/besman-${environment_name}.sh"
 
 		__besman_install_"${environment_name}" "${environment_name}" "${version_id}"
 

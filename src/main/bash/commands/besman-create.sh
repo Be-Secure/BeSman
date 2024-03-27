@@ -115,7 +115,7 @@ function __besman_open_file_vscode() {
 function __besman_set_variables()
 {
     local path
-    __bes_set "BESMAN_LOCAL_ENV" "True"
+    __bes_set "BESMAN_LOCAL_ENV" "true"
     [[ -n $BESMAN_LOCAL_ENV_DIR ]] && return 0
     while [[ ( -z $path ) || ( ! -d $path )  ]] 
     do
@@ -229,6 +229,8 @@ function __besman_create_env_with_config()
 
 function __besman_install_$environment_name
 {
+    # We set this variable to make sure BeSman can install the envs smoothly.
+    export BESMAN_LIGHT_MODE=false
     __besman_check_for_gh || return 1 # Checks if GitHub CLI is present or not.
     __besman_check_github_id || return 1 # checks whether the user github id has been populated or not under BESMAN_USER_NAMESPACE 
     __besman_check_for_ansible || return 1 # Checks if ansible is installed or not.
@@ -309,7 +311,8 @@ function __besman_create_env_basic
 
 function __besman_install_$environment_name
 {
-
+    # We set this variable to make sure BeSman can install the envs smoothly.
+    export BESMAN_LIGHT_MODE true
 }
 
 function __besman_uninstall_$environment_name

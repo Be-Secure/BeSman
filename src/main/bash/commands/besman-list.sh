@@ -83,12 +83,12 @@ function __besman_list_envs()
 
     unset flag arr env list
 
-    if [[ $BESMAN_LOCAL_ENV == "True" ]]; then
+    if [[ $BESMAN_LOCAL_ENV == "true" ]]; then
 
         __besman_echo_yellow "Pointing to local dir $BESMAN_LOCAL_ENV_DIR"
         __besman_echo_no_colour ""
         __besman_echo_white "If you wish to change, run the below command"
-        __besman_echo_yellow "$ bes set BESMAN_LOCAL_ENV False"
+        __besman_echo_yellow "$ bes set BESMAN_LOCAL_ENV false"
         __besman_echo_yellow "$ bes set BESMAN_ENV_REPOS <GitHub Org>"
     else      
         __besman_echo_yellow "Pointing to $BESMAN_ENV_REPOS"
@@ -99,7 +99,7 @@ function __besman_list_envs()
 function __besman_check_repo_exist()
 {
     local namespace repo response repo_url
-    [[ $BESMAN_LOCAL_ENV == "True" ]] && return 0
+    [[ $BESMAN_LOCAL_ENV == "true" ]] && return 0
     namespace=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 1)
     repo=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 2)
     repo_url="https://api.github.com/repos/$namespace/$repo"
@@ -116,7 +116,7 @@ function __besman_check_repo_exist()
 function __besman_update_list()
 {
     local bes_list
-    if [[ ( -n $BESMAN_LOCAL_ENV ) && ( $BESMAN_LOCAL_ENV == "True" )]]; then
+    if [[ ( -n $BESMAN_LOCAL_ENV ) && ( $BESMAN_LOCAL_ENV == "true" )]]; then
         local env_dir_list bes_list
         [[ -z $BESMAN_LOCAL_ENV_DIR ]] && __besman_echo_red "Please set the local env dir first" && return 1
         [[ ! -d $BESMAN_LOCAL_ENV_DIR ]] && __besman_echo_red "Could not find dir $BESMAN_LOCAL_ENV_DIR" && return 1
