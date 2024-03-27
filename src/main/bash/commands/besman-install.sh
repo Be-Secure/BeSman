@@ -25,9 +25,9 @@ function __bes_install {
 		
 		mv "${BESMAN_DIR}/envs/besman-${environment_name}.sh" "${BESMAN_DIR}/envs/besman-${environment_name}/$version_id/"
 		source "${BESMAN_DIR}/envs/besman-${environment_name}/${version_id}/besman-${environment_name}.sh"
-		[[ ( -n $BESMAN_LIGHT_MODE ) && ( $BESMAN_LIGHT_MODE == "False" ) ]] && __besman_source_env_params "$environment_name"
+		[[ ( -n $BESMAN_LIGHT_MODE ) && ( $BESMAN_LIGHT_MODE == "false" ) ]] && __besman_source_env_params "$environment_name"
 		__besman_show_lab_association_prompt "$environment_name" "$version_id" || return 1
-		[[ ( -n $BESMAN_LIGHT_MODE ) && ( $BESMAN_LIGHT_MODE == "False" ) ]] && __besman_create_roles_config_file 
+		[[ ( -n $BESMAN_LIGHT_MODE ) && ( $BESMAN_LIGHT_MODE == "false" ) ]] && __besman_create_roles_config_file 
 
 		__besman_install_"${environment_name}" "${environment_name}" "${version_id}"
 
@@ -60,7 +60,7 @@ function __besman_get_local_env()
 	default_config_path=$BESMAN_DIR/tmp/besman-$environment_name-config.yaml
 	[[ ! -d $BESMAN_LOCAL_ENV_DIR ]] && __besman_echo_red "Could not find dir $BESMAN_LOCAL_ENV_DIR" && return 1
 	cp "$BESMAN_LOCAL_ENV_DIR/$ossp/$version/besman-$environment.sh" "$BESMAN_DIR/envs/"
-	if [[ ( -n $BESMAN_LIGHT_MODE ) && ( $BESMAN_LIGHT_MODE == "False" ) && ( ! -f "$HOME/besman-$environment-config.yaml" ) ]]; then
+	if [[ ( -n $BESMAN_LIGHT_MODE ) && ( $BESMAN_LIGHT_MODE == "false" ) && ( ! -f "$HOME/besman-$environment-config.yaml" ) ]]; then
 		
 		if [[ -f $default_config_path ]]; then
 			__besman_echo_yellow "A config file already exists"
@@ -109,7 +109,7 @@ function __besman_get_remote_env {
 	curl_flag=true
 	__besman_secure_curl "$env_url" >>"${BESMAN_DIR}/envs/besman-${environment_name}.sh"
 	[[ "$?" -ne 0 ]] && __besman_echo_red "Failed while trying to get the besman-${environment_name}.sh" && return 1
-	if [[ ( -n $BESMAN_LIGHT_MODE ) && ( $BESMAN_LIGHT_MODE == "False" ) && ( ! -f "$HOME/besman-${ossp}-${env_type}-env-config.yaml" ) ]]; then
+	if [[ ( -n $BESMAN_LIGHT_MODE ) && ( $BESMAN_LIGHT_MODE == "false" ) && ( ! -f "$HOME/besman-${ossp}-${env_type}-env-config.yaml" ) ]]; then
 		config_url="https://raw.githubusercontent.com/${env_repo_namespace}/${env_repo}/master/${ossp}/${version_id}/besman-${ossp}-${env_type}-env-config.yaml"
 		if [[ -f $default_config_path ]]; then
 			__besman_echo_yellow "A config file already exists"
