@@ -13,10 +13,13 @@ function __besman_source_env_params
       __besman_echo_yellow "Sourcing user config parameters from $BESMAN_ENV_CONFIG_FILE_PATH"
     
     elif [[ -f $BESMAN_DIR/tmp/$env_config ]]; then
+      export BESMAN_ENV_CONFIG_FILE_PATH=$BESMAN_DIR/tmp/$env_config
+      __besman_echo_yellow "Sourcing default config parameters"
+    else
 		__besman_download_default_configations || return 1
       export BESMAN_ENV_CONFIG_FILE_PATH=$BESMAN_DIR/tmp/$env_config
       __besman_echo_yellow "Sourcing default config parameters"
-    fi
+	fi
     
 
     # creating a temporary shell script file for exporting variables from config file.
