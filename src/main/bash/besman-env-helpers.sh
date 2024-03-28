@@ -16,7 +16,7 @@ function __besman_source_env_params
       export BESMAN_ENV_CONFIG_FILE_PATH=$BESMAN_DIR/tmp/$env_config
       __besman_echo_yellow "Sourcing default config parameters"
     else
-		__besman_download_default_configations || return 1
+		__besman_download_default_configations "$environment" || return 1
       export BESMAN_ENV_CONFIG_FILE_PATH=$BESMAN_DIR/tmp/$env_config
       __besman_echo_yellow "Sourcing default config parameters"
 	fi
