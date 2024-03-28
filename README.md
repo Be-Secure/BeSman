@@ -107,30 +107,44 @@ BeSman is designed to work with linux machines. So, if you are a windows user, y
 
 # Usage
 
-        bes [command] [options] [ [environment name] | [playbook name] | [version] ]
-
-        Commands
-        -----------------------------------
-        help: Display the help command
-        list: List available environments, playbooks, roles.
-        install: Install available environments.
-        uninstall: Uninstall the installed environment.
-        update: Update the configurations of the installed environment.
-        validate: Validate the installtion of the environment.
-        reset: Reset the environment to default configurations.
-        create: Create environment script.
-        set: Change the BeSman config variables.
-        pull: Fetches the playbook from remote to local.
-        run: Execute available playbooks.
-        upgrade: Upgrade BeSman to the latest version
-        rm | remove: Remove BeSman from machine.
-
-        Options
-        -------------------------------------
-        -env | --environment: For passing the name of the environment script.
-        -V | --version: For passing the version number.
-        -P | --playbook: For passing the playbook name
-        --role: To list the role names
-
+        NAME
+           bes - The cli for BeSman  
+          
+        SYNOPSIS  
+           bes [command] [options] [ [environment name] | [playbook name] | [version] ] 
+          
+        DESCRIPTION
+           BeSman (pronounced as ‘B-e-S-man’) is a command-line utility designed for creating and provisioning customized security environments.
+           It helps security professionals to reduce the turn around time for assessment of Open Source projects, AI Models, Model Datasets
+           leaving them focus on the assessment task rather than setting up environment for it.
+           BeSman also provides seamless support for creating and executing BeS playbooks, enabling users to automate complex workflows and tasks.
+           With BeSman, users can efficiently manage and execute playbooks, streamlining their processes and enhancing productivity.
+          
+         COMMANDS 
+           help: Display the help command 
+           list: List available environments, playbooks, roles. 
+           install: Install available environments. 
+           uninstall: Uninstall the installed environment. 
+           update: Update the configurations of the installed environment. 
+           validate: Validate the installtion of the environment. 
+           reset: Reset the environment to default configurations. 
+           create: Create environment script. 
+           set: Change the BeSman config variables. 
+           pull: Fetches the playbook from remote to local. 
+           run: Execute available playbooks. 
+           upgrade: Upgrade BeSman to the latest version 
+           rm | remove: Remove BeSman from machine. 
+           status: Display the list of installed environments and its current version 
+          
+         OPTIONS 
+           -env | --environment: For passing the name of the environment script. 
+           -V | --version: For passing the version number. 
+           -P | --playbook: For passing the playbook name 
+           --role: To list the role names 
+          
+        For more details execute below command
+           $ bes help <command name>
+           Choose command name from list of COMMANDS
+  
 
 You can find more details of the command from the BeSman [webpage](https://be-secure.github.io/Be-Secure/bes-besman-details/)
