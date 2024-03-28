@@ -300,11 +300,11 @@ function __besman_create_env_with_config()
 
 function __besman_install_$environment_name
 {
-    # We set this variable to make sure BeSman can install the envs smoothly.
-    # export BESMAN_LIGHT_MODE=false
-    __besman_check_for_gh || return 1 # Checks if GitHub CLI is present or not.
+
+    __besman_check_vcs_exist || return 1 # Checks if GitHub CLI is present or not.
     __besman_check_github_id || return 1 # checks whether the user github id has been populated or not under BESMAN_USER_NAMESPACE 
     __besman_check_for_ansible || return 1 # Checks if ansible is installed or not.
+    __besman_create_roles_config_file
     
     # Requirements file is used to list the required ansible roles. The data for requirements file comes from BESMAN_ANSIBLE_ROLES env var.
     # This function updates the requirements file from BESMAN_ANSIBLE_ROLES env var.
@@ -320,7 +320,19 @@ function __besman_install_$environment_name
     if [[ -d \$BESMAN_ARTIFACT_DIR ]]; then
         __besman_echo_white "The clone path already contains dir names \$BESMAN_ARTIFACT_NAME"
     else
-        __besman_gh_clone "\$BESMAN_ORG" "\$BESMAN_ARTIFACT_NAME" "\$BESMAN_ARTIFACT_DIR"
+        __besman_echo_white "Cloning source code repo from \$BESMAN_USER_NAMESPACE/\$BESMAN_ARTIFACT_NAME"
+        __besman_repo_clone "\$BESMAN_USER_NAMESPACE" "\$BESMAN_ARTIFACT_NAME" "\$BESMAN_ARTIFACT_DIR" || return 1
+        cd "\$BESMAN_ARTIFACT_DIR" && git checkout -b "$\BESMAN_ARTIFACT_VERSION"_tavoss 1.2.24
+        cd "$\HOME"
+    fi
+
+    if [[ -d $\BESMAN_ASSESSMENT_DATASTORE_DIR ]] 
+    then
+        __besman_echo_white "Assessment datastore found at $\BESMAN_ASSESSMENT_DATASTORE_DIR"
+    else
+        __besman_echo_white "Cloning assessment datastore from $\BESMAN_USER_NAMESPACE/besecure-assessment-datastore"
+        __besman_repo_clone "$\BESMAN_USER_NAMESPACE" "besecure-assessment-datastore" "$\BESMAN_ASSESSMENT_DATASTORE_DIR" || return 1
+
     fi
     # Please add the rest of the code here for installation
 }
@@ -379,8 +391,7 @@ function __besman_create_env_basic
     touch "$env_file_path"
     cat <<EOF > "$env_file_path"
 #!/bin/bash
-# We set this variable to make sure BeSman can install the envs smoothly.
-# export BESMAN_LIGHT_MODE true
+
 function __besman_install_$environment_name
 {
 
