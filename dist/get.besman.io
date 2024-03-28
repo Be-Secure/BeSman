@@ -10,16 +10,24 @@ export BESMAN_SERVICE="https://raw.githubusercontent.com"
 # BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
 
 BESMAN_NAMESPACE="Be-Secure"
-BESMAN_VERSION="0.1.0"
+BESMAN_VERSION="0.2.0"
 BESMAN_ENV_REPOS="$BESMAN_NAMESPACE/besecure-ce-env-repo"
 # BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
 
 
 
-if [ -z "$BESMAN_DIR" ]; then
-    BESMAN_DIR="$HOME/.besman"
+if [[ -z "$BESMAN_DIR" ]]; then
+    export BESMAN_DIR="$HOME/.besman"
 fi
 
+if [[ -z "$BESMAN_CODE_COLLAB_URL" ]]
+	export BESMAN_CODE_COLLAB_URL="https://github.com"
+fi
+
+if [[ -z "$BESMAN_VCS" ]]
+then
+	export BESMAN_VCS="git"
+fi
 # variables
 besman_bin_folder="${BESMAN_DIR}/bin"
 besman_src_folder="${BESMAN_DIR}/src"
@@ -36,6 +44,8 @@ besman_bash_profile="${HOME}/.bash_profile"
 besman_profile="${HOME}/.profile"
 besman_bashrc="${HOME}/.bashrc"
 besman_zshrc="${HOME}/.zshrc"
+besman_playbook_dir="$BESMAN_DIR/playbooks"
+
 
 
 
@@ -223,6 +233,7 @@ mkdir -p "$besman_stage_folder"
 mkdir -p "$besman_env_folder"
 mkdir -p "$besman_etc_folder"
 mkdir -p "$besman_var_folder"
+mkdir -p "$besman_playbook_dir"
 
 
 
@@ -246,17 +257,19 @@ touch "$besman_user_config_file"
 {
     echo "BESMAN_VERSION=$BESMAN_VERSION"
     echo "BESMAN_USER_NAMESPACE="
+	echo "BESMAN_CODE_COLLAB_URL=$BESMAN_CODE_COLLAB_URL"
+	echo "BESMAN_VCS=$BESMAN_VCS"
     echo "BESMAN_ENV_ROOT=$HOME/BeSman_env"
     echo "BESMAN_NAMESPACE=$BESMAN_NAMESPACE"
     echo "BESMAN_INTERACTIVE_USER_MODE=true"
     echo "BESMAN_DIR=$HOME/.besman"
     echo "BESMAN_ENV_REPOS=$BESMAN_ENV_REPOS"
-    echo "BESMAN_PLAYBOOK_REPO=besecure-ce-playbook-repo"
+    echo "BESMAN_PLAYBOOK_REPO=besecure-playbooks-store"
     echo "BESMAN_GH_TOKEN="
-    echo "BESMAN_OFFLINE_MODE=true"
-    echo "BESMAN_LOCAL_ENV=False"
-	echo "BESMAN_LIGHT_MODE=False"
+    echo "BESMAN_LOCAL_ENV=false"
 	echo "BESMAN_LOCAL_ENV_DIR="
+    echo "BESMAN_PLAYBOOK_DIR=$besman_playbook_dir"
+
 } >> "$besman_user_config_file"
 echo "Download script archive..."
 
