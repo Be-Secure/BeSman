@@ -272,7 +272,6 @@ function __besman_download_default_configations()
 	__besman_check_url_valid "$config_url" 
 	if [[ $? -eq 1 ]]
 	then
-		__besman_echo_yellow "Skipping download of default configuration file"
 		return 1
 	fi
 	__besman_secure_curl "$config_url" >> "$default_config_path"

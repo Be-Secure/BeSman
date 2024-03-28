@@ -28,6 +28,8 @@ function __bes_install {
 		if [[ $? -eq 1 ]]
 		then
 			__besman_error_rollback "$environment_name"
+			__besman_manage_install_out "$return_val" "$environment_name"
+
 		fi
 		# [[ ( -n $BESMAN_LIGHT_MODE ) && ( $BESMAN_LIGHT_MODE == "false" __besman_source_env_params "$environment_name"
 		# [[ ( -n $BESMAN_LIGHT_MODE ) && ( $BESMAN_LIGHT_MODE == "false" ) ]] && __besman_create_roles_config_file 
@@ -36,6 +38,8 @@ function __bes_install {
 		if [[ $? -eq 1 ]]
 		then
 			__besman_error_rollback "$environment_name"
+			__besman_manage_install_out "$return_val" "$environment_name"
+
 		fi
 		source "${BESMAN_DIR}/envs/besman-${environment_name}/${version_id}/besman-${environment_name}.sh"
 		__besman_install_"${environment_name}" "${environment_name}" "${version_id}"
