@@ -37,6 +37,10 @@ __besman_echo_no_colour '   -V | --version: For passing the version number. '
 __besman_echo_no_colour '   -P | --playbook: For passing the playbook name '
 __besman_echo_no_colour '   --role: To list the role names '
 __besman_echo_no_colour '  '
+__besman_echo_white 'For more details execute below command'
+__besman_echo_yellow '   $ bes help <command name>'
+__besman_echo_no_colour '   Choose command name from list of COMMANDS'
+__besman_echo_no_colour '  '
 }
 
 function __bes_help_install {

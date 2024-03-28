@@ -11,6 +11,7 @@ function bes {
 			__besman_echo_red "Could not find file besman-$environment.sh"
 			__besman_echo_white "Make sure you have given the correct command name"		
 			__besman_echo_white "If the issue persists, re-install BESman and try again"	
+			__bes_help
 			return 1
 		fi
 
@@ -55,8 +56,8 @@ function bes {
 	case $command in 
 		install)
 			
-			[[ ${#opts[@]} -ne 2 ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
-			[[ ${#args[@]} -ne 3 ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
+			[[ ${#opts[@]} -ne 2 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_install && return 1
+			[[ ${#args[@]} -ne 3 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_install && return 1
 			__besman_validate_environment $environment || return 1
 			# __besman_check_environment_exists "$environment" || return 1
 			__besman_check_if_version_exists $environment $version || return 1
@@ -64,8 +65,8 @@ function bes {
 			__bes_$command $environment $version
 			;;
 		uninstall)
-			[[ ( ${#opts[@]} -eq 0 || ${#opts[@]} -gt 2 ) ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
-			[[ ( ${#args[@]} -eq 0 || ${#args[@]} -gt 3 ) ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
+			[[ ( ${#opts[@]} -eq 0 || ${#opts[@]} -gt 2 ) ]] && __besman_echo_red "Incorrect syntax" && __bes_help_uninstall && return 1
+			[[ ( ${#args[@]} -eq 0 || ${#args[@]} -gt 3 ) ]] && __besman_echo_red "Incorrect syntax" && __bes_help_uninstall && return 1
 			__besman_check_input_env_format "$environment" || return 1
 			[[ $environment == "all" ]] && __bes_$command $environment && return 0
 			if [[ -z $version && -f $BESMAN_DIR/envs/besman-$environment/current ]]; then
@@ -79,13 +80,13 @@ function bes {
 			__bes_$command $environment $version
 			;;
 		status | upgrade | remove)
-			[[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
-			[[ "${#opts[@]}" -ne 0 ]] && __besman_echo_red "Incorrect syntax" && return 1
-			__bes_$command
+			[[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
+			[[ "${#opts[@]}" -ne 0 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
+			__bes_"$command"
 			;;
 		help)
-			[[ "${#args[@]}" -ne 1 && "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
-			[[ "${#opts[@]}" -ne 0 ]] && __besman_echo_red "Incorrect syntax" && return 1
+			[[ "${#args[@]}" -ne 1 && "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
+			[[ "${#opts[@]}" -ne 0 ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
 			if [[ "${#args[@]}" -eq 1 ]]; then
 				__bes_$command
 			elif [[ "${#args[@]}" -eq 2 ]]; then
@@ -132,8 +133,11 @@ function bes {
 					reset)
 						__bes_help_reset
 					;;
+					pull)
+						__bes_help_pull
+					;;
 					*)
-					__besman_echo_red "Unrecognized argument: ${args[1]}" && return 1
+					__besman_echo_red "Unrecognized argument: ${args[1]}" && __bes_help && return 1
 					;;
 				esac
 			fi
@@ -156,8 +160,8 @@ function bes {
 		run)
 			# bes run --playbook sbom -V 0.0.1
 
-				[[ "${#args[@]}" -ne 3 ]] && __besman_echo_red "Incorrect syntax" && return 1
-				[[ "${#opts[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
+				[[ "${#args[@]}" -ne 3 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_run && return 1
+				[[ "${#opts[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_run && return 1
 
 				# [[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
 				__bes_"$command" "${args[1]}" "${args[2]}"
@@ -166,46 +170,46 @@ function bes {
 		list)
 			if [[ -z ${opts[0]} ]]; then
 				
-				[[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
-				[[ "${#opts[@]}" -ne 0 ]] && __besman_echo_red "Incorrect syntax" && return 1
+				[[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_list && return 1
+				[[ "${#opts[@]}" -ne 0 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_list && return 1
 				__bes_$command
 			else
-				[[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
-				[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
+				[[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_list && return 1
+				[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_list && return 1
 				__bes_$command ${opts[0]}
 			fi
 			;;
 		update)
 			if [[ -z $environment ]]; then
 				
-				[[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
-				[[ "${#opts[@]}" -ne 0 ]] && __besman_echo_red "Incorrect syntax" && return 1
+				[[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_update && return 1
+				[[ "${#opts[@]}" -ne 0 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_update && return 1
 				__bes_$command
 			else
-				[[ "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
-				[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
+				[[ "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_update && return 1
+				[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_update && return 1
 				__besman_check_input_env_format "$environment" || return 1
 				__besman_validate_environment $environment || return 1
 				__bes_$command $environment
 			fi
 			;;	
 		validate)
-				[[ "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
-				[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
+				[[ "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_validate && return 1
+				[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_validate && return 1
 				__besman_check_input_env_format "$environment" || return 1
 				__besman_validate_environment $environment || return 1
 				__bes_$command $environment
 			;;
 		reset)
-				[[ "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
-				[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
+				[[ "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_reset && return 1
+				[[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_reset && return 1
 				__besman_check_input_env_format "$environment" || return 1
 				__besman_validate_environment $environment || return 1
 				__bes_$command $environment 
 			;;
 		pull)
-			[[ "${#args[@]}" -ne 3 ]] && __besman_echo_red "Incorrect syntax" && return 1
-			[[ "${#opts[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && return 1
+			[[ "${#args[@]}" -ne 3 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_pull && return 1
+			[[ "${#opts[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_pull && return 1
 		
 				playbook_name=${args[1]}	
 				version=${args[2]}
@@ -218,7 +222,7 @@ function bes {
 			local purpose vuln env ext
 			type=${opts[0]}
 			if [[ ( -n $type ) && ( $type == --playbook || $type == -P ) ]]; then
-				[[ ${#args[@]} != ${#opts[@]} ]] && __besman_echo_red "Incorrect syntax" && return 1
+				[[ ${#args[@]} != ${#opts[@]} ]] && __besman_echo_red "Incorrect syntax" && __bes_help_create && return 1
 				# type=playbook
 				for (( i=0; i<${#opts[@]}; i++ ))
 				do
@@ -257,7 +261,7 @@ function bes {
 			unset type purpose vuln env ext
 			;;
 		version)
-			[[ ${#opts[@]} -eq 0 ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
+			[[ ${#opts[@]} -eq 0 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_version && __bes_help && return 1
 			if [[ -n $opt_environment ]]; then
 				__besman_check_input_env_format "$environment" || return 1
 				__besman_validate_environment $environment || return 1
