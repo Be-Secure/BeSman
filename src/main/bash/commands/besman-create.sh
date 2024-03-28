@@ -81,6 +81,7 @@ function __bes_create
         if [[ ( -n "$template_type" ) && ( "$template_type" == "basic" ) ]]; then
 
             __besman_create_env_basic "$env_file_path" || return 1
+            __besman_create_env_config_basic "$environment_name" "$version"
         elif [[ -z "$template_type" ]]; then
             __besman_create_env_with_config "$env_file_path" 
             __besman_create_env_config "$environment_name" "$version"
@@ -93,6 +94,76 @@ function __bes_create
     __besman_open_file_vscode "$env_file_path" "$config_file_path" || return 1
 
     
+}
+
+function __besman_create_env_config_basic()
+{
+    {
+    local environment_name config_file ossp_name env_type config_file_path version overwrite
+    environment_name=$1
+    version=$2
+    ossp_name=$(echo "$environment_name" | cut -d "-" -f 1)
+    env_type=$(echo "$environment_name" | cut -d "-" -f 2)
+    config_file="besman-$ossp_name-$env_type-env-config.yaml"
+    config_file_path=$BESMAN_LOCAL_ENV_DIR/$ossp/$version/$config_file
+    if [[ -f $config_file_path ]]; then
+        __besman_echo_yellow "Config file $config_file exists under $BESMAN_LOCAL_ENV_DIR/$ossp/$version"
+        read -rp " Do you wish to replace?(y/n): " overwrite
+        if [[ ( "$overwrite" == "" ) || ( "$overwrite" == "y" ) || ( "$overwrite" == "Y" ) ]]; then
+            rm "$config_file_path"
+        else
+            return 
+        fi
+    fi
+    [[ ! -f $config_file_path ]] && touch "$config_file_path" && __besman_echo_yellow "Creating new config file $config_file_path"
+    cat <<EOF > "$config_file_path"
+---
+# If you wish to update the default configuration values, copy this file and place it under your home dir, under the same name.
+# These variables are used to drive the installation of the environment script.
+# The variables that start with BESMAN_ are converted to environment vars.
+# If you wish to add any other vars that should be used globally, add the var using the below format.
+# BESMAN_<var name>: <value>
+# If you are not using any particular value, remove it or comment it(#).
+#*** - These variables should not be removed, nor left empty.
+# BESMAN_ORG - used to mention where you should clone the repo from, default value is Be-Secure
+BESMAN_ORG: Be-Secure #***
+
+# BESMAN_ARTIFACT_TYPE - project/ml model/training dataset
+BESMAN_ARTIFACT_TYPE: # project/ml model/training dataset #***
+
+# BESMAN_ARTIFACT_NAME - name of the artifact under assessment.
+BESMAN_ARTIFACT_NAME: $ossp_name #***
+
+# BESMAN_ARTIFACT_VERSION - version of the artifact under assessment.
+BESMAN_ARTIFACT_VERSION: #Enter the version of the artifact here. #***
+
+# BESMAN_ARTIFACT_URL - Source code url of the artifact under assessment.
+BESMAN_ARTIFACT_URL: https://github.com/Be-Secure/$ossp_name #***
+
+#BESMAN_ENV_NAME - This variable stores the name of the environment file.
+BESMAN_ENV_NAME: $environment_name #***
+
+# BESMAN_ARTIFACT_DIR - The path where you wish to clone the source code of the artifact under assessment.
+# If you wish to change the clone path, provide the complete path.
+BESMAN_ARTIFACT_DIR: \$HOME/\$BESMAN_ARTIFACT_NAME #***
+
+# BESMAN_TOOL_PATH - The path where we download the assessment and other required tools during installation.
+BESMAN_TOOL_PATH: /opt #***
+
+# BESMAN_LAB_OWNER_TYPE - Organization/lab/individual.
+BESMAN_LAB_OWNER_TYPE: Organization #***
+
+# BESMAN_LAB_OWNER_NAME - Name of the owner of the lab. Default is Be-Secure.
+BESMAN_LAB_OWNER_NAME: Be-Secure #***
+
+# BESMAN_ASSESSMENT_DATASTORE_DIR - This is the local dir where we store the assessment reports. Default is home.
+BESMAN_ASSESSMENT_DATASTORE_DIR: \$HOME/besecure-assessment-datastore #***
+
+# BESMAN_ASSESSMENT_DATASTORE_URL - The remote repo where we store the assessment reports.
+BESMAN_ASSESSMENT_DATASTORE_URL: https://github.com/Be-Secure/besecure-assessment-datastore #***
+EOF
+}
+
 }
 function __besman_open_file_vscode() {
     if [[ -z $(which code) ]]; then
@@ -115,7 +186,7 @@ function __besman_open_file_vscode() {
 function __besman_set_variables()
 {
     local path
-    __bes_set "BESMAN_LOCAL_ENV" "True"
+    __bes_set "BESMAN_LOCAL_ENV" "true"
     [[ -n $BESMAN_LOCAL_ENV_DIR ]] && return 0
     while [[ ( -z $path ) || ( ! -d $path )  ]] 
     do
@@ -229,9 +300,11 @@ function __besman_create_env_with_config()
 
 function __besman_install_$environment_name
 {
-    __besman_check_for_gh || return 1 # Checks if GitHub CLI is present or not.
+
+    __besman_check_vcs_exist || return 1 # Checks if GitHub CLI is present or not.
     __besman_check_github_id || return 1 # checks whether the user github id has been populated or not under BESMAN_USER_NAMESPACE 
     __besman_check_for_ansible || return 1 # Checks if ansible is installed or not.
+    __besman_create_roles_config_file
     
     # Requirements file is used to list the required ansible roles. The data for requirements file comes from BESMAN_ANSIBLE_ROLES env var.
     # This function updates the requirements file from BESMAN_ANSIBLE_ROLES env var.
@@ -247,7 +320,19 @@ function __besman_install_$environment_name
     if [[ -d \$BESMAN_ARTIFACT_DIR ]]; then
         __besman_echo_white "The clone path already contains dir names \$BESMAN_ARTIFACT_NAME"
     else
-        __besman_gh_clone "\$BESMAN_ORG" "\$BESMAN_ARTIFACT_NAME" "\$BESMAN_ARTIFACT_DIR"
+        __besman_echo_white "Cloning source code repo from \$BESMAN_USER_NAMESPACE/\$BESMAN_ARTIFACT_NAME"
+        __besman_repo_clone "\$BESMAN_USER_NAMESPACE" "\$BESMAN_ARTIFACT_NAME" "\$BESMAN_ARTIFACT_DIR" || return 1
+        cd "\$BESMAN_ARTIFACT_DIR" && git checkout -b "$\BESMAN_ARTIFACT_VERSION"_tavoss 1.2.24
+        cd "$\HOME"
+    fi
+
+    if [[ -d $\BESMAN_ASSESSMENT_DATASTORE_DIR ]] 
+    then
+        __besman_echo_white "Assessment datastore found at $\BESMAN_ASSESSMENT_DATASTORE_DIR"
+    else
+        __besman_echo_white "Cloning assessment datastore from $\BESMAN_USER_NAMESPACE/besecure-assessment-datastore"
+        __besman_repo_clone "$\BESMAN_USER_NAMESPACE" "besecure-assessment-datastore" "$\BESMAN_ASSESSMENT_DATASTORE_DIR" || return 1
+
     fi
     # Please add the rest of the code here for installation
 }
