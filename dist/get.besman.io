@@ -21,6 +21,7 @@ if [[ -z "$BESMAN_DIR" ]]; then
 fi
 
 if [[ -z "$BESMAN_CODE_COLLAB_URL" ]]
+then
 	export BESMAN_CODE_COLLAB_URL="https://github.com"
 fi
 
