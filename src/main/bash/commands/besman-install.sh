@@ -38,7 +38,6 @@ function __bes_install {
 		if [[ $? -eq 1 ]]
 		then
 			__besman_error_rollback "$environment_name"
-			__besman_manage_install_out "$return_val" "$environment_name"
 			return 1
 
 		fi
