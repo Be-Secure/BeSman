@@ -106,6 +106,7 @@ function __besman_run_ansible_playbook_extra_vars
 function __besman_create_roles_config_file()
 {
     local env_config_file roles_config_file
+    [[ -z $BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH ]] && __besman_echo_yellow "Skipping creation of roles config" && return 1
     [[ ! -d $BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH ]] && mkdir -p "$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH"
     env_config_file=$BESMAN_ENV_CONFIG_FILE_PATH # BESMAN_ENV_CONFIG_FILE_PATH is set from env-helpers:__besman_source_env_params()
     roles_config_file=$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH/$BESMAN_ARTIFACT_NAME-roles-config.yml

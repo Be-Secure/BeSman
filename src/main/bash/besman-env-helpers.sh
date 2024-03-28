@@ -9,14 +9,17 @@ function __besman_source_env_params
     # checks whether user configuration exists
     if [[ -f $HOME/$env_config ]]; then
         
-        export BESMAN_ENV_CONFIG_FILE_PATH=$HOME/$env_config
-        __besman_echo_yellow "Sourcing user config parameters from $BESMAN_ENV_CONFIG_FILE_PATH"
+      export BESMAN_ENV_CONFIG_FILE_PATH=$HOME/$env_config
+      __besman_echo_yellow "Sourcing user config parameters from $BESMAN_ENV_CONFIG_FILE_PATH"
     
     elif [[ -f $BESMAN_DIR/tmp/$env_config ]]; then
-
-        export BESMAN_ENV_CONFIG_FILE_PATH=$BESMAN_DIR/tmp/$env_config
-        __besman_echo_yellow "Sourcing default config parameters from $BESMAN_ENV_CONFIG_FILE_PATH"
-    fi
+      export BESMAN_ENV_CONFIG_FILE_PATH=$BESMAN_DIR/tmp/$env_config
+      __besman_echo_yellow "Sourcing default config parameters"
+    else
+		__besman_download_default_configations "$environment" || return 1
+      export BESMAN_ENV_CONFIG_FILE_PATH=$BESMAN_DIR/tmp/$env_config
+      __besman_echo_yellow "Sourcing default config parameters"
+	fi
     
 
     # creating a temporary shell script file for exporting variables from config file.
@@ -251,4 +254,26 @@ function __besman_validate_assessment
   echo "${assessments[@]}" | grep -qw "$type"
   [[ "$?" != "0" ]] && __besman_echo_red "Could not find assessment type" &&  __besman_echo_no_colour "Select from the following:" && echo "${assessments[@]}" && return 1
   unset type assessments
+}
+
+function __besman_download_default_configations()
+{
+	local environment_name env_repo_namespace env_repo ossp env_url default_config_path curl_flag config_url
+	env_repo_namespace=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 1)
+	env_repo=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 2)
+	environment_name=$1
+	ossp=$(echo "$environment_name" | cut -d "-" -f 1)
+	config_url="https://raw.githubusercontent.com/${env_repo_namespace}/${env_repo}/master/${ossp}/${version_id}/besman-$environment_name-config.yaml"
+	default_config_path=$BESMAN_DIR/tmp/besman-$environment_name-config.yaml
+
+	[[ -f "$default_config_path" ]] && rm "$default_config_path"
+	touch "$default_config_path"
+
+	__besman_check_url_valid "$config_url" 
+	if [[ $? -eq 1 ]]
+	then
+		return 1
+	fi
+	__besman_secure_curl "$config_url" >> "$default_config_path"
+
 }
