@@ -29,7 +29,7 @@ function __bes_install {
 		then
 			__besman_error_rollback "$environment_name"
 			__besman_manage_install_out "$return_val" "$environment_name"
-
+			return 1
 		fi
 		# [[ ( -n $BESMAN_LIGHT_MODE ) && ( $BESMAN_LIGHT_MODE == "false" __besman_source_env_params "$environment_name"
 		# [[ ( -n $BESMAN_LIGHT_MODE ) && ( $BESMAN_LIGHT_MODE == "false" ) ]] && __besman_create_roles_config_file 
@@ -39,6 +39,7 @@ function __bes_install {
 		then
 			__besman_error_rollback "$environment_name"
 			__besman_manage_install_out "$return_val" "$environment_name"
+			return 1
 
 		fi
 		source "${BESMAN_DIR}/envs/besman-${environment_name}/${version_id}/besman-${environment_name}.sh"
@@ -166,7 +167,6 @@ function __besman_show_lab_association_prompt()
 		__besman_echo_no_colour ""
 		__besman_echo_white "3. Edit the variables - BESMAN_LAB_OWNER_NAME and BESMAN_LAB_OWNER_TYPE"
 		__besman_echo_no_colour ""
-		__besman_error_rollback "$environment_name"
 		return 1
 		fi		
 	fi
