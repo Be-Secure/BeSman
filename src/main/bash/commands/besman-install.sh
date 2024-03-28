@@ -25,10 +25,18 @@ function __bes_install {
 		
 		mv "${BESMAN_DIR}/envs/besman-${environment_name}.sh" "${BESMAN_DIR}/envs/besman-${environment_name}/$version_id/"
 		__besman_source_env_params "$environment_name"
+		if [[ $? -eq 1 ]]
+		then
+			__besman_error_rollback "$environment_name"
+		fi
 		# [[ ( -n $BESMAN_LIGHT_MODE ) && ( $BESMAN_LIGHT_MODE == "false" __besman_source_env_params "$environment_name"
 		# [[ ( -n $BESMAN_LIGHT_MODE ) && ( $BESMAN_LIGHT_MODE == "false" ) ]] && __besman_create_roles_config_file 
 
-		__besman_show_lab_association_prompt "$environment_name" "$version_id" || return 1
+		__besman_show_lab_association_prompt "$environment_name" "$version_id"
+		if [[ $? -eq 1 ]]
+		then
+			__besman_error_rollback "$environment_name"
+		fi
 		source "${BESMAN_DIR}/envs/besman-${environment_name}/${version_id}/besman-${environment_name}.sh"
 		__besman_install_"${environment_name}" "${environment_name}" "${version_id}"
 
@@ -138,6 +146,7 @@ function __besman_show_lab_association_prompt()
 	version=$2
 	ossp=$(echo "$environment_name" | cut -d "-" -f 1)
 
+	[[ -z "$BESMAN_LAB_OWNER_NAME" ]] && return 1
 	if [[ $BESMAN_LAB_OWNER_NAME == "Be-Secure" ]] 
 	then
 		__besman_echo_yellow "Going with default lab association - Be-Secure Commuinity Lab"
