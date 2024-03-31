@@ -33,13 +33,13 @@ function __bes_install {
 		fi
 
 
-		__besman_show_lab_association_prompt "$environment_name" "$version_id"
-		if [[ $? -eq 1 ]]
-		then
-			__besman_error_rollback "$environment_name"
-			return 1
+		#__besman_show_lab_association_prompt "$environment_name" "$version_id"
+		#if [[ $? -eq 1 ]]
+		#then
+		#	__besman_error_rollback "$environment_name"
+		#	return 1
 
-		fi
+		#fi
 		source "${BESMAN_DIR}/envs/besman-${environment_name}/${version_id}/besman-${environment_name}.sh"
 		__besman_install_"${environment_name}" "${environment_name}" "${version_id}"
 
