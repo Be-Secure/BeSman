@@ -22,7 +22,7 @@ jobs:
         run: mkdir -p build/tmp 
       - name: Generate artifacts
         run: |
-          zip -rj ./build/tmp/besman-latest.zip ./dist/list.txt ./src/main/bash/besman-* ./src/main/bash/envs/besman-* ./src/main/bash/commands/besman-*
+          zip -rj ./build/tmp/besman-latest.zip ./dist/list.txt ./src/main/bash/besman-* ./src/main/bash/scripts/besman-* ./src/main/bash/commands/besman-*
           cp ./build/tmp/besman-latest.zip ./build/tmp/besman-$RELEASE_VERSION.zip
           mv ./scripts/get.besman.io ./build/tmp/
           ls ./build/tmp/
