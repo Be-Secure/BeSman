@@ -46,7 +46,7 @@ besman_profile="${HOME}/.profile"
 besman_bashrc="${HOME}/.bashrc"
 besman_zshrc="${HOME}/.zshrc"
 besman_playbook_dir="$BESMAN_DIR/playbooks"
-
+besman_scripts_folder="$BESMAN_DIR/scripts"
 
 
 
@@ -235,6 +235,7 @@ mkdir -p "$besman_env_folder"
 mkdir -p "$besman_etc_folder"
 mkdir -p "$besman_var_folder"
 mkdir -p "$besman_playbook_dir"
+mkdir -p "$besman_scripts_folder"
 
 
 
@@ -305,7 +306,8 @@ echo "Install scripts..."
 
 
 mv "${besman_stage_folder}/besman-init.sh" "$besman_bin_folder"
-mv "$besman_stage_folder"/besman-* "$besman_src_folder"
+mv "$besman_stage_folder"/besman-*.sh "$besman_src_folder"
+mv "$besman_stage_folder"/besman-*.py "$besman_scripts_folder"
 mv "$besman_stage_folder"/list.txt "$besman_var_folder"
 [[ -d ${besman_stage_folder} ]] && rm -rf ${besman_stage_folder}/*
 
