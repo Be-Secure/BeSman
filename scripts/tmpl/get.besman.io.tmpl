@@ -304,12 +304,12 @@ unzip -qo "$besman_zip_file" -d "$besman_stage_folder"
 echo "Install scripts..."
 
 
-
+ls "$besman_stage_folder"
 mv "${besman_stage_folder}/besman-init.sh" "$besman_bin_folder"
 mv "$besman_stage_folder"/besman-*.sh "$besman_src_folder"
-mv "$besman_stage_folder"/besman-*.py "$besman_scripts_folder"
+mv "$besman_stage_folder"/* "$besman_scripts_folder"
 mv "$besman_stage_folder"/list.txt "$besman_var_folder"
-[[ -d ${besman_stage_folder} ]] && rm -rf ${besman_stage_folder}/*
+# [[ -d ${besman_stage_folder} ]] && rm -rf ${besman_stage_folder}/*
 
 echo "Set version to $BESMAN_VERSION ..."
 echo "$BESMAN_VERSION" > "${BESMAN_DIR}/var/version.txt"
