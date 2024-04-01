@@ -127,21 +127,43 @@ function __besman_show_lab_association_prompt()
 	version=$2
 	ossp=$(echo "$environment_name" | cut -d "-" -f 1)
 
-	[[ -z "$BESMAN_LAB_OWNER_NAME" ]] && return 1
-	if [[ $BESMAN_LAB_OWNER_NAME == "Be-Secure" ]] 
+	if [[ -z "$BESMAN_LAB_NAME" ]]
+	then
+		__besman_echo_red "Lab name is missing."
+		__besman_echo_yellow "Please use the below command to export it."
+		__besman_echo_no_colour ""
+		__besman_echo_white "$ export BESMAN_LAB_NAME=<Name of the lab>"
+		__besman_echo_no_colour ""
+		__besman_echo_yellow "OR"
+		__besman_echo_no_colour ""
+		__besman_echo_no_colour "1. Check if the file $HOME/besman-$environment_name-config.yaml exists in $HOME"
+		__besman_echo_no_colour ""
+		__besman_echo_no_colour "2. If the file does not exist, run the below command to download the file"
+		__besman_echo_no_colour ""
+		__besman_echo_yellow "		wget -P \$HOME https://raw.githubusercontent.com/$BESMAN_NAMESPACE/besecure-ce-env-repo/master/$ossp/$version/besman-$environment_name-config.yaml"
+		__besman_echo_no_colour ""
+		__besman_echo_no_colour "3. Open the file $HOME/besman-$environment_name-config.yaml in an editor"
+		__besman_echo_no_colour ""
+		__besman_echo_white "	 4. Edit the variables - BESMAN_LAB_NAME and BESMAN_LAB_TYPE"
+		__besman_echo_no_colour ""
+		return 1
+	fi
+	if [[ $BESMAN_LAB_NAME == "Be-Secure" ]] 
 	then
 		__besman_echo_yellow "Going with default lab association - Be-Secure Commuinity Lab"
 		read -rp "Do you wish to change the lab association (y/n)?:" user_input
 		if [[ $user_input == "y" ]] 
 		then	
 		__besman_echo_no_colour ""
-		__besman_echo_no_colour "1. Run the below command"
+		__besman_echo_no_colour "1. Check if the file $HOME/besman-$environment_name-config.yaml exists in $HOME"
+		__besman_echo_no_colour ""
+		__besman_echo_no_colour "2. If the file does not exist, run the below command to download the file"
 		__besman_echo_no_colour ""
 		__besman_echo_yellow "		wget -P \$HOME https://raw.githubusercontent.com/$BESMAN_NAMESPACE/besecure-ce-env-repo/master/$ossp/$version/besman-$environment_name-config.yaml"
 		__besman_echo_no_colour ""
-		__besman_echo_no_colour "2. Open the file $HOME/besman-$environment_name-config.yaml in an editor"
+		__besman_echo_no_colour "3. Open the file $HOME/besman-$environment_name-config.yaml in an editor"
 		__besman_echo_no_colour ""
-		__besman_echo_white "3. Edit the variables - BESMAN_LAB_OWNER_NAME and BESMAN_LAB_OWNER_TYPE"
+		__besman_echo_white "	 4. Edit the variables - BESMAN_LAB_NAME and BESMAN_LAB_TYPE"
 		__besman_echo_no_colour ""
 		return 1
 		fi		
