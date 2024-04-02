@@ -19,7 +19,7 @@ if [[ $environment == "all" && -z $version ]]; then
 	
 		if [[ -d $BESMAN_DIR/envs/besman-$i ]]; then
 		
-		__besman_uninstall_"$i" "$i"
+		__besman_uninstall "$i"
 		fi
 	
 	done  
@@ -44,7 +44,7 @@ elif [[ -f $BESMAN_DIR/envs/besman-$environment/current && $version == $(cat $BE
   __besman_echo_cyan "This would leave the environment without a current"
   __besman_interactive_uninstall || return 1
   __besman_echo_no_colour "Uninstalling version $version of $environment"
-  __besman_uninstall_$environment "$environment"
+  __besman_uninstall "$environment"
   
   rm $BESMAN_DIR/envs/besman-$environment/current 
   rm -rf $BESMAN_DIR/envs/besman-$environment/$version 

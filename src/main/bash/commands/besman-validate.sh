@@ -6,7 +6,7 @@ function __bes_validate
 
     __besman_echo_white "Validating $environment"
 
-    __besman_validate_$environment 
+    __besman_validate 
     if [[ "$?" -eq 0 ]]; then
         __besman_echo_green "Successfully validated"
     else

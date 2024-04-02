@@ -41,7 +41,7 @@ function __bes_install {
 
 		fi
 		source "${BESMAN_DIR}/envs/besman-${environment_name}/${version_id}/besman-${environment_name}.sh"
-		__besman_install_"${environment_name}" "${environment_name}" "${version_id}"
+		__besman_install "${environment_name}" "${version_id}"
 
 		return_val="$?"
 
