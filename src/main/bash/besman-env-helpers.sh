@@ -55,7 +55,7 @@ function __besman_unset_env_parameters_and_cleanup()
 {
     local environment ossp 
     environment=$1
-    ossp=$(echo "$environment" | cut -d "-" -f 1)
+    ossp=$(echo "$environment_name" | sed -E 's/-(RT|BT)-env//')
     while read -r line; 
     do
         # To skip comments
