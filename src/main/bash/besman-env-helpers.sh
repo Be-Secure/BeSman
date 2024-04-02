@@ -262,7 +262,7 @@ function __besman_download_default_configations()
 	env_repo_namespace=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 1)
 	env_repo=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 2)
 	environment_name=$1
-	ossp=$(echo "$environment_name" | cut -d "-" -f 1)
+	ossp=$(echo "$environment_name" | sed -E 's/-(RT|BT)-env//')
 	config_url="https://raw.githubusercontent.com/${env_repo_namespace}/${env_repo}/master/${ossp}/${version_id}/besman-$environment_name-config.yaml"
 	default_config_path=$BESMAN_DIR/tmp/besman-$environment_name-config.yaml
 

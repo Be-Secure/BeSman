@@ -108,8 +108,11 @@ function __besman_get_remote_env {
 	env_repo_namespace=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 1)
 	env_repo=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 2)
 	environment_name=$1
-	env_type=$(echo "$environment_name" | cut -d "-" -f 2)
-	ossp=$(echo "$environment_name" | cut -d "-" -f 1)
+	echo "env - $environment_name" ##remove me
+	env_type=$(echo "$environment_name" | rev | cut -d "-" -f 2 | rev)
+	echo "env_type - $env_type" ##remove me
+	ossp=$(echo "$environment_name" | sed -E 's/-(RT|BT)-env//')
+	echo "ossp - $ossp" ##remove me
 	env_url="https://raw.githubusercontent.com/${env_repo_namespace}/${env_repo}/master/${ossp}/${version_id}/besman-${environment_name}.sh"
 	default_config_path=$BESMAN_DIR/tmp/besman-$environment_name-config.yaml
 	curl_flag=true
@@ -125,7 +128,8 @@ function __besman_show_lab_association_prompt()
 	local environment_name version user_input
 	environment_name=$1
 	version=$2
-	ossp=$(echo "$environment_name" | cut -d "-" -f 1)
+	ossp=$(echo "$environment_name" | sed -E 's/-(RT|BT)-env//')
+	echo "ossp - $ossp" ##remove me
 
 	if [[ -z "$BESMAN_LAB_NAME" ]]
 	then
