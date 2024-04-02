@@ -23,7 +23,7 @@ function __bes_reset
     [[ -f "$roles_config_file" ]] && rm "$roles_config_file"
     __besman_create_roles_config_file
     __besman_echo_yellow "Resetting..."
-    __besman_reset_"$environment"
+    __besman_reset
    
     if [[ "$?" -eq 0 ]]; then
         __besman_echo_green "Reset Successful"

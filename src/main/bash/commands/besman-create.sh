@@ -297,7 +297,7 @@ function __besman_create_env_with_config()
     cat <<EOF > "$env_file_path"
 #!/bin/bash
 
-function __besman_install_$environment_name
+function __besman_install
 {
 
     __besman_check_vcs_exist || return 1 # Checks if GitHub CLI is present or not.
@@ -336,7 +336,7 @@ function __besman_install_$environment_name
     # Please add the rest of the code here for installation
 }
 
-function __besman_uninstall_$environment_name
+function __besman_uninstall
 {
     __besman_check_for_trigger_playbook "\$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH/\$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK"
     [[ "\$?" -eq 1 ]] && __besman_create_ansible_playbook
@@ -351,7 +351,7 @@ function __besman_uninstall_$environment_name
 
 }
 
-function __besman_update_$environment_name
+function __besman_update
 {
     __besman_check_for_trigger_playbook "\$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH/\$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK"
     [[ "\$?" -eq 1 ]] && __besman_create_ansible_playbook
@@ -360,7 +360,7 @@ function __besman_update_$environment_name
 
 }
 
-function __besman_validate_$environment_name
+function __besman_validate
 {
     __besman_check_for_trigger_playbook "\$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH/\$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK"
     [[ "\$?" -eq 1 ]] && __besman_create_ansible_playbook
@@ -369,7 +369,7 @@ function __besman_validate_$environment_name
 
 }
 
-function __besman_reset_$environment_name
+function __besman_reset
 {
     __besman_check_for_trigger_playbook "\$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH/\$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK"
     [[ "\$?" -eq 1 ]] && __besman_create_ansible_playbook
@@ -391,27 +391,27 @@ function __besman_create_env_basic
     cat <<EOF > "$env_file_path"
 #!/bin/bash
 
-function __besman_install_$environment_name
+function __besman_install
 {
 
 }
 
-function __besman_uninstall_$environment_name
-{
-    
-}
-
-function __besman_update_$environment_name
+function __besman_uninstall
 {
     
 }
 
-function __besman_validate_$environment_name
+function __besman_update
 {
     
 }
 
-function __besman_reset_$environment_name
+function __besman_validate
+{
+    
+}
+
+function __besman_reset
 {
     
 }
