@@ -58,7 +58,7 @@ function __bes_create {
         version=$3
         template_type=$4
         [[ -z $version ]] && version="0.0.1"
-        if echo "$environment_name" | grep -E 'RT|BT'; then
+        if echo "$environment_name" | grep -qE 'RT|BT'; then
             ossp=$(echo "$environment_name" | sed -E 's/-(RT|BT)-env//')
         else
             ossp=$(echo "$environment_name" | cut -d "-" -f 1)

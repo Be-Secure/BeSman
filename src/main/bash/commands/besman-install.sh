@@ -68,7 +68,7 @@ function __besman_get_local_env()
 
 	environment=$1
 	version=$2
-	if  echo "$environment_name" | grep -E 'RT|BT'
+	if  echo "$environment_name" | grep -qE 'RT|BT'
 	then
 		ossp=$(echo "$environment_name" | sed -E 's/-(RT|BT)-env//')
 	else
@@ -115,7 +115,7 @@ function __besman_get_remote_env {
 	env_repo=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 2)
 	environment_name=$1
 	env_type=$(echo "$environment_name" | rev | cut -d "-" -f 2 | rev)
-	if  echo "$environment_name" | grep -E 'RT|BT'
+	if  echo "$environment_name" | grep -qE 'RT|BT'
 	then
 		ossp=$(echo "$environment_name" | sed -E 's/-(RT|BT)-env//')
 	else
@@ -137,7 +137,7 @@ function __besman_show_lab_association_prompt()
 	local environment_name version user_input
 	environment_name=$1
 	version=$2
-	if  echo "$environment_name" | grep -E 'RT|BT'
+	if  echo "$environment_name" | grep -qE 'RT|BT'
 	then
 		ossp=$(echo "$environment_name" | sed -E 's/-(RT|BT)-env//')
 	else
