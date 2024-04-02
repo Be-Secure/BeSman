@@ -68,7 +68,7 @@ function __besman_get_local_env()
 
 	environment=$1
 	version=$2
-	ossp=$(echo "$environment" | cut -d "-" -f 1)
+	ossp=$(echo "$environment_name" | sed -E 's/-(RT|BT)-env//')
 	default_config_path=$BESMAN_DIR/tmp/besman-$environment_name-config.yaml
 	[[ ! -d $BESMAN_LOCAL_ENV_DIR ]] && __besman_echo_red "Could not find dir $BESMAN_LOCAL_ENV_DIR" && return 1
 	cp "$BESMAN_LOCAL_ENV_DIR/$ossp/$version/besman-$environment.sh" "$BESMAN_DIR/envs/"
