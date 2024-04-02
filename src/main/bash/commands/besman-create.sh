@@ -150,17 +150,18 @@ BESMAN_ARTIFACT_DIR: \$HOME/\$BESMAN_ARTIFACT_NAME #***
 # BESMAN_TOOL_PATH - The path where we download the assessment and other required tools during installation.
 BESMAN_TOOL_PATH: /opt #***
 
-# BESMAN_LAB_OWNER_TYPE - Organization/lab/individual.
-BESMAN_LAB_OWNER_TYPE: Organization #***
+# BESMAN_LAB_TYPE - Organization. This variable indicates the individual's lab affiliation
+BESMAN_LAB_TYPE: Organization #***
 
-# BESMAN_LAB_OWNER_NAME - Name of the owner of the lab. Default is Be-Secure.
-BESMAN_LAB_OWNER_NAME: Be-Secure #***
+# BESMAN_LAB_NAME - Name of the lab. Default is Be-Secure. This variable indicates the individual's lab affiliation
+BESMAN_LAB_NAME: Be-Secure #***
 
 # BESMAN_ASSESSMENT_DATASTORE_DIR - This is the local dir where we store the assessment reports. Default is home.
 BESMAN_ASSESSMENT_DATASTORE_DIR: \$HOME/besecure-assessment-datastore #***
 
 # BESMAN_ASSESSMENT_DATASTORE_URL - The remote repo where we store the assessment reports.
 BESMAN_ASSESSMENT_DATASTORE_URL: https://github.com/Be-Secure/besecure-assessment-datastore #***
+
 EOF
 }
 
@@ -249,11 +250,11 @@ BESMAN_ARTIFACT_DIR: \$HOME/\$BESMAN_ARTIFACT_NAME #***
 # BESMAN_TOOL_PATH - The path where we download the assessment and other required tools during installation.
 BESMAN_TOOL_PATH: /opt #***
 
-# BESMAN_LAB_OWNER_TYPE - Organization/lab/individual.
-BESMAN_LAB_OWNER_TYPE: Organization #***
+# BESMAN_LAB_TYPE - Organization/lab/individual.
+BESMAN_LAB_TYPE: Organization #***
 
-# BESMAN_LAB_OWNER_NAME - Name of the owner of the lab. Default is Be-Secure.
-BESMAN_LAB_OWNER_NAME: Be-Secure #***
+# BESMAN_LAB_NAME - Name of the owner of the lab. Default is Be-Secure.
+BESMAN_LAB_NAME: Be-Secure #***
 
 # BESMAN_ASSESSMENT_DATASTORE_DIR - This is the local dir where we store the assessment reports. Default is home.
 BESMAN_ASSESSMENT_DATASTORE_DIR: \$HOME/besecure-assessment-datastore #***
