@@ -12,7 +12,7 @@ function __bes_update {
 		__besman_source_env_params "$environment"
 		[[ -f "$roles_config_file" ]] && rm "$roles_config_file"
 		__besman_create_roles_config_file
-		__besman_update_"$environment"
+		__besman_update
 		if [[ "$?" -ne 0 ]]; then
 			__besman_echo_red "Update failed"
 		else
