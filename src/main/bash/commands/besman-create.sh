@@ -60,8 +60,8 @@ function __bes_create
         environment_name=$2
         version=$3
         template_type=$4
-        [[ -z $version ]] && version="0.0.1"
-        ossp=$(echo "$environment_name" | cut -d "-" -f 1)
+        [[ -z $version ]] && version="0.0.1"        
+        ossp=$(echo "$environment_name" | sed -E 's/-(RT|BT)-env//')
         env_file_name="besman-$environment_name.sh"
         __besman_set_variables
         env_file_path=$BESMAN_LOCAL_ENV_DIR/$ossp/$version/$env_file_name
@@ -102,8 +102,8 @@ function __besman_create_env_config_basic()
     local environment_name config_file ossp_name env_type config_file_path version overwrite
     environment_name=$1
     version=$2
-    ossp_name=$(echo "$environment_name" | cut -d "-" -f 1)
-    env_type=$(echo "$environment_name" | cut -d "-" -f 2)
+    ossp_name=$(echo "$environment_name" | sed -E 's/-(RT|BT)-env//')
+    env_type=$(echo "$environment_name" | rev | cut -d "-" -f 2 | rev)
     config_file="besman-$ossp_name-$env_type-env-config.yaml"
     config_file_path=$BESMAN_LOCAL_ENV_DIR/$ossp/$version/$config_file
     if [[ -f $config_file_path ]]; then
@@ -200,8 +200,8 @@ function __besman_create_env_config()
     local environment_name config_file ossp_name env_type config_file_path version overwrite
     environment_name=$1
     version=$2
-    ossp_name=$(echo "$environment_name" | cut -d "-" -f 1)
-    env_type=$(echo "$environment_name" | cut -d "-" -f 2)
+    ossp_name=$(echo "$environment_name" | sed -E 's/-(RT|BT)-env//')
+    env_type=$(echo "$environment_name" | rev | cut -d "-" -f 2 | rev)
     config_file="besman-$ossp_name-$env_type-env-config.yaml"
     config_file_path=$BESMAN_LOCAL_ENV_DIR/$ossp/$version/$config_file
     if [[ -f $config_file_path ]]; then
