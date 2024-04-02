@@ -55,7 +55,13 @@ function __besman_unset_env_parameters_and_cleanup()
 {
     local environment ossp 
     environment=$1
-    ossp=$(echo "$environment_name" | sed -E 's/-(RT|BT)-env//')
+    if  echo "$environment" | grep -qE 'RT|BT'
+    then
+      ossp=$(echo "$environment" | sed -E 's/-(RT|BT)-env//')
+    else
+      ossp=$(echo "$environment" | cut -d "-" -f 1)
+
+    fi    
     while read -r line; 
     do
         # To skip comments
@@ -262,8 +268,14 @@ function __besman_download_default_configations()
 	env_repo_namespace=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 1)
 	env_repo=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 2)
 	environment_name=$1
-	ossp=$(echo "$environment_name" | sed -E 's/-(RT|BT)-env//')
-	config_url="https://raw.githubusercontent.com/${env_repo_namespace}/${env_repo}/master/${ossp}/${version_id}/besman-$environment_name-config.yaml"
+	if  echo "$environment_name" | grep -qE 'RT|BT'
+	then
+		ossp=$(echo "$environment_name" | sed -E 's/-(RT|BT)-env//')
+	else
+		ossp=$(echo "$environment_name" | cut -d "-" -f 1)
+
+	fi	
+  config_url="https://raw.githubusercontent.com/${env_repo_namespace}/${env_repo}/master/${ossp}/${version_id}/besman-$environment_name-config.yaml"
 	default_config_path=$BESMAN_DIR/tmp/besman-$environment_name-config.yaml
 
 	[[ -f "$default_config_path" ]] && rm "$default_config_path"
