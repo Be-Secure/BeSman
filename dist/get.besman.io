@@ -9,12 +9,10 @@ export BESMAN_SERVICE="https://raw.githubusercontent.com"
 
 # BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
 
-BESMAN_NAMESPACE="Be-Secure"
-BESMAN_VERSION="0.2.0"
+BESMAN_NAMESPACE="asa1997"
+BESMAN_VERSION="0.3.0"
 BESMAN_ENV_REPOS="$BESMAN_NAMESPACE/besecure-ce-env-repo"
 # BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
-
-
 
 if [[ -z "$BESMAN_DIR" ]]; then
     export BESMAN_DIR="$HOME/.besman"
@@ -46,7 +44,7 @@ besman_profile="${HOME}/.profile"
 besman_bashrc="${HOME}/.bashrc"
 besman_zshrc="${HOME}/.zshrc"
 besman_playbook_dir="$BESMAN_DIR/playbooks"
-
+besman_scripts_folder="$BESMAN_DIR/scripts"
 
 
 
@@ -235,6 +233,7 @@ mkdir -p "$besman_env_folder"
 mkdir -p "$besman_etc_folder"
 mkdir -p "$besman_var_folder"
 mkdir -p "$besman_playbook_dir"
+mkdir -p "$besman_scripts_folder"
 
 
 
@@ -303,9 +302,9 @@ unzip -qo "$besman_zip_file" -d "$besman_stage_folder"
 echo "Install scripts..."
 
 
-
 mv "${besman_stage_folder}/besman-init.sh" "$besman_bin_folder"
-mv "$besman_stage_folder"/besman-* "$besman_src_folder"
+mv "$besman_stage_folder"/besman-*.sh "$besman_src_folder"
+mv "$besman_stage_folder"/besman-*.py* "$besman_scripts_folder"
 mv "$besman_stage_folder"/list.txt "$besman_var_folder"
 [[ -d ${besman_stage_folder} ]] && rm -rf ${besman_stage_folder}/*
 
