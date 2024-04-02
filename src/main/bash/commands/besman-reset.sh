@@ -45,7 +45,13 @@ function __besman_get_default_config_file()
     env_repo_namespace=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 1)
 	env_repo=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 2)
 	env_type=$(echo "$environment_name" | rev | cut -d "-" -f 2 | rev)
-	ossp=$(echo "$environment_name" | sed -E 's/-(RT|BT)-env//')
+	if  echo "$environment_name" | grep -E 'RT|BT'
+	then
+		ossp=$(echo "$environment_name" | sed -E 's/-(RT|BT)-env//')
+	else
+		ossp=$(echo "$environment_name" | cut -d "-" -f 1)
+
+	fi    
     version=$(cat "${BESMAN_DIR}/envs/besman-${environment}/current")
     config_url="https://raw.githubusercontent.com/${env_repo_namespace}/${env_repo}/master/${ossp}/${version}/besman-${ossp}-${env_type}-env-config.yaml"
 
