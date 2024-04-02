@@ -113,8 +113,8 @@ def main():
         "ASSESSMENT_TOOL_VERSION",
         "ASSESSMENT_TOOL_PLAYBOOK",
 
-        "BESMAN_LAB_OWNER_TYPE",
-        "BESMAN_LAB_OWNER_NAME",
+        "BESMAN_LAB_TYPE",
+        "BESMAN_LAB_NAME",
         "PLAYBOOK_EXECUTION_STATUS",
         "EXECUTION_TIMESTAMP",
         "EXECUTION_DURATION",
@@ -140,8 +140,8 @@ def main():
     tool_version = os.environ.get("ASSESSMENT_TOOL_VERSION")
     playbook = os.environ.get("ASSESSMENT_TOOL_PLAYBOOK")
 
-    execution_type = os.environ.get("BESMAN_LAB_OWNER_TYPE")
-    execution_id = os.environ.get("BESMAN_LAB_OWNER_NAME")
+    execution_type = os.environ.get("BESMAN_LAB_TYPE")
+    execution_id = os.environ.get("BESMAN_LAB_NAME")
     execution_status = os.environ.get("PLAYBOOK_EXECUTION_STATUS")
     execution_timestamp = os.environ.get("EXECUTION_TIMESTAMP")
     execution_duration = os.environ.get("EXECUTION_DURATION")
