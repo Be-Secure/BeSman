@@ -68,7 +68,13 @@ function __besman_get_local_env()
 
 	environment=$1
 	version=$2
-	ossp=$(echo "$environment_name" | sed -E 's/-(RT|BT)-env//')
+	if  echo "$environment_name" | grep -qE 'RT|BT'
+	then
+		ossp=$(echo "$environment_name" | sed -E 's/-(RT|BT)-env//')
+	else
+		ossp=$(echo "$environment_name" | cut -d "-" -f 1)
+
+	fi
 	default_config_path=$BESMAN_DIR/tmp/besman-$environment_name-config.yaml
 	[[ ! -d $BESMAN_LOCAL_ENV_DIR ]] && __besman_echo_red "Could not find dir $BESMAN_LOCAL_ENV_DIR" && return 1
 	cp "$BESMAN_LOCAL_ENV_DIR/$ossp/$version/besman-$environment.sh" "$BESMAN_DIR/envs/"
@@ -109,7 +115,13 @@ function __besman_get_remote_env {
 	env_repo=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 2)
 	environment_name=$1
 	env_type=$(echo "$environment_name" | rev | cut -d "-" -f 2 | rev)
-	ossp=$(echo "$environment_name" | sed -E 's/-(RT|BT)-env//')
+	if  echo "$environment_name" | grep -qE 'RT|BT'
+	then
+		ossp=$(echo "$environment_name" | sed -E 's/-(RT|BT)-env//')
+	else
+		ossp=$(echo "$environment_name" | cut -d "-" -f 1)
+
+	fi
 	env_url="https://raw.githubusercontent.com/${env_repo_namespace}/${env_repo}/master/${ossp}/${version_id}/besman-${environment_name}.sh"
 	default_config_path=$BESMAN_DIR/tmp/besman-$environment_name-config.yaml
 	curl_flag=true
@@ -125,8 +137,13 @@ function __besman_show_lab_association_prompt()
 	local environment_name version user_input
 	environment_name=$1
 	version=$2
-	ossp=$(echo "$environment_name" | sed -E 's/-(RT|BT)-env//')
+	if  echo "$environment_name" | grep -qE 'RT|BT'
+	then
+		ossp=$(echo "$environment_name" | sed -E 's/-(RT|BT)-env//')
+	else
+		ossp=$(echo "$environment_name" | cut -d "-" -f 1)
 
+	fi
 	if [[ -z "$BESMAN_LAB_NAME" ]]
 	then
 		__besman_echo_red "Lab name is missing."
