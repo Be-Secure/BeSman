@@ -93,7 +93,7 @@ fi
 # <https://github.com/besman/besman-extensions>.
 OLD_IFS="$IFS"
 IFS=$'\n'
-scripts=($(find "${BESMAN_DIR}/src" "${BESMAN_DIR}/envs" -type f -name 'besman-*'))
+scripts=($(find "${BESMAN_DIR}/src" "${BESMAN_DIR}/envs" -type f -name 'besman-*.sh'))
 for f in "${scripts[@]}"; do
 	source "$f"
 done
