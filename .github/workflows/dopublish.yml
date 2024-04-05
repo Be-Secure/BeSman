@@ -6,8 +6,8 @@ on:
     tags:
       - '*.*.*'
 env:
-  BES_ARCHIVE_DOWNLOAD_REPO: "BeSman"
-  BESMAN_NAMESPACE: "asa1997"
+  BES_ARCHIVE_DOWNLOAD_REPO: ${{ secrets.BES_ARCHIVE_DOWNLOAD_REPO }}
+  BESMAN_NAMESPACE: ${{ secrets.BESMAN_NAMESPACE }}
 jobs:
   publish_artifacts:
     runs-on: ubuntu-latest
