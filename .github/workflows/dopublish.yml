@@ -72,6 +72,13 @@ jobs:
           release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
+
+      - name: Switch to dist branch
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git fetch origin dist
+          git checkout dist
       
       - name: Upload Release Asset
         id: upload-release-asset 
