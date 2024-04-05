@@ -8,7 +8,7 @@ on:
 env:
   BES_ARCHIVE_DOWNLOAD_REPO: "BeSman"
   BESMAN_NAMESPACE: "asa1997"
-  BESMAN_VERSION: ${{ github.ref }}
+  BESMAN_VERSION: $(basename ${{ github.ref }})
 jobs:
   publish_artifacts:
     runs-on: ubuntu-latest
