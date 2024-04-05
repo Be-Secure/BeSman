@@ -17,6 +17,9 @@ jobs:
       - name: Set env for version
         run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
 
+      - name: list 
+        run: ls
+
       - name: Copy and replace template files
         run: |
           cp ./scripts/tmpl/*.tmpl ./scripts/
