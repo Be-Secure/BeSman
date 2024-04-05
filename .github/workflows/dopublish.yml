@@ -22,8 +22,8 @@ jobs:
 
       - name: Copy and replace template files
         run: |
-          cp ./scripts/tmpl/*.tmpl ./scripts/
-          for file in ./scripts/*.tmpl; do
+          cp scripts/tmpl/*.tmpl scripts/
+          for file in scripts/*.tmpl; do
               sed -i "s/@BES_VERSION@/${{ github.ref }}/g" $file
               sed -i "s/@BES_ARCHIVE_DOWNLOAD_REPO@/${{ secrets.BES_ARCHIVE_DOWNLOAD_REPO }}/g" $file
               sed -i "s/@BES_NAMESPACE@/${{ secrets.BESMAN_NAMESPACE }}/g" $file
