@@ -26,10 +26,10 @@ jobs:
         run: |
               cp scripts/tmpl/*.tmpl scripts/
               file=scripts/get.besman.io.tmpl
-              sed -i "s|@BES_VERSION@|'$BESMAN_RELEASE_VERSION'|g" scripts/get.besman.io.tmpl
-              sed -i "s|@BES_ARCHIVE_DOWNLOAD_REPO@|'$BES_ARCHIVE_DOWNLOAD_REPO'|g" scripts/get.besman.io.tmpl
-              sed -i "s|@BES_NAMESPACE@|'$BESMAN_NAMESPACE'|g" scripts/get.besman.io.tmpl
-              mv scripts/get.besman.io.tmpl "${file//.tmpl/}"
+              sed -i "s|@BES_VERSION@|$BESMAN_RELEASE_VERSION|g" $file
+              sed -i "s|@BES_ARCHIVE_DOWNLOAD_REPO@|$BES_ARCHIVE_DOWNLOAD_REPO|g" $file
+              sed -i "s|@BES_NAMESPACE@|$BESMAN_NAMESPACE|g" $file
+              mv $file "${file//.tmpl/}"
 
       - name: Setting up dir
         run: mkdir -p build/tmp 
