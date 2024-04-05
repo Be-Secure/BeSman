@@ -27,9 +27,9 @@ jobs:
         run: |
               cp scripts/tmpl/*.tmpl scripts/
               file=scripts/get.besman.io.tmpl
-              sed -i "s/@BES_VERSION@/'$BESMAN_VERSION'/g" scripts/get.besman.io.tmpl
-              sed -i "s/@BES_ARCHIVE_DOWNLOAD_REPO@/'$BES_ARCHIVE_DOWNLOAD_REPO'/g" scripts/get.besman.io.tmpl
-              sed -i "s/@BES_NAMESPACE@/'$BESMAN_NAMESPACE'/g" scripts/get.besman.io.tmpl
+              sed -i "s|@BES_VERSION@|'$BESMAN_VERSION'|g" scripts/get.besman.io.tmpl
+              sed -i "s|@BES_ARCHIVE_DOWNLOAD_REPO@|'$BES_ARCHIVE_DOWNLOAD_REPO'|g" scripts/get.besman.io.tmpl
+              sed -i "s|@BES_NAMESPACE@|'$BESMAN_NAMESPACE'|g" scripts/get.besman.io.tmpl
               mv scripts/get.besman.io.tmpl "${file//.tmpl/}"
 
       - name: Setting up dir
