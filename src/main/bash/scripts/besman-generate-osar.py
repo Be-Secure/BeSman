@@ -149,7 +149,8 @@ tool_processors = {
     "sonarqube": sonar_parser,
     "spdx-sbom-generator": sbom_parser,
     "ossf scorecard": scorecard_parser,
-    "fossology": fossology_parser
+    "fossology": fossology_parser,
+    "criticality_score": criticality_score_parser
 }
 
 
