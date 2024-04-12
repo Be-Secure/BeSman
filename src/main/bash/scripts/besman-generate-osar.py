@@ -3,6 +3,21 @@ import os
 import sys
 
 
+def criticality_score_parser(user_data):
+    # Extract the default_score from the input JSON
+    default_score = user_data.get('default_score', 'N/A')
+
+    # Create a result object
+    result_object = {
+        "feature": "Criticality Score",
+        "aspect": "Score",
+        "attribute": "N/A",
+        "value": default_score
+    }
+
+    return [result_object]
+
+
 def fossology_parser(user_data):
     # Create a set to store distinct licenses
     distinct_licenses = set()
