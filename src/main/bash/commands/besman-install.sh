@@ -8,6 +8,7 @@ function __bes_install {
 	# If environmnet not installed.
 	if [[ ! -d "${BESMAN_DIR}/envs/besman-${environment_name}/$version_id" ]]; then
 
+
 		if [[ (-n $BESMAN_LOCAL_ENV) && ($BESMAN_LOCAL_ENV == "true") ]]; then
 			__besman_get_local_env "$environment_name" "$version_id" || return 1
 		fi
@@ -23,6 +24,7 @@ function __bes_install {
 
 		__besman_echo_no_colour "$version_id" >"$current"
 
+
 		mv "${BESMAN_DIR}/envs/besman-${environment_name}.sh" "${BESMAN_DIR}/envs/besman-${environment_name}/$version_id/"
 		__besman_source_env_params "$environment_name"
 		if [[ $? -eq 1 ]]; then
@@ -33,6 +35,7 @@ function __bes_install {
 
 		__besman_show_lab_association_prompt "$environment_name" "$version_id"
 		if [[ $? -eq 1 ]]; then
+
 			__besman_error_rollback "$environment_name"
 			return 1
 
@@ -64,7 +67,9 @@ function __besman_get_local_env() {
 
 	environment=$1
 	version=$2
+
 	if echo "$environment_name" | grep -qE 'RT|BT'; then
+
 		ossp=$(echo "$environment_name" | sed -E 's/-(RT|BT)-env//')
 	else
 		ossp=$(echo "$environment_name" | cut -d "-" -f 1)
@@ -75,10 +80,12 @@ function __besman_get_local_env() {
 	cp "$BESMAN_LOCAL_ENV_DIR/$ossp/$version/besman-$environment.sh" "$BESMAN_DIR/envs/"
 	if [[ ! -f "$HOME/besman-$environment-config.yaml" ]]; then
 
+
 		[[ -f $default_config_path ]] && rm "$default_config_path"
 		touch "$default_config_path"
 		[[ ! -f "$BESMAN_LOCAL_ENV_DIR/$ossp/$version/besman-$environment-config.yaml" ]] && __besman_echo_red "Could not find config file in the path $BESMAN_LOCAL_ENV_DIR/$ossp/$version/"
 		[[ -f "$BESMAN_LOCAL_ENV_DIR/$ossp/$version/besman-$environment-config.yaml" ]] && cp "$BESMAN_LOCAL_ENV_DIR/$ossp/$version/besman-$environment-config.yaml" "$default_config_path"
+
 	fi
 
 }
@@ -110,7 +117,9 @@ function __besman_get_remote_env {
 	env_repo=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 2)
 	environment_name=$1
 	env_type=$(echo "$environment_name" | rev | cut -d "-" -f 2 | rev)
+
 	if echo "$environment_name" | grep -qE 'RT|BT'; then
+
 		ossp=$(echo "$environment_name" | sed -E 's/-(RT|BT)-env//')
 	else
 		ossp=$(echo "$environment_name" | cut -d "-" -f 1)
@@ -122,13 +131,16 @@ function __besman_get_remote_env {
 	__besman_check_url_valid "$env_url" || return 1
 	__besman_secure_curl "$env_url" >>"${BESMAN_DIR}/envs/besman-${environment_name}.sh"
 
+
 }
 
 function __besman_show_lab_association_prompt() {
 	local environment_name version user_input
 	environment_name=$1
 	version=$2
+
 	if echo "$environment_name" | grep -qE 'RT|BT'; then
+
 		ossp=$(echo "$environment_name" | sed -E 's/-(RT|BT)-env//')
 	else
 		ossp=$(echo "$environment_name" | cut -d "-" -f 1)
