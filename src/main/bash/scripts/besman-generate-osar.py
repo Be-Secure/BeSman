@@ -201,7 +201,7 @@ def main():
     execution_timestamp = os.environ.get("EXECUTION_TIMESTAMP")
     execution_duration = os.environ.get("EXECUTION_DURATION")
     report_output_path = os.environ.get("DETAILED_REPORT_PATH")
-    beslab_assessment_datastore_url = os.environ.get("BESLAB_ASSESSMENT_DATASTORE_URL")
+    beslab_assessment_datastore_url = os.environ.get("BESMAN_ASSESSMENT_DATASTORE_URL")
 
     osar_path = os.environ.get("OSAR_PATH")
 
