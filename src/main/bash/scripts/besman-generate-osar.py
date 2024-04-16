@@ -168,8 +168,13 @@ def main():
         "ASSESSMENT_TOOL_VERSION",
         "ASSESSMENT_TOOL_PLAYBOOK",
 
+<<<<<<< HEAD
         "BESLAB_OWNER_TYPE",
         "BESLAB_OWNER_NAME",
+=======
+        "BESMAN_LAB_TYPE",
+        "BESMAN_LAB_NAME",
+>>>>>>> 99a7933 (Added issue template for bug reports and Renamed lab association variables (#131))
         "PLAYBOOK_EXECUTION_STATUS",
         "EXECUTION_TIMESTAMP",
         "EXECUTION_DURATION",
@@ -195,8 +200,13 @@ def main():
     tool_version = os.environ.get("ASSESSMENT_TOOL_VERSION")
     playbook = os.environ.get("ASSESSMENT_TOOL_PLAYBOOK")
 
+<<<<<<< HEAD
     execution_type = os.environ.get("BESLAB_OWNER_TYPE")
     execution_id = os.environ.get("BESLAB_OWNER_NAME")
+=======
+    execution_type = os.environ.get("BESMAN_LAB_TYPE")
+    execution_id = os.environ.get("BESMAN_LAB_NAME")
+>>>>>>> 99a7933 (Added issue template for bug reports and Renamed lab association variables (#131))
     execution_status = os.environ.get("PLAYBOOK_EXECUTION_STATUS")
     execution_timestamp = os.environ.get("EXECUTION_TIMESTAMP")
     execution_duration = os.environ.get("EXECUTION_DURATION")
