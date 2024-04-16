@@ -1,7 +1,59 @@
 import json
 import os
 import sys
-from datetime import datetime
+
+
+def criticality_score_parser(user_data):
+    # Extract the default_score from the input JSON
+    default_score = user_data.get('default_score', 'N/A')
+
+    # Create a result object
+    result_object = {
+        "feature": "Criticality Score",
+        "aspect": "Score",
+        "attribute": "N/A",
+        "value": default_score
+    }
+
+    return [result_object]
+
+
+def fossology_parser(user_data):
+    # Create a set to store distinct licenses
+    distinct_licenses = set()
+    # Iterate through the JSON data and extract licenses
+    for item in user_data:
+        concluded_license = item.get("LicenseConcluded", "")
+        if concluded_license:
+            distinct_licenses.add(concluded_license)
+        # Convert the set to a list
+    distinct_licenses_list = list(distinct_licenses)
+    filtered_licenses_list = list(filter(lambda x: x != 'NOASSERTION', distinct_licenses_list))
+
+    # Create result objects for each distinct license
+    result_objects = [{
+        "feature": "License Compliance",
+        "aspect": "Count",
+        "attribute": "N/A",
+        "value": len(filtered_licenses_list)
+    }]
+    print(distinct_licenses_list)
+    return result_objects
+
+
+def scorecard_parser(user_data):
+    # Extract the overall score from the scorecard data
+    overall_score = user_data.get('score', 'N/A')
+
+    # Create the result object JSON
+    result_object = {
+        "feature": "ScoreCard",
+        "aspect": "Score",
+        "attribute": "N/A",
+        "value": overall_score
+    }
+    # Return the result object as a list
+    return [result_object]
 
 
 def sbom_parser(user_data):
@@ -95,7 +147,10 @@ def write_json_data(osar_data, osar_file_path):
 # Add more tools and their corresponding processing functions here
 tool_processors = {
     "sonarqube": sonar_parser,
-    "spdx-sbom-generator": sbom_parser
+    "spdx-sbom-generator": sbom_parser,
+    "ossf scorecard": scorecard_parser,
+    "fossology": fossology_parser,
+    "criticality_score": criticality_score_parser
 }
 
 
@@ -146,7 +201,7 @@ def main():
     execution_timestamp = os.environ.get("EXECUTION_TIMESTAMP")
     execution_duration = os.environ.get("EXECUTION_DURATION")
     report_output_path = os.environ.get("DETAILED_REPORT_PATH")
-    BESMAN_ASSESSMENT_DATASTORE_URL = os.environ.get("BESMAN_ASSESSMENT_DATASTORE_URL")
+    beslab_assessment_datastore_url = os.environ.get("BESMAN_ASSESSMENT_DATASTORE_URL")
 
     osar_path = os.environ.get("OSAR_PATH")
 
@@ -173,7 +228,7 @@ def main():
     else:
         print(f"Wrong DETAILED_REPORT_PATH. Please pass the correct path to besecure-assessment-datastore")
         sys.exit(1)
-    output_path = os.path.join(BESMAN_ASSESSMENT_DATASTORE_URL, remaining_path)
+    output_path = os.path.join(beslab_assessment_datastore_url, remaining_path)
 
     new_assessment = {
         "tool": {
