@@ -14,7 +14,7 @@ If you are reporting a bug, please help to speed up problem diagnosis by providi
 
 # Reporting Security Vulnerabilities
 
-If you think you have found a security vulnerability in Spring Boot please DO NOT disclose it publicly until we’ve had a chance to fix it. Please don’t report security vulnerabilities using GitHub issues, instead please reach out to the maintainers of the project.
+If you think you have found a security vulnerability in our project please DO NOT disclose it publicly until we’ve had a chance to fix it. Please don’t report security vulnerabilities using GitHub issues, instead please reach out to arun.suresh@wipro.com.
 
 # Contributing steps
 
