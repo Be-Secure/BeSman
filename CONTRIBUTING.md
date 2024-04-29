@@ -35,24 +35,24 @@ Here we discuss the branching and release strategy for our projects. It ensures 
     - Only production-ready code is merged into this branch.
     - Releases are tagged from this branch.
   
-2. **Development Branch (dev)**:
+2. **Development Branch (develop)**:
 
-    - The `dev` branch serves as the integration branch for ongoing development work.
-    - Automated testing is conducted when the pull request is raised to the `dev` branch.
-    - All feature branches are merged into `dev` via pull requests.
+    - The `develop` branch serves as the integration branch for ongoing development work.
+    - Automated testing is conducted when the pull request is raised to the `develop` branch.
+    - All feature branches are merged into `develop` via pull requests.
     - Once changes are validated, an RC (Release Candidate) is prepared for testing.
 
 ## Pull request process
 
 1. **Feature Development**:
 
-    - Create a feature branch off `dev` for each new feature or bug fix.
+    - Create a feature branch off `develop` for each new feature or bug fix.
     - Name the branch descriptively (e.g., `feature/new-feature`).
     - Implement the changes in the feature branch.
 
 2. **Pull Requests**:
 
-    - Once the feature is ready, open a pull request from the feature branch to `dev`.
+    - Once the feature is ready, open a pull request from the feature branch to `develop`.
     - Ensure the PR title and description are clear and descriptive.
     - Various automated checks will be done on the files changed.
     - Resolve any failing checks promptly.
@@ -60,12 +60,12 @@ Here we discuss the branching and release strategy for our projects. It ensures 
 
 3. **Release Candidate (RC)**:
 
-    - When `dev` is stable, prepare an RC from the `dev` branch for testing.
+    - When `develop` is stable, prepare an RC from the `develop` branch for testing.
     - The RC undergoes end-to-end testing to ensure it meets quality standards.
 
 4. **Final Release**:
 
-   - After successful testing, the changes will be merged from `dev` into `main`.
+   - After successful testing, the changes will be merged from `develop` into `main`.
    - Merge commit will be tagged as a stable release.
    - Deploy the release to production.
 
