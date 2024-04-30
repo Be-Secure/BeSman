@@ -16,7 +16,7 @@ If you are reporting a bug, please help to speed up problem diagnosis by providi
 
 If you think you have found a security vulnerability in our project please DO NOT disclose it publicly until we’ve had a chance to fix it. Please don’t report security vulnerabilities using GitHub issues, instead please reach out to arun.suresh@wipro.com.
 
-# Contributing steps
+# Contributing Steps
 
 - Identify an existing issue you would like to work on, or submit an issue describing your proposed change to the repo in question.
 - The repo owners will respond to your issue promptly.
@@ -33,7 +33,7 @@ Here we discuss the branching and release strategy for our projects. It ensures 
 
     - The `main` branch represents the stable version of the software.
     - Only production-ready code is merged into this branch.
-    - Releases are tagged from this branch.
+    - Stable releases are tagged from this branch.
   
 2. **Development Branch (develop)**:
 
@@ -63,11 +63,10 @@ Here we discuss the branching and release strategy for our projects. It ensures 
     - When `develop` is stable, prepare an RC from the `develop` branch for testing.
     - The RC undergoes end-to-end testing to ensure it meets quality standards.
 
-4. **Final Release**:
+4. **Stable Release**:
 
    - After successful testing, the changes will be merged from `develop` into `main`.
    - Merge commit will be tagged as a stable release.
-   - Deploy the release to production.
 
 ## Other guidelines
 
@@ -88,5 +87,5 @@ Here we discuss the branching and release strategy for our projects. It ensures 
 
 4. **Communication**:
 
-    - Discuss major changes or architectural decisions with the team.
+    - Discuss major changes or architectural decisions with the community.
     - Communicate any delays or blockers promptly.
