@@ -35,11 +35,13 @@ For code that has a listed maintainer or maintainers in our [CODEOWNERS](./READM
 
 If an an unmaintained area of code interests you and you'd like to become a maintainer, you may simply make a PR against our [CODEOWNERS](./README.md) file with your github handle attached to the approriate area. If there is a maintainer or team of maintainers for that area, please coordinate with them as necessary.
 
-# Proposing a hange
+# Proposing a Change
 
 In order to be respectful of the time of community contributors, we aim to discuss potential changes in GitHub issues prior to implementation. That will allow us to give design feedback up front and set expectations about the scope of the change, and, for larger changes, how best to approach the work such that the BeSman team can review it and merge it along with other concurrent work.
 
 If the bug you wish to fix or enhancement you wish to implement isn't already covered by a GitHub issue that contains feedback from the BeSman team, please do start a discussion (either in a new GitHub issue or an existing one, as appropriate) before you invest significant development time. If you mention your intent to implement the change described in your issue, the BeSman team can, as best as possible, prioritize including implementation-related feedback in the subsequent discussion.
+
+Please also look at the [review checklist](./checklist.md) to understand the code standards that we follow.
 
 # Reporting Security Vulnerabilities
 
@@ -70,7 +72,7 @@ Even with everyone making their best effort to be responsive, it can be time-con
 The following checks run when a PR is opened:
 
 1. Contributor License Agreement (CLA): If this is your first contribution to Terraform you will be asked to sign the CLA.
-2. Checks: Some automated checks are triggered to verify whether the contents in the pr follow our guidelines. Also performs a shell check for linting.
+2. Checks: Some automated checks are triggered to verify whether the contents in the pr follow our [guidelines](./checklist.md). Also performs a shell check for linting.
 
 # Contributing Steps
 
