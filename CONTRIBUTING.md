@@ -51,7 +51,7 @@ If you think you have found a security vulnerability in our project please DO NO
 
 1. You are welcome to submit a [draft pull request](https://github.blog/2019-02-14-introducing-draft-pull-requests/) for commentary or review before it is fully completed. It's also a good idea to include specific questions or items you'd like feedback on.
 2. Once you believe your pull request is ready to be merged you can create your pull request.
-3. When time permits BeSman's core team members will look over your contribution and either merge, or provide comments letting you know if there is anything left to do. It may take some time for us to respond. We may also have questions that we need answered about the code, either because something doesn't make sense to us or because we want to understand your thought process. We kindly ask that you do not target specific team members.
+3. When time permits BeSman's core team members will look over your contribution and either merge, or provide comments letting you know if there is anything left to do. It may take some time for us to respond. We may also have questions that we need answers about the code, either because something doesn't make sense to us or because we want to understand your thought process. We kindly ask that you do not target specific team members.
 4. If we have requested changes, you can either make those changes or, if you disagree with the suggested changes, we can have a conversation about our reasoning and agree on a path forward. This may be a multi-step process. Our view is that pull requests are a chance to collaborate, and we welcome conversations about how to do things better. It is the contributor's responsibility to address any changes requested. While reviewers are happy to give guidance, it is unsustainable for us to perform the coding work necessary to get a PR into a mergeable state.
 5. In some cases, we might decide that a PR should be closed without merging. We'll make sure to provide clear reasoning when this happens. Following the recommended process above is one of the ways to ensure you don't spend time on a PR we can't or won't merge.
 
@@ -71,8 +71,8 @@ Even with everyone making their best effort to be responsive, it can be time-con
 
 The following checks run when a PR is opened:
 
-1. Contributor License Agreement (CLA): If this is your first contribution to Terraform you will be asked to sign the CLA.
-2. Checks: Some automated checks are triggered to verify whether the contents in the pr follow our [guidelines](./checklist.md), and linting.
+1. Contributor License Agreement (CLA): If this is your first contribution to BeSman you will be asked to sign the CLA.
+2. Checks: Some automated checks are triggered to verify whether the contents in the pr follow our [guidelines](./checklist.md) and linting.
 
 # Contributing Steps
 
