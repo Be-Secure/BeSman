@@ -72,7 +72,7 @@ Even with everyone making their best effort to be responsive, it can be time-con
 The following checks run when a PR is opened:
 
 1. Contributor License Agreement (CLA): If this is your first contribution to Terraform you will be asked to sign the CLA.
-2. Checks: Some automated checks are triggered to verify whether the contents in the pr follow our [guidelines](./checklist.md). Also performs a shell check for linting.
+2. Checks: Some automated checks are triggered to verify whether the contents in the pr follow our [guidelines](./checklist.md), and linting.
 
 # Contributing Steps
 
