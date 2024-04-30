@@ -13,9 +13,9 @@
 *       @asa1997 @harimohanr
 
 # For docs and other md files
-*.md   @asa1997 @harimohanr @vinodpanicker
+*.md   @asa1997 @harimohanr @panickervinod
 
-docs/* @asa1997 @harimohanr @vinodpanicker
+docs/* @asa1997 @harimohanr @panickervinod
 
 # For source code changes
 src/* @asa1997 @harimohanr
