@@ -1,0 +1,21 @@
+# This is a comment.
+# Each line is a file pattern followed by one or more owners.
+# More on CODEOWNERS files: https://help.github.com/en/github/creating-cloning-and-archiving-repositories/about-code-owners
+
+# Entries that are commented out have maintainers that are not in the
+# Be-Secure organization and so cannot be automatically added as reviewers.
+#
+# We retain those as documentation of who agreed to maintain, but they
+# cannot be used automatically by GitHub's pull request workflow and would
+# make GitHub consider this file invalid if not commented.
+
+# For any changes, Unless a later match takes precedence, these maintainer will be requested for review
+*       @asa1997 @harimohanr
+
+# For docs and other md files
+*.md   @asa1997 @harimohanr @panickervinod
+
+docs/* @asa1997 @harimohanr @panickervinod
+
+# For source code changes
+src/* @asa1997 @harimohanr
