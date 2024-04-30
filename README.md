@@ -50,60 +50,29 @@ It also provides seamless support for creating and executing BeS playbooks, enab
 
 # Installation
 
-## For Windows
+BeSman is designed to work in linux based environments.
 
-BeSman is designed to work with linux machines. So, if you are a windows user, you can use [oah-installer](https://github.com/be-secure/oah-installer), a component of [**OpenAppHack(OAH)**](https://openapphack.github.io/OAH/), to install [oah-shell](https://github.com/be-secure/oah-shell) in the local system and using it to bring up [oah-bes-vm](https://github.com/be-secure/oah-bes-vm), an ubuntu VM, with BeSman installed.
+`Note: Windows users should install WSL in their machines.`
 
-### Pre-requisites
-
-- <a href="https://www.virtualbox.org/" target="_blank">Virtual Box</a>
-- <a href="https://www.vagrantup.com/" target="_blank">Vagrant</a>
-- <a href="https://gitforwindows.org/" target="_blank">Git Bash</a>
-
-1.  Open your git bash
-
-2.  Execute the below command to set the correct namespace
-
-        export BES_NAMESPACE=Be-Secure
-
-3.  Install oah-shell
-
-    curl -s https://raw.githubusercontent.com/Be-Secure/oah-installer/master/install.sh | bash
-
-4.  Confirm the installation oah-shell by executing the below command which would list various oah commands
-
-        oah
-
-5.  Execute the below command to get the list of environments
-
-        oah list
-
-    Note: Make sure **oah-bes-vm** is listed. If not, execute step 2 and run the below command
-
-         source ${OAH_DIR}/bin/oah-init
-
-6.  Setup oah-bes-vm for BeSman by executing the below command.
-
-        oah install -v oah-bes-vm
-
-## For Linux
-
-### Pre-requisites
+## Pre-requisites
 
 - <a href="https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html" target="_blank">Ansible</a>
 - <a href="https://github.com/cli/cli/blob/trunk/docs/install_linux.md" target="_blank">Github CLI</a>
 
-1.  Download the latest binary
+1. Open your terminal
+
+2.  Download the latest binary
 
         curl -L https://raw.githubusercontent.com/Be-Secure/BeSman/dist/dist/get.besman.io | bash
 
-2.  Source the files into memory
+3.  Source the files into memory
 
         source $HOME/.besman/bin/besman-init.sh
 
-3.  Run the below command to confirm installation
+4.  Run the below command to confirm installation
 
         bes help
+
 
 # Usage
 
