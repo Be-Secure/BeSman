@@ -31,9 +31,9 @@ If you feel like you are stuck somewhere, please start a [discussion](https://gi
 
 Maintainers are key contributors to our community project.
 
-For code that has a listed maintainer or maintainers in our [CODEOWNERS](./README.md) file, the Be-Secure team will highlight them for participation in PRs which relate to the area of code they maintain. The expectation is that a maintainer will review the code and work with the PR contributor before the code is merged by the Be-Secure team.
+For code that has a listed maintainer or maintainers in our [CODEOWNERS](./CODEOWNERS) file, the Be-Secure team will highlight them for participation in PRs which relate to the area of code they maintain. The expectation is that a maintainer will review the code and work with the PR contributor before the code is merged by the Be-Secure team.
 
-If an an unmaintained area of code interests you and you'd like to become a maintainer, you may simply make a PR against our [CODEOWNERS](./README.md) file with your github handle attached to the approriate area. If there is a maintainer or team of maintainers for that area, please coordinate with them as necessary.
+If an an unmaintained area of code interests you and you'd like to become a maintainer, you may simply make a PR against our [CODEOWNERS](./CODEOWNERS) file with your github handle attached to the appropriate area. If there is a maintainer or team of maintainers for that area, please coordinate with them as necessary.
 
 # Proposing a Change
 
