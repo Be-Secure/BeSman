@@ -52,7 +52,7 @@ function __besman_fetch_playbook {
     local playbook_name="$1"
     local playbook_version="$2"
     local playbook_file="$BESMAN_PLAYBOOK_DIR/besman-$playbook_name-$playbook_version-playbook.sh"
-    local playbook_url="https://raw.githubusercontent.com/$BESMAN_NAMESPACE/$BESMAN_PLAYBOOK_REPO/main/playbooks/besman-$playbook_name-$playbook_version-playbook.sh"
+    local playbook_url="https://raw.githubusercontent.com/$BESMAN_PLAYBOOK_REPO/$BESMAN_PLAYBOOK_REPO_BRANCH/playbooks/besman-$playbook_name-$playbook_version-playbook.sh"
 
     if [[ -f "$playbook_file" ]]; then
         return 2

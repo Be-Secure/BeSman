@@ -275,7 +275,7 @@ function __besman_download_default_configations()
 		ossp=$(echo "$environment_name" | cut -d "-" -f 1)
 
 	fi	
-  config_url="https://raw.githubusercontent.com/${env_repo_namespace}/${env_repo}/master/${ossp}/${version_id}/besman-$environment_name-config.yaml"
+  config_url="https://raw.githubusercontent.com/${env_repo_namespace}/${env_repo}/$BESMAN_ENV_REPO_BRANCH/${ossp}/${version_id}/besman-$environment_name-config.yaml"
 	default_config_path=$BESMAN_DIR/tmp/besman-$environment_name-config.yaml
 
 	[[ -f "$default_config_path" ]] && rm "$default_config_path"

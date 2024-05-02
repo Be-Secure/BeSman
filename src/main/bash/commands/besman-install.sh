@@ -125,7 +125,7 @@ function __besman_get_remote_env {
 		ossp=$(echo "$environment_name" | cut -d "-" -f 1)
 
 	fi
-	env_url="https://raw.githubusercontent.com/${env_repo_namespace}/${env_repo}/master/${ossp}/${version_id}/besman-${environment_name}.sh"
+	env_url="https://raw.githubusercontent.com/${env_repo_namespace}/${env_repo}/$BESMAN_ENV_REPO_BRANCH/${ossp}/${version_id}/besman-${environment_name}.sh"
 	default_config_path=$BESMAN_DIR/tmp/besman-$environment_name-config.yaml
 	curl_flag=true
 	__besman_check_url_valid "$env_url" || return 1
