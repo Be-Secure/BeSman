@@ -129,8 +129,9 @@ function __besman_update_list()
         local org repo path 
         org=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 1)
         repo=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 2)
+        branch=$BESMAN_ENV_REPO_BRANCH
         bes_list="$BESMAN_DIR/var/list.txt"
-        path="https://raw.githubusercontent.com/$org/$repo/master/list.txt"
+        path="https://raw.githubusercontent.com/$org/$repo/$branch/list.txt"
         __besman_secure_curl "$path" > "$bes_list"
     fi
 
@@ -242,6 +243,11 @@ function __besman_list_playbooks()
     __besman_echo_no_colour "$local_annotation - local playbook"
     __besman_echo_no_colour "======================================================================="
     __besman_echo_no_colour ""
+
+    __besman_echo_no_colour ""
+    __besman_echo_yellow "Pointing to $BESMAN_PLAYBOOK_REPO"
+    __besman_echo_yellow "If you wish to change the repo run the below command"
+    __besman_echo_yellow "$ bes set BESMAN_PLAYBOOK_REPO <GitHub Org>/<Repo name>"
 
     [[ -f $playbook_details_file ]] && rm "$playbook_details_file"
 

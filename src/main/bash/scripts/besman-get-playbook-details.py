@@ -1,8 +1,9 @@
 import requests
 import os
 
-namespace = os.environ["BESMAN_NAMESPACE"]
-url = f'https://raw.githubusercontent.com/{namespace}/besecure-playbooks-store/main/playbook-metadata.json'  
+playbook_repo = os.environ["BESMAN_PLAYBOOK_REPO"]
+branch = os.environ["BESMAN_PLAYBOOK_REPO_BRANCH"]
+url = f'https://raw.githubusercontent.com/{playbook_repo}/{branch}/playbook-metadata.json'  
 response = requests.get(url)
 data = response.json()
 besman_dir = os.environ['BESMAN_DIR']

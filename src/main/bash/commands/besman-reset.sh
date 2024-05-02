@@ -53,7 +53,7 @@ function __besman_get_default_config_file()
 
 	fi    
     version=$(cat "${BESMAN_DIR}/envs/besman-${environment}/current")
-    config_url="https://raw.githubusercontent.com/${env_repo_namespace}/${env_repo}/master/${ossp}/${version}/besman-${ossp}-${env_type}-env-config.yaml"
+    config_url="https://raw.githubusercontent.com/${env_repo_namespace}/${env_repo}/$BESMAN_ENV_REPO_BRANCH/${ossp}/${version}/besman-${ossp}-${env_type}-env-config.yaml"
 
     [[ -f "$env_config_path" ]] && rm "$env_config_path"
     touch "$env_config_path"
