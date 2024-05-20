@@ -21,7 +21,8 @@ then
 	sudo apt update && sudo apt install jq -y
 fi
 
-releases=$(curl -s "https://api.github.com/repos/$BESMAN_NAMESPACE/BESMAN/releases" | jq -r '.[].tag_name')
+echo "Checking version number"
+releases=$(curl -s --silent "https://api.github.com/repos/$BESMAN_NAMESPACE/BESMAN/releases" | jq -r '.[].tag_name')
 
 if ! echo "$releases" | grep -q "^$BESMAN_VERSION$"; then
 	echo "Version $BESMAN_VERSION is not a valid release in repository $repo."
