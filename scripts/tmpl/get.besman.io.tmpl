@@ -23,8 +23,8 @@ fi
 
 releases=$(curl -s "https://api.github.com/repos/$BESMAN_NAMESPACE/BESMAN/releases" | jq -r '.[].tag_name')
 
-if ! echo "$releases" | grep -q "^$version$"; then
-	echo "Version $version is not a valid release in repository $repo."
+if ! echo "$releases" | grep -q "^$BESMAN_VERSION$"; then
+	echo "Version $BESMAN_VERSION is not a valid release in repository $repo."
 	exit 1
 fi
 
