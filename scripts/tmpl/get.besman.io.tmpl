@@ -10,9 +10,24 @@ export BESMAN_SERVICE="https://raw.githubusercontent.com"
 # BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
 
 BESMAN_NAMESPACE="@BES_NAMESPACE@"
-BESMAN_VERSION="@BES_VERSION@"
+BESMAN_VERSION="${BESMAN_VERSION:-@BES_VERSION@}"
+
 BESMAN_ENV_REPOS="$BESMAN_NAMESPACE/besecure-ce-env-repo"
 # BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
+
+if [[ -z $(command -v jq) ]]
+then
+	echo "Installing jq"
+	sudo apt update && sudo apt install jq -y
+fi
+
+echo "Checking version number"
+releases=$(curl -s --silent "https://api.github.com/repos/$BESMAN_NAMESPACE/BESMAN/releases" | jq -r '.[].tag_name')
+
+if ! echo "$releases" | grep -q "^$BESMAN_VERSION$"; then
+	echo "Version $BESMAN_VERSION is not a valid release in repository $repo."
+	exit 1
+fi
 
 if [[ -z "$BESMAN_DIR" ]]; then
     export BESMAN_DIR="$HOME/.besman"
@@ -186,6 +201,18 @@ if [[ -z $(which gh) ]]; then
   sudo apt update
   sudo apt install gh -y
 
+fi
+
+if [[ -z $(command -v pip) ]]
+then
+	echo "Installing pip"
+	sudo apt install python3-pip -y
+fi
+
+if [[ -z $(command -v jupyter) ]]
+then
+	echo "Installing jupyter notebook"
+	python3 -m pip install notebook
 fi
 
 if [[ "$solaris" == true ]]; then
