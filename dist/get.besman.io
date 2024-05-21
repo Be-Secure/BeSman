@@ -10,9 +10,24 @@ export BESMAN_SERVICE="https://raw.githubusercontent.com"
 # BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
 
 BESMAN_NAMESPACE="Be-Secure"
-BESMAN_VERSION="0.3.3"
+BESMAN_VERSION="${BESMAN_VERSION:-0.4.0-rc1}"
+
 BESMAN_ENV_REPOS="$BESMAN_NAMESPACE/besecure-ce-env-repo"
 # BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
+
+if [[ -z $(command -v jq) ]]
+then
+	echo "Installing jq"
+	sudo apt update && sudo apt install jq -y
+fi
+
+echo "Checking version number"
+releases=$(curl -s --silent "https://api.github.com/repos/$BESMAN_NAMESPACE/BESMAN/releases" | jq -r '.[].tag_name')
+
+if ! echo "$releases" | grep -q "^$BESMAN_VERSION$"; then
+	echo "Version $BESMAN_VERSION is not a valid release in repository $repo."
+	exit 1
+fi
 
 if [[ -z "$BESMAN_DIR" ]]; then
     export BESMAN_DIR="$HOME/.besman"
@@ -188,6 +203,18 @@ if [[ -z $(which gh) ]]; then
 
 fi
 
+if [[ -z $(command -v pip) ]]
+then
+	echo "Installing pip"
+	sudo apt install python3-pip -y
+fi
+
+if [[ -z $(command -v jupyter) ]]
+then
+	echo "Installing jupyter notebook"
+	python3 -m pip install notebook
+fi
+
 if [[ "$solaris" == true ]]; then
 	echo "Looking for gsed..."
 	if [ -z $(which gsed) ]; then
@@ -264,12 +291,14 @@ touch "$besman_user_config_file"
     echo "BESMAN_INTERACTIVE_USER_MODE=true"
     echo "BESMAN_DIR=$HOME/.besman"
     echo "BESMAN_ENV_REPOS=$BESMAN_ENV_REPOS"
-    echo "BESMAN_PLAYBOOK_REPO=besecure-playbooks-store"
+    echo "BESMAN_ENV_REPO_BRANCH=master"
+    echo "BESMAN_PLAYBOOK_REPO=$BESMAN_NAMESPACE/besecure-playbooks-store"
+    echo "BESMAN_PLAYBOOK_REPO_BRANCH=main"
     echo "BESMAN_GH_TOKEN="
+    echo "BESMAN_OFFLINE_MODE=true"
     echo "BESMAN_LOCAL_ENV=false"
-	echo "BESMAN_LOCAL_ENV_DIR="
+    echo "BESMAN_LOCAL_ENV_DIR="
     echo "BESMAN_PLAYBOOK_DIR=$besman_playbook_dir"
-
 } >> "$besman_user_config_file"
 echo "Download script archive..."
 
