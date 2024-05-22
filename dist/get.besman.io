@@ -10,7 +10,7 @@ export BESMAN_SERVICE="https://raw.githubusercontent.com"
 # BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
 
 BESMAN_NAMESPACE="Be-Secure"
-BESMAN_VERSION="${BESMAN_VERSION:-0.4.0-rc1}"
+BESMAN_VERSION="${BESMAN_VERSION:-0.4.0-rc2}"
 
 BESMAN_ENV_REPOS="$BESMAN_NAMESPACE/besecure-ce-env-repo"
 # BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
@@ -22,10 +22,10 @@ then
 fi
 
 echo "Checking version number"
-releases=$(curl -s --silent "https://api.github.com/repos/$BESMAN_NAMESPACE/BESMAN/releases" | jq -r '.[].tag_name')
-
-if ! echo "$releases" | grep -q "^$BESMAN_VERSION$"; then
-	echo "Version $BESMAN_VERSION is not a valid release in repository $repo."
+release=$(curl -s --insecure --silent "https://api.github.com/repos/$BESMAN_NAMESPACE/BeSman/releases" | jq -r '.[].tag_name' | grep "^$BESMAN_VERSION$")
+if [[ -z $release ]] 
+then
+    echo "Version $release is not a valid version of $BESMAN_NAMESPACE/BeSman"
 	exit 1
 fi
 
@@ -304,7 +304,7 @@ echo "Download script archive..."
 
 # once move to besman namespace needs to update besman-latest.zip 
 #curl -sL --location --progress-bar "${BESMAN_SERVICE}/${BESMAN_NAMESPACE}/BESman/dist/dist/besman-latest.zip" > "$besman_zip_file"
-curl -sL --location --progress-bar "${BESMAN_SERVICE}/${BESMAN_NAMESPACE}/BeSman/dist/dist/besman-latest.zip" > "$besman_zip_file"
+curl -sL --location --progress-bar "${BESMAN_SERVICE}/${BESMAN_NAMESPACE}/BeSman/dist/dist/besman-$BESMAN_VERSION.zip" > "$besman_zip_file"
 #cp "/vagrant/ProEnv/besman-latest.zip"  "$besman_zip_file"
 
 
