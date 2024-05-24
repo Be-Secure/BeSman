@@ -152,40 +152,22 @@ def update_assessment_step(osar_data, osar_file_path):
 
     with open(config_file, 'r') as file:
         data = yaml.safe_load(file)
-            
-        if 'completionCriteria' not in osar_data:
-            osar_data['completionCriteria'] = []
-            osar_data['completionStatus'] = False
-            for tool in data.get('ASSESSMENT_STEP', []):
-                if tool == assessment_type:
-                    osar_data['completionCriteria'].append({tool: True})
-                else:
-                    osar_data['completionCriteria'].append({tool: False})
-        else:
-           for tool in data.get('ASSESSMENT_STEP', []):
-                tool_found = False
-                for criteria in osar_data['completionCriteria']:
-                    for key in criteria:
-                        if key == tool and tool == assessment_type:
-                            criteria[key] = True
-                            tool_found = True
-                        elif key == tool and tool != assessment_type:
-                            tool_found = True
-                if not tool_found:
-                    osar_data['completionCriteria'].append({tool: False})
-                        #     osar_data['completionCriteria'].append({tool: False})
-        # Write the updated data back to the file
-    for criteria in osar_data['completionCriteria']:
-        for key, value in criteria.items():
-            if value == False:
-                osar_data['completionStatus'] = False
-                break
-            else:
-                osar_data['completionStatus'] = True
-                
+
+    if 'completionCriteria' not in osar_data or not isinstance(osar_data['completionCriteria'], dict):
+        osar_data['completionCriteria'] = {}
+
+    for tool in data.get('ASSESSMENT_STEP', []):
+        if tool == assessment_type:
+            osar_data['completionCriteria'][tool] = True
+        elif tool not in osar_data['completionCriteria']:
+            osar_data['completionCriteria'][tool] = False
+
+    # Determine the overall completion status
+    osar_data['completionStatus'] = all(osar_data['completionCriteria'].values())
+
+    # Write the updated data back to the file
     with open(osar_file_path, 'w') as file:
         json.dump(osar_data, file, indent=4)
-
 # Define a dictionary mapping tool names to processing functions
 # Add more tools and their corresponding processing functions here
 tool_processors = {
