@@ -156,13 +156,13 @@ def update_assessment_step(osar_data, osar_file_path):
         if 'completionCriteria' not in osar_data:
             osar_data['completionCriteria'] = []
             osar_data['completionStatus'] = False
-            for tool in data.get('BESMAN_ASSESSMENT_STEP', []):
+            for tool in data.get('ASSESSMENT_STEP', []):
                 if tool == assessment_type:
                     osar_data['completionCriteria'].append({tool: True})
                 else:
                     osar_data['completionCriteria'].append({tool: False})
         else:
-           for tool in data.get('BESMAN_ASSESSMENT_STEP', []):
+           for tool in data.get('ASSESSMENT_STEP', []):
                 tool_found = False
                 for criteria in osar_data['completionCriteria']:
                     for key in criteria:
@@ -191,7 +191,7 @@ def update_assessment_step(osar_data, osar_file_path):
 tool_processors = {
     "sonarqube": sonar_parser,
     "spdx-sbom-generator": sbom_parser,
-    "ossf scorecard": scorecard_parser,
+    "scorecard": scorecard_parser,
     "fossology": fossology_parser,
     "criticality_score": criticality_score_parser
 }
@@ -218,7 +218,6 @@ def main():
         "EXECUTION_DURATION",
         "DETAILED_REPORT_PATH",
         "BESMAN_ASSESSMENT_DATASTORE_URL",
-        # "BESMAN_ASSESSMENT_STEP",
         "OSAR_PATH"
     ]
 
@@ -245,7 +244,6 @@ def main():
     execution_duration = os.environ.get("EXECUTION_DURATION")
     report_output_path = os.environ.get("DETAILED_REPORT_PATH")
     beslab_assessment_datastore_url = os.environ.get("BESMAN_ASSESSMENT_DATASTORE_URL")
-    # assessment_step = os.environ.get("BESMAN_ASSESSMENT_STEP")
 
 
     osar_path = os.environ.get("OSAR_PATH")
@@ -313,11 +311,7 @@ def main():
         "environment": environment
     })
 
-    # osar_data['completionCriteria'] = {}
-    # osar_data['completionStatus'] = False
-
     update_assessment_step(osar_data, osar_file_path)
-    # append_assessment(osar_data, assessment_step_data)
     append_assessment(osar_data, new_assessment)
 
     write_json_data(osar_data, osar_file_path)
