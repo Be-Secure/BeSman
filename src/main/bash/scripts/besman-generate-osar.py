@@ -1,6 +1,7 @@
 import json
 import os
 import sys
+import yaml
 
 
 def criticality_score_parser(user_data):
@@ -142,13 +143,55 @@ def write_json_data(osar_data, osar_file_path):
     with open(osar_file_path, 'w') as f:
         json.dump(osar_data, f, indent=4)
 
+def update_assessment_step(osar_data, osar_file_path):
+    config_file = os.environ.get('BESMAN_ENV_CONFIG_FILE_PATH')
+    assessment_type = os.environ.get('ASSESSMENT_TOOL_TYPE')
+    if config_file is None or assessment_type is None:
+        print("Error: Environment variables 'BESMAN_ENV_CONFIG_FILE_PATH' and 'ASSESSMENT_TOOL_TYPE' are not set.")
+        return
+
+    with open(config_file, 'r') as file:
+        data = yaml.safe_load(file)
+            
+        if 'completionCriteria' not in osar_data:
+            osar_data['completionCriteria'] = []
+            osar_data['completionStatus'] = False
+            for tool in data.get('ASSESSMENT_STEP', []):
+                if tool == assessment_type:
+                    osar_data['completionCriteria'].append({tool: True})
+                else:
+                    osar_data['completionCriteria'].append({tool: False})
+        else:
+           for tool in data.get('ASSESSMENT_STEP', []):
+                tool_found = False
+                for criteria in osar_data['completionCriteria']:
+                    for key in criteria:
+                        if key == tool and tool == assessment_type:
+                            criteria[key] = True
+                            tool_found = True
+                        elif key == tool and tool != assessment_type:
+                            tool_found = True
+                if not tool_found:
+                    osar_data['completionCriteria'].append({tool: False})
+                        #     osar_data['completionCriteria'].append({tool: False})
+        # Write the updated data back to the file
+    for criteria in osar_data['completionCriteria']:
+        for key, value in criteria.items():
+            if value == False:
+                osar_data['completionStatus'] = False
+                break
+            else:
+                osar_data['completionStatus'] = True
+                
+    with open(osar_file_path, 'w') as file:
+        json.dump(osar_data, file, indent=4)
 
 # Define a dictionary mapping tool names to processing functions
 # Add more tools and their corresponding processing functions here
 tool_processors = {
     "sonarqube": sonar_parser,
     "spdx-sbom-generator": sbom_parser,
-    "ossf scorecard": scorecard_parser,
+    "scorecard": scorecard_parser,
     "fossology": fossology_parser,
     "criticality_score": criticality_score_parser
 }
@@ -175,7 +218,6 @@ def main():
         "EXECUTION_DURATION",
         "DETAILED_REPORT_PATH",
         "BESMAN_ASSESSMENT_DATASTORE_URL",
-
         "OSAR_PATH"
     ]
 
@@ -202,6 +244,7 @@ def main():
     execution_duration = os.environ.get("EXECUTION_DURATION")
     report_output_path = os.environ.get("DETAILED_REPORT_PATH")
     beslab_assessment_datastore_url = os.environ.get("BESMAN_ASSESSMENT_DATASTORE_URL")
+
 
     osar_path = os.environ.get("OSAR_PATH")
 
@@ -268,6 +311,7 @@ def main():
         "environment": environment
     })
 
+    update_assessment_step(osar_data, osar_file_path)
     append_assessment(osar_data, new_assessment)
 
     write_json_data(osar_data, osar_file_path)
