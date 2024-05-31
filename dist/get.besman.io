@@ -10,7 +10,7 @@ export BESMAN_SERVICE="https://raw.githubusercontent.com"
 # BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
 
 BESMAN_NAMESPACE="Be-Secure"
-BESMAN_VERSION="${BESMAN_VERSION:-0.4.0-rc2}"
+BESMAN_VERSION="${BESMAN_VERSION:-0.4.0}"
 
 BESMAN_ENV_REPOS="$BESMAN_NAMESPACE/besecure-ce-env-repo"
 # BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
@@ -213,6 +213,12 @@ if [[ -z $(command -v jupyter) ]]
 then
 	echo "Installing jupyter notebook"
 	python3 -m pip install notebook
+fi
+
+if ! pip list | grep PyYAML
+then
+  echo "Installing pyYAML"
+  python3 -m pip install pyYAML
 fi
 
 if [[ "$solaris" == true ]]; then
