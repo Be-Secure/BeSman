@@ -97,6 +97,13 @@ BeSman is designed to work with linux machines. So, if you are a windows user, y
 
         curl -L https://raw.githubusercontent.com/Be-Secure/BeSman/dist/dist/get.besman.io | bash
 
+
+    If you want to install a specific version, use the following command, replacing X.Y.Z with the desired version:
+
+        export BESMAN_VERSION=X.Y.Z
+        
+        curl -L https://raw.githubusercontent.com/Be-Secure/BeSman/dist/dist/get.besman.io | bash
+
 2.  Source the files into memory
 
         source $HOME/.besman/bin/besman-init.sh
