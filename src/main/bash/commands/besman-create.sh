@@ -160,6 +160,12 @@ BESMAN_ASSESSMENT_DATASTORE_DIR: \$HOME/besecure-assessment-datastore #***
 # BESMAN_ASSESSMENT_DATASTORE_URL - The remote repo where we store the assessment reports.
 BESMAN_ASSESSMENT_DATASTORE_URL: https://github.com/Be-Secure/besecure-assessment-datastore #***
 
+ASSESSMENT_STEP:
+    - sbom
+    - sast
+    - scorecard
+    - criticality_score
+
 EOF
     }
 
@@ -276,6 +282,11 @@ BESMAN_ARTIFACT_TRIGGER_PLAYBOOK: besman-\$BESMAN_ARTIFACT_NAME-$env_type-trigge
 # Default value is false
 BESMAN_DISPLAY_SKIPPED_ANSIBLE_HOSTS: false #***
 
+ASSESSMENT_STEP:
+    - sbom
+    - sast
+    - scorecard
+    - criticality_score
 
 # The default values of the ansible roles will be present in their respective repos.
 # You can go to https://github.com/Be-Secure/<repo of the ansible role>/blob/main/defaults/main.yml.

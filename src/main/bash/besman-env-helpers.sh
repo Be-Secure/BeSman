@@ -2,8 +2,9 @@
 
 function __besman_source_env_params
 {
-    local  key value line tmp_var_file environment env_config
+    local  key value line tmp_var_file environment env_config version
     environment=$1
+    version=$2
     env_config="besman-$environment-config.yaml"
     
     # checks whether user configuration exists
@@ -16,7 +17,7 @@ function __besman_source_env_params
       export BESMAN_ENV_CONFIG_FILE_PATH=$BESMAN_DIR/tmp/$env_config
       __besman_echo_yellow "Sourcing default config parameters"
     else
-		__besman_download_default_configations "$environment" || return 1
+		__besman_download_default_configations "$environment" "$version" || return 1
       export BESMAN_ENV_CONFIG_FILE_PATH=$BESMAN_DIR/tmp/$env_config
       __besman_echo_yellow "Sourcing default config parameters"
 	fi
@@ -268,6 +269,7 @@ function __besman_download_default_configations()
 	env_repo_namespace=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 1)
 	env_repo=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 2)
 	environment_name=$1
+  version_id=$2
 	if  echo "$environment_name" | grep -qE 'RT|BT'
 	then
 		ossp=$(echo "$environment_name" | sed -E 's/-(RT|BT)-env//')
