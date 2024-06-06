@@ -112,13 +112,27 @@ def watchtower_parser(user_data):
     
     for serverity, count in vulns.items():
         vuln = {
-            "feature": "Vulnerability",
+            "feature": "a",
             "aspect": "Severity",
             "attribute": serverity,
             "value": count
         }
         vuln_list.append(vuln)
     return vuln_list
+
+def counterfit_parser(user_data):
+    result_list = []
+    attact_details = user_data["attack_details"]
+    category = attact_details["attack_category"]
+    success = user_data["success"][0]
+    result = {
+            "feature": "Attack",
+            "aspect": category,
+            "attribute": "Success",
+            "value": success
+        }
+    result_list.append(result)
+    return result_list
 
 def read_json_file(filename):
     try:
@@ -207,7 +221,8 @@ tool_processors = {
     "scorecard": scorecard_parser,
     "fossology": fossology_parser,
     "criticality_score": criticality_score_parser,
-    "watchtower": watchtower_parser
+    "watchtower": watchtower_parser,
+    "counterfit": counterfit_parser
 }
 
 
