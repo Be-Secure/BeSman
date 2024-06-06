@@ -23,6 +23,6 @@ function __bes_verify {
         cosign verify-blob $file_name --key cosign.pub --bundle $file_name.bundle
 
 	#verify the attestation
-	cosign verify-blob-attestation $file_name --key cosign.pub --predicate $file_name.predicate.json --bundle $file_name.attest.bundle
+	cosign verify-blob-attestation $file_name --key cosign.pub --bundle $file_name.attest.bundle
 }
 

@@ -3,16 +3,26 @@
 function __bes_attest {
 	local environment_name env_repo environment_name version_id env_config
 	file_name=$1
-        COSIGN_PASSWORD=$(openssl rand -base64 32)
-        export COSIGN_PASSWORD
+        
+        export COSIGN_PASSWORD=$(openssl rand -base64 32)
 	export COSIGN_KEY_LOCATION=$(pwd)
+        
+	cosign version 2>&1>/dev/null
 
-	# install COSIGN
-        LATEST_VERSION=$(curl https://api.github.com/repos/sigstore/cosign/releases/latest | grep tag_name | cut -d : -f2 | tr -d "v\", ")
-        curl -O -L "https://github.com/sigstore/cosign/releases/latest/download/cosign_${LATEST_VERSION}_amd64.deb"
-        sudo dpkg -i cosign_${LATEST_VERSION}_amd64.deb
+	if [ xx"$?" != xx"0" ];then
+	  # install COSIGN
+          LATEST_VERSION=$(curl https://api.github.com/repos/sigstore/cosign/releases/latest | grep tag_name | cut -d : -f2 | tr -d "v\", ")
+          curl -O -L "https://github.com/sigstore/cosign/releases/latest/download/cosign_${LATEST_VERSION}_amd64.deb"
+          sudo dpkg -i cosign_${LATEST_VERSION}_amd64.deb
+	  rm -rf cosign_${LATEST_VERSION}_amd64.deb
+        fi
 
-        cosign generate-key-pair
+	if [ ! -f cosign.key ];then
+           cosign generate-key-pair 2>&1>/dev/null
+	fi
+
+         # Generate a predicate file
+        create_predicate $file_name
 
 	if [ -f $file_name ];then
             cosign sign-blob --yes --key cosign.key --bundle $file_name.bundle $file_name > $file_name.sig
@@ -22,12 +32,8 @@ function __bes_attest {
 	     return 1
 	fi
 
-
-        # Generate a predicate file
-	[[ create_predicate $file_name ]] && return 1
-
 	#upload attestation files
-	[[ upload_attested $file_name ]] && return 1
+	upload_attested $file_name
 }
 
 function create_predicate {
@@ -39,17 +45,17 @@ function create_predicate {
     
     local shasum=$(sha256sum $file)
 
-    cat <<EOF >"$predicatefile"
-    {
+cat <<EOF >"$predicatefile"
+{
     "predicateType": "$PredicateType",
     "subject": {
-        "name" : "$file"
+        "name" : "$file",
 	"digest": {
            "sha256": "$shasum"
         }
     },
     "timestamp": "$timestamp"
-    }
+}
 EOF
 
 return 0
@@ -67,11 +73,15 @@ function upload_attested {
            echo "Key not generated properly." && return 1
         fi
 
-	git add cosign.pub $sigfile $predicatefile $file.attest.sig $file.attest.sig $file.bundle $file.attest.bundle
-
-	git commit -a -m "Signed and attested the file  $file"
-
-	git push origin 
-
-	return 0
+	if git rev-parse --is-inside-work-tree > /dev/null 2>&1 ; then
+	  git add cosign.pub $sigfile $predicatefile $file.attest.sig $file.attest.sig $file.bundle $file.attest.bundle
+	  git commit -a -m "Signed and attested the file  $file"
+	  git push origin
+	else
+	  echo ""
+          echo "Present directory is not git controlled."
+	  echo "Please upload the following files to the OSAR directory manually."
+	  echo "     cosign.pub $sigfile $predicatefile $file.attest.sig $file.attest.sig $file.bundle $file.attest.bundle"
+	  echo ""
+	fi
 }
