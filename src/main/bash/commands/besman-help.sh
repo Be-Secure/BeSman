@@ -253,6 +253,38 @@ function __bes_help_run {
     __besman_echo_no_colour '  '
 }
 
+function __bes_help_attest {
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'NAME'
+    __besman_echo_no_colour '   attest - To attest the OSAR report '
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'SYNOPSIS  '
+    __besman_echo_yellow '    $ bes attest --file <OSAR file name>'
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'DESCRIPTION'
+    __besman_echo_no_colour '   Used to attest and create the key and signature file for OSAR report.'
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'EXAMPLE'
+    __besman_echo_no_colour '   bes attest --file sonar-scanner.osar'
+    __besman_echo_no_colour '  '
+}
+
+function __bes_help_run {
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'NAME'
+    __besman_echo_no_colour '   verify - To verify the OSAR report attestation '
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'SYNOPSIS  '
+    __besman_echo_yellow '    $ bes verify --file <OSAR file name>'
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'DESCRIPTION'
+    __besman_echo_no_colour '   Used to verify the attestation of OSAR report.'
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'EXAMPLE'
+    __besman_echo_no_colour '   bes verify --file sonar-scanner.osar'
+    __besman_echo_no_colour '  '
+}
+
 function __bes_help_validate {
     __besman_echo_no_colour '  '
     __besman_echo_white 'NAME'
