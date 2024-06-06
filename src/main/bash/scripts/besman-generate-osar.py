@@ -112,7 +112,7 @@ def watchtower_parser(user_data):
     
     for serverity, count in vulns.items():
         vuln = {
-            "feature": "a",
+            "feature": "Vulnerability",
             "aspect": "Severity",
             "attribute": serverity,
             "value": count
@@ -128,7 +128,7 @@ def counterfit_parser(user_data):
     result = {
             "feature": "Attack",
             "aspect": category,
-            "attribute": "Success",
+            "attribute": "success",
             "value": success
         }
     result_list.append(result)
