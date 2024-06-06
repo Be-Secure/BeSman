@@ -166,6 +166,30 @@ fi
 
   fi
 
+if [[ -z $(command -v jq) ]]
+then
+	echo "Installing jq"
+	sudo apt update && sudo apt install jq -y
+fi
+
+if [[ -z $(command -v pip) ]]
+then
+	echo "Installing pip"
+	sudo apt install python3-pip -y
+fi
+
+if [[ -z $(command -v jupyter) ]]
+then
+	echo "Installing jupyter notebook"
+	python3 -m pip install notebook
+fi
+
+if ! pip list | grep PyYAML
+then
+  echo "Installing pyYAML"
+  python3 -m pip install pyYAML
+fi
+
 echo "Installing BeSMAN scripts..."
 
 
@@ -259,6 +283,7 @@ if [[ -z $(grep 'besman-init.sh' "$besman_zshrc") ]]; then
     echo "Updated existing ${besman_zshrc}"
 fi
 
+bash
 echo -e "\n\n\nAll done!\n\n"
 
 echo "Please open a new terminal, or run the following in the existing one:"

@@ -10,9 +10,24 @@ export BESMAN_SERVICE="https://raw.githubusercontent.com"
 # BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
 
 BESMAN_NAMESPACE="@BES_NAMESPACE@"
-BESMAN_VERSION="@BES_VERSION@"
+BESMAN_VERSION="${BESMAN_VERSION:-@BES_VERSION@}"
+
 BESMAN_ENV_REPOS="$BESMAN_NAMESPACE/besecure-ce-env-repo"
 # BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
+
+if [[ -z $(command -v jq) ]]
+then
+	echo "Installing jq"
+	sudo apt update && sudo apt install jq -y
+fi
+
+echo "Checking version number"
+release=$(curl -s --insecure --silent "https://api.github.com/repos/$BESMAN_NAMESPACE/BeSman/releases" | jq -r '.[].tag_name' | grep "^$BESMAN_VERSION$")
+if [[ -z $release ]] 
+then
+    echo "Version $release is not a valid version of $BESMAN_NAMESPACE/BeSman"
+	exit 1
+fi
 
 if [[ -z "$BESMAN_DIR" ]]; then
     export BESMAN_DIR="$HOME/.besman"
@@ -188,6 +203,24 @@ if [[ -z $(which gh) ]]; then
 
 fi
 
+if [[ -z $(command -v pip) ]]
+then
+	echo "Installing pip"
+	sudo apt install python3-pip -y
+fi
+
+if [[ -z $(command -v jupyter) ]]
+then
+	echo "Installing jupyter notebook"
+	python3 -m pip install notebook
+fi
+
+if ! pip list | grep PyYAML
+then
+  echo "Installing pyYAML"
+  python3 -m pip install pyYAML
+fi
+
 if [[ "$solaris" == true ]]; then
 	echo "Looking for gsed..."
 	if [ -z $(which gsed) ]; then
@@ -277,7 +310,7 @@ echo "Download script archive..."
 
 # once move to besman namespace needs to update besman-latest.zip 
 #curl -sL --location --progress-bar "${BESMAN_SERVICE}/${BESMAN_NAMESPACE}/BESman/dist/dist/besman-latest.zip" > "$besman_zip_file"
-curl -sL --location --progress-bar "${BESMAN_SERVICE}/${BESMAN_NAMESPACE}/BeSman/dist/dist/besman-latest.zip" > "$besman_zip_file"
+curl -sL --location --progress-bar "${BESMAN_SERVICE}/${BESMAN_NAMESPACE}/BeSman/dist/dist/besman-$BESMAN_VERSION.zip" > "$besman_zip_file"
 #cp "/vagrant/ProEnv/besman-latest.zip"  "$besman_zip_file"
 
 
