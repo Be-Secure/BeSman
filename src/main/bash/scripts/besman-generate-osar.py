@@ -128,7 +128,7 @@ def counterfit_parser(user_data):
     result = {
             "feature": "Attack",
             "aspect": category,
-            "attribute": "success",
+            "attribute": "Success",
             "value": success
         }
     result_list.append(result)
