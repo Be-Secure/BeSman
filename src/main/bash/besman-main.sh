@@ -79,7 +79,7 @@ function bes {
 			__besman_validate_version_format $version || return 1
 			__bes_$command $environment $version
 			;;
-		status | upgrade | remove)
+		status | upgrade | remove | reload)
 			[[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
 			[[ "${#opts[@]}" -ne 0 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
 			__bes_"$command"
@@ -151,6 +151,9 @@ function bes {
 					;;
 					pull)
 						__bes_help_pull
+					;;
+					reload)
+						__bes_help_reload
 					;;
 					*)
 					__besman_echo_red "Unrecognized argument: ${args[1]}" && __bes_help && return 1

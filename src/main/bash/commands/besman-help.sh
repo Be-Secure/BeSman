@@ -30,6 +30,7 @@ __besman_echo_no_colour '   run: Execute available playbooks. '
 __besman_echo_no_colour '   upgrade: Upgrade BeSman to the latest version '
 __besman_echo_no_colour '   rm | remove: Remove BeSman from machine. '
 __besman_echo_no_colour '   status: Display the list of installed environments and its current version '
+__besman_echo_no_colour '   reload: Reloads the configuration of the current environment '
 __besman_echo_no_colour '  '
 __besman_echo_white ' OPTIONS '
 __besman_echo_no_colour '   -env | --environment: For passing the name of the environment script. '
@@ -337,5 +338,17 @@ function __bes_help_pull {
     __besman_echo_no_colour '  '
     __besman_echo_white 'EXAMPLE'
     __besman_echo_no_colour '   bes pull --playbook spdx-sbom-generator -V 0.0.1'
+    __besman_echo_no_colour '  '
+}
+
+function __bes_help_reload()
+{
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'NAME'
+    __besman_echo_no_colour '   reload - Reloads the configuration of the current environment.'
+    __besman_echo_no_colour '            Useful when using a common environment for multiple artifacts.'
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'SYNOPSIS  '
+    __besman_echo_yellow '    $ bes reload'
     __besman_echo_no_colour '  '
 }

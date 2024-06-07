@@ -26,7 +26,7 @@ function __bes_install {
 
 
 		mv "${BESMAN_DIR}/envs/besman-${environment_name}.sh" "${BESMAN_DIR}/envs/besman-${environment_name}/$version_id/"
-		__besman_source_env_params "$environment_name"
+		__besman_source_env_params "$environment_name" "$version_id"
 		if [[ $? -eq 1 ]]; then
 			__besman_error_rollback "$environment_name"
 			__besman_manage_install_out "$return_val" "$environment_name"
