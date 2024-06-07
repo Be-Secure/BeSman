@@ -42,8 +42,16 @@ function __bes_attest {
         create_predicate $filename
 
 	if [ -f $filename ];then
-            cosign sign-blob --yes --key cosign.key --bundle $filename.bundle $filename > $filename.sig
-	    cosign attest-blob $filename --yes --key cosign.key --bundle $filename.attest.bundle --predicate $filename.predicate.json > $filename.attest.sig
+
+	    cosign sign-blob --yes --key cosign.key --bundle $filename.bundle $filename 2>&1 | tee signlog > $filename.sig
+            cosign attest-blob $filename --yes --key cosign.key --bundle $filename.attest.bundle --predicate $filename.predicate.json 2>&1 | tee attestlog > $filename.attest.sig
+
+            tail -n 1 $filename.sig > $filename.sig.tmp
+            mv $filename.sig.tmp $filename.sig
+
+            tail -n 1 $filename.attest.sig > $filename.attest.sig.tmp
+            mv $filename.sig.tmp $filename.attest.sig
+
 	else
              __besman_echo_red "file $filename not found."
 	     return 1
