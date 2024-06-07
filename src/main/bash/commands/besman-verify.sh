@@ -56,7 +56,6 @@ function __bes_verify {
 	   __besman_echo_red "$filename is not verified."
 	fi
 
-
 	if [ ! -z $filepath ];then
            cd $wd
 	fi
