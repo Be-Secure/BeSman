@@ -234,8 +234,6 @@ def main():
     beslab_assessment_datastore_url = os.environ.get("BESMAN_ASSESSMENT_DATASTORE_URL")
     assessment_datastore_dir = os.environ.get("BESMAN_ASSESSMENT_DATASTORE_DIR")
     
-
-
     osar_path = os.environ.get("OSAR_PATH")
 
     # Read and parse the JSON file(user data e.g. sonar-scan-json, snyk, sbom etc...) specified by report_output_path
