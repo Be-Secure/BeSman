@@ -26,7 +26,7 @@ function bes {
 			rm | remove)
 				args=("${args[@]}" "$1")
 			;;
-			-env | -V | --environment | --version | --playbook | -P | --role | --file)         
+			-env | -V | --environment | --version | --playbook | -P | --role | --file | --path)         
 				opts=("${opts[@]}" "$1") ## -env | -V 
 			;; 
         	*)
@@ -85,14 +85,14 @@ function bes {
 			__bes_"$command"
 			;;
 		attest)
-                        [[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
-                        [[ "${#opts[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
-                        __bes_"$command" "${args[1]}"
+			([[ "${#args[@]}" -lt 1 ]] || [[ "${#args[@]}" -gt 2 ]]) && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
+			([[ "${#opts[@]}" -lt 2 ]] || [[ "${#opts[@]}" -gt 3 ]]) && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
+                        __bes_"$command"  "${opts[@]}" "${args[@]}"
 			;;
 		verify)
-                        [[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
-                        [[ "${#opts[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
-                        __bes_"$command" "${args[1]}"
+			([[ "${#args[@]}" -lt 1 ]] || [[ "${#args[@]}" -gt 2 ]]) && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
+                        ([[ "${#opts[@]}" -lt 2 ]] || [[ "${#opts[@]}" -gt 3 ]]) && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
+                        __bes_"$command" "${opts[@]}" "${args[@]}"
                         ;;
 		help)
 			[[ "${#args[@]}" -ne 1 && "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
