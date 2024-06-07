@@ -103,7 +103,7 @@ function bes {
 				case ${args[1]} in 
 					install)
 						__bes_help_install
-					;;I
+					;;
 					uninstall)
 						__bes_help_uninstall
 					;;
