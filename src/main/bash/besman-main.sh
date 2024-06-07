@@ -85,13 +85,13 @@ function bes {
 			__bes_"$command"
 			;;
 		attest)
-			([[ "${#args[@]}" -lt 1 ]] || [[ "${#args[@]}" -gt 2 ]]) && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
-			([[ "${#opts[@]}" -lt 2 ]] || [[ "${#opts[@]}" -gt 3 ]]) && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
+			([[ "${#args[@]}" -lt 2 ]] || [[ "${#args[@]}" -gt 3 ]]) && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
+			([[ "${#opts[@]}" -lt 1 ]] || [[ "${#opts[@]}" -gt 2 ]]) && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
                         __bes_"$command"  "${opts[@]}" "${args[@]}"
 			;;
 		verify)
-			([[ "${#args[@]}" -lt 1 ]] || [[ "${#args[@]}" -gt 2 ]]) && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
-                        ([[ "${#opts[@]}" -lt 2 ]] || [[ "${#opts[@]}" -gt 3 ]]) && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
+			([[ "${#args[@]}" -lt 2 ]] || [[ "${#args[@]}" -gt 3 ]]) && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
+                        ([[ "${#opts[@]}" -lt 1 ]] || [[ "${#opts[@]}" -gt 2 ]]) && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
                         __bes_"$command" "${opts[@]}" "${args[@]}"
                         ;;
 		help)
@@ -103,7 +103,7 @@ function bes {
 				case ${args[1]} in 
 					install)
 						__bes_help_install
-					;;
+					;;I
 					uninstall)
 						__bes_help_uninstall
 					;;
