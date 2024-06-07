@@ -270,7 +270,7 @@ function __bes_help_attest {
     __besman_echo_no_colour '  '
 }
 
-function __bes_help_run {
+function __bes_help_verify {
     __besman_echo_no_colour '  '
     __besman_echo_white 'NAME'
     __besman_echo_no_colour '   verify - To verify the OSAR report attestation '
