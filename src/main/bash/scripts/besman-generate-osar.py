@@ -120,6 +120,20 @@ def watchtower_parser(user_data):
         vuln_list.append(vuln)
     return vuln_list
 
+def counterfit_parser(user_data):
+    result_list = []
+    attact_details = user_data["attack_details"]
+    category = attact_details["attack_category"]
+    success = user_data["success"][0]
+    result = {
+            "feature": "Attack",
+            "aspect": category,
+            "attribute": "Success",
+            "value": success
+        }
+    result_list.append(result)
+    return result_list
+
 def read_json_file(filename):
     try:
         with open(filename, 'r') as f:
@@ -156,48 +170,6 @@ def write_json_data(osar_data, osar_file_path):
     with open(osar_file_path, 'w') as f:
         json.dump(osar_data, f, indent=4)
 
-def update_assessment_step(osar_data, osar_file_path):
-    config_file = os.environ.get('BESMAN_ENV_CONFIG_FILE_PATH')
-    assessment_type = os.environ.get('ASSESSMENT_TOOL_TYPE')
-    if config_file is None or assessment_type is None:
-        print("Error: Environment variables 'BESMAN_ENV_CONFIG_FILE_PATH' and 'ASSESSMENT_TOOL_TYPE' are not set.")
-        return
-
-    with open(config_file, 'r') as file:
-        data = yaml.safe_load(file)
-            
-        if 'completionCriteria' not in osar_data:
-            osar_data['completionCriteria'] = []
-            osar_data['completionStatus'] = False
-            for tool in data.get('ASSESSMENT_STEP', []):
-                if tool == assessment_type:
-                    osar_data['completionCriteria'].append({tool: True})
-                else:
-                    osar_data['completionCriteria'].append({tool: False})
-        else:
-           for tool in data.get('ASSESSMENT_STEP', []):
-                tool_found = False
-                for criteria in osar_data['completionCriteria']:
-                    for key in criteria:
-                        if key == tool and tool == assessment_type:
-                            criteria[key] = True
-                            tool_found = True
-                        elif key == tool and tool != assessment_type:
-                            tool_found = True
-                if not tool_found:
-                    osar_data['completionCriteria'].append({tool: False})
-                        #     osar_data['completionCriteria'].append({tool: False})
-        # Write the updated data back to the file
-    for criteria in osar_data['completionCriteria']:
-        for key, value in criteria.items():
-            if value == False:
-                osar_data['completionStatus'] = False
-                break
-            else:
-                osar_data['completionStatus'] = True
-                
-    with open(osar_file_path, 'w') as file:
-        json.dump(osar_data, file, indent=4)
 
 # Define a dictionary mapping tool names to processing functions
 # Add more tools and their corresponding processing functions here
@@ -207,7 +179,8 @@ tool_processors = {
     "scorecard": scorecard_parser,
     "fossology": fossology_parser,
     "criticality_score": criticality_score_parser,
-    "watchtower": watchtower_parser
+    "watchtower": watchtower_parser,
+    "counterfit": counterfit_parser
 }
 
 
@@ -328,7 +301,6 @@ def main():
         "environment": environment
     })
 
-    update_assessment_step(osar_data, osar_file_path)
     append_assessment(osar_data, new_assessment)
 
     write_json_data(osar_data, osar_file_path)
