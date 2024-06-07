@@ -43,7 +43,7 @@ function __bes_attest {
 
 	if [ -f $filename ];then
             cosign sign-blob --yes --key cosign.key --bundle $filename.bundle $filename > $filename.sig
-	    cosign attest $filename --yes --key cosign.key --bundle $filename.attest.bundle --predicate $filename.predicate.json > $filename.attest.sig
+	    cosign attest-blob $filename --yes --key cosign.key --bundle $filename.attest.bundle --predicate $filename.predicate.json > $filename.attest.sig
 	else
              __besman_echo_red "file $filename not found."
 	     return 1

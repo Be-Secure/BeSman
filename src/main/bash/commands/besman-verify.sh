@@ -23,7 +23,8 @@ function __bes_verify {
         fi
 
 	#check if cosign installed
-	cosign version
+	cosign version 2>&1>/dev/null
+
 	if [ xx"$?" != xx"0" ];then
 	  # install COSIGN
           LATEST_VERSION=$(curl https://api.github.com/repos/sigstore/cosign/releases/latest | grep tag_name | cut -d : -f2 | tr -d "v\", ")
@@ -32,16 +33,16 @@ function __bes_verify {
         fi
 
 	#check if the required files at present at current folder.
-	if [ ! -f $file_name ] || [ ! -f cosign.pub ] || [ ! -f $filename.attest.bundle ] || [ ! -f $filename.bundle ];then
+	if [ ! -f $filename ] || [ ! -f cosign.pub ] || [ ! -f $filename.attest.bundle ] || [ ! -f $filename.bundle ];then
            __besman_echo_red "Required file/files not found"
            return 1
         fi
 
         #verify the signature
-        cosign verify-blob $file_name --key cosign.pub --bundle $file_name.bundle
+        cosign verify-blob $filename --key cosign.pub --bundle $filename.bundle
 
 	#verify the attestation
-	cosign verify-blob-attestation $file_name --key cosign.pub --bundle $file_name.attest.bundle
+	cosign verify-blob-attestation $filename --key cosign.pub --bundle $filename.attest.bundle
 
 	if [ ! -z $filepath ];then
            cd $wd
