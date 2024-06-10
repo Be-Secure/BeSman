@@ -41,7 +41,6 @@ function __bes_verify {
         fi
 
         #verify the signature
-	__besman_echo_yellow "Verifying signature for $filename..."
         cosign verify-blob $filename --key cosign.pub --bundle $filename.bundle 2>&1 | tee sigresult > /dev/null
 	#verify the attestation
 	cosign verify-blob-attestation $filename --key cosign.pub --bundle $filename.attest.bundle 2>&1 | tee attestresult > /dev/null
