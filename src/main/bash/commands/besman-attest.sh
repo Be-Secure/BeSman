@@ -24,9 +24,7 @@ function __bes_attest {
 	export COSIGN_PASSWORD=$(openssl rand -base64 32)
         export COSIGN_KEY_LOCATION=$(pwd)
 
-        which cosign 2>&1>/dev/null
-
-	if [ xx"$?" != xx"0" ];then
+	if [[ -z $(which cosign) ]];then
 	  # install COSIGN
           LATEST_VERSION=$(curl https://api.github.com/repos/sigstore/cosign/releases/latest | grep tag_name | cut -d : -f2 | tr -d "v\", ")
           curl --silent -O -L "https://github.com/sigstore/cosign/releases/latest/download/cosign_${LATEST_VERSION}_amd64.deb" 2>&1>/dev/null
