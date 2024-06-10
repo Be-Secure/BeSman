@@ -40,11 +40,21 @@ function __bes_verify {
         fi
 
         #verify the signature
-        cosign verify-blob $filename --key cosign.pub --bundle $filename.bundle
+	__besman_echo_yellow "Verifying signature for $filename..."
+        cosign verify-blob $filename --key cosign.pub --bundle $filename.bundle 2>&1 | tee signresult > /dev/null
+
 
 	#verify the attestation
-	cosign verify-blob-attestation $filename --key cosign.pub --bundle $filename.attest.bundle
+	cosign verify-blob-attestation $filename --key cosign.pub --bundle $filename.attest.bundle 2>&1 | tee attestresult > /dev/null
 
+        sigr=$(cat signresult)
+	attr=$(cat attestresult)
+
+	if grep "Verified OK" signresult 2>&1>/dev/null &&  grep "Verified OK" signresult 2>&1>/dev/null ;then
+           __besman_echo_green "$filename is Verified Sucessfully."
+	else
+	   __besman_echo_red "$filename is not verified."
+	fi
 
 	if [ ! -z $filepath ];then
            cd $wd
