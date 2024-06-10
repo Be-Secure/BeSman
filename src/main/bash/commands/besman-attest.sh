@@ -34,23 +34,35 @@ function __bes_attest {
 	  [[ -f  cosign_${LATEST_VERSION}_amd64.deb ]] && rm -rf cosign_${LATEST_VERSION}_amd64.deb
         fi
 
-	if [ ! -f cosign.key ];then
-           cosign generate-key-pair 2>&1>/dev/null
-	fi
-
-         # Generate a predicate file
-        create_predicate $filename
+	local cosignpub="cosign.pub"
+	local cosignkey="cosign.key"
+	local predicatefile="$filename.predicate.json"
+        local bundlefile="$filename.bundle"
+	local attestbundlefile="$filename.attest.bundle"
+	local sigfile="$filename.sig"
+	local attestsigfile="$filename.attest.sig"
 
 	if [ -f $filename ];then
 
-	    cosign sign-blob --yes --key cosign.key --bundle $filename.bundle $filename 2>&1 | tee signlog > $filename.sig
-            cosign attest-blob $filename --yes --key cosign.key --bundle $filename.attest.bundle --predicate $filename.predicate.json 2>&1 | tee attestlog > $filename.attest.sig
+	    if [ ! -f cosign.key ];then
+              cosign generate-key-pair 2>&1>/dev/null
+            fi
 
-            tail -n 1 $filename.sig > $filename.sig.tmp
-            mv $filename.sig.tmp $filename.sig
+	    # Generate a predicate file
+            create_predicate $filename
 
-            tail -n 1 $filename.attest.sig > $filename.attest.sig.tmp
-            mv $filename.sig.tmp $filename.attest.sig
+	    cosign sign-blob --yes --key $cosignkey --bundle $bundlefile $filename 2>&1 | tee signlog > $sigfile
+            cosign attest-blob $filename --yes --key $cosignkey --bundle $attestbundlefile --predicate $predicatefile 2>&1 | tee attestlog > $attestsigfile
+
+            tail -n 1 $sigfile > $sigfile.tmp
+            [[ -f $sigfile.tmp ]] && mv -f $sigfile.tmp $sigfile
+
+
+            tail -n 1 $attestsigfile > $attestsigfile.tmp
+            [[ -f  $attestsigfile.tmp ]] && mv -f $attestsigfile.tmp $attestsigfile
+
+	    [[ -f signlog ]] && rm -f signlog
+	    [[ -f attestlog ]] && rm -f attestlog
 
 	else
              __besman_echo_red "file $filename not found."
@@ -60,9 +72,23 @@ function __bes_attest {
 	#upload attestation files
 	upload_attested $filename
 
+        [[ -f cosign.key ]] && \
+	[[ -f cosign.pub ]] && \
+	[[ -f $sigfile ]] && \
+	[[ -f $attestsigfile ]] && \
+	[[ -f $bundlefile ]] && \
+	[[ -f $attestbundlefile ]] && \
+	[[ -f $predicatefile ]] && \
+	__besman_echo_green "Attestation for $filename are generated successfully." && \
+	COMPLETED="1"
+
 	if [ ! -z $filepath ];then
-	  cd $wd
-	fi
+          cd $wd
+        fi
+
+	[[ -z $COMPLETED ]] && __besman_echo_red "Attestation not successful." && return 1
+
+
 }
 
 function create_predicate {
@@ -94,24 +120,46 @@ return 0
 function upload_attested {
 	local file=$1
 	local sigfile=$1.sig
+	local attestsigfile=$1.attest.sig
+	local bundlefile=$1.bundle
+	local attestbundlefile=$1.attest.bundle
 	local predicatefile=$1.predicate.json
+	local cosignpub=cosign.pub
         
 	[[ ! -f $sigfile ]] && echo "Error: Signature file not found." && return 1
-
-	if [[ ! -f cosign.key ]] || [[ ! -f cosign.pub ]]; then
-           echo "Key not generated properly." && return 1
-        fi
+	[[ ! -f $attestsigfile ]] && echo "Error: Attestation Signature file not found." && return 1
+        [[ ! -f $attestbundlefile ]] && echo "Error: bundle file not found." && return 1 
+        [[ ! -f $bundlefile ]] && echo "Error: Attestation bundle file not found." && return 1
+        [[ ! -f $predicatefile ]] && echo "Error: Predicate file not found." && return 1
+        [[ ! -f $cosignpub ]] && echo "Error: cosign public key file not found." && return 1
 
 	if git rev-parse --is-inside-work-tree > /dev/null 2>&1 ; then
-	  git add cosign.pub $sigfile $predicatefile $file.attest.sig $file.attest.sig $file.bundle $file.attest.bundle
+          remoteUrl=$(git config --get remote.origin.url)
+          __besman_echo_cyan "Pushing attestation file to $remoteUrl"
+
+	  git add $cosignpub $sigfile $predicatefile $attestsigfile $bundlefile $attestbundlefile
 	  git commit -a -m "Signed and attested the file  $file"
-	  git push origin
+	  git push origin --quiet
+	  [[ xx"$?" == xx"0" ]] && __besman_echo_green "Pushed attestation file at $remoteUrl successfully."
+	  if [ xx"$?" != xx"0" ];then
+            __besman_echo_red "Error: Not able to push the attestation file. Upload the files manually to $remoteUrl."
+	    __besman_echo_yellow "- $cosignpub"
+            __besman_echo_yellow "- $sigfile"
+            __besman_echo_yellow "- $predicatefile"
+            __besman_echo_yellow "- $attestsigfile"
+            __besman_echo_yellow "- $bundlefile"
+            __besman_echo_yellow "- $attestbundlefile"
+	  fi
+
 	else
 	  echo ""
-	  [[ ! -z $filepath ]] && __besman_echo_yellow "Filepath provided is not git controlled."
-	  [[ -z $filepath ]] && __besman_echo_yellow "Present working directory is not git controlled."
-	  __besman_echo_yellow "Please upload the following files to the OSAR directory manually."
-	  __besman_echo_yellow "     cosign.pub $sigfile $predicatefile $file.attest.sig $file.attest.sig $file.bundle $file.attest.bundle"
+	  __besman_echo_cyan "Not a git controlled directory. Please upload the following files to the OSAR remote directory manually."
+	  __besman_echo_yellow "- $cosignpub"
+	  __besman_echo_yellow "- $sigfile"
+	  __besman_echo_yellow "- $predicatefile"
+	  __besman_echo_yellow "- $attestsigfile"
+	  __besman_echo_yellow "- $bundlefile"
+	  __besman_echo_yellow "- $attestbundlefile"
 	  echo ""
 	fi
 }
