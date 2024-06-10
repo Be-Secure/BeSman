@@ -23,13 +23,14 @@ function __bes_verify {
         fi
 
 	#check if cosign installed
-	cosign version 2>&1>/dev/null
+	which cosign 2>&1>/dev/null
   
 	if [ xx"$?" != xx"0" ];then
 	  # install COSIGN
           LATEST_VERSION=$(curl https://api.github.com/repos/sigstore/cosign/releases/latest | grep tag_name | cut -d : -f2 | tr -d "v\", ")
-          curl -O -L "https://github.com/sigstore/cosign/releases/latest/download/cosign_${LATEST_VERSION}_amd64.deb"
-          sudo dpkg -i cosign_${LATEST_VERSION}_amd64.deb
+          curl --silent -O -L "https://github.com/sigstore/cosign/releases/latest/download/cosign_${LATEST_VERSION}_amd64.deb" 2>&1>/dev/null
+          sudo dpkg -i cosign_${LATEST_VERSION}_amd64.deb 2>&1>/dev/null
+	  rm -f  cosign_${LATEST_VERSION}_amd64.deb
         fi
 
 	#check if the required files at present at current folder.
@@ -41,7 +42,7 @@ function __bes_verify {
 
         #verify the signature
 	__besman_echo_yellow "Verifying signature for $filename..."
-        cosign verify-blob $filename --key cosign.pub --bundle $filename.bundle 2>&1 | tee signresult > /dev/null
+        cosign verify-blob $filename --key cosign.pub --bundle $filename.bundle 2>&1 | tee sigresult > /dev/null
 
 
 	#verify the attestation
@@ -55,6 +56,9 @@ function __bes_verify {
 	else
 	   __besman_echo_red "$filename is not verified."
 	fi
+
+	[[ -f sigresult ]] && rm -f sigresult
+	[[ -f attestresult ]] && rm -f attestresult
 
 	if [ ! -z $filepath ];then
            cd $wd
