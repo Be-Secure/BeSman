@@ -112,46 +112,80 @@ BeSman is designed to work with linux machines. So, if you are a windows user, y
 
         bes help
 
+
 # Usage
 
-        NAME
-           bes - The cli for BeSman  
-          
-        SYNOPSIS  
-           bes [command] [options] [ [environment name] | [playbook name] | [version] ] 
-          
-        DESCRIPTION
-           BeSman (pronounced as ‘B-e-S-man’) is a command-line utility designed for creating and provisioning customized security environments.
-           It helps security professionals to reduce the turn around time for assessment of Open Source projects, AI Models, Model Datasets
-           leaving them focus on the assessment task rather than setting up environment for it.
-           BeSman also provides seamless support for creating and executing BeS playbooks, enabling users to automate complex workflows and tasks.
-           With BeSman, users can efficiently manage and execute playbooks, streamlining their processes and enhancing productivity.
-          
-         COMMANDS 
-           help: Display the help command 
-           list: List available environments, playbooks, roles. 
-           install: Install available environments. 
-           uninstall: Uninstall the installed environment. 
-           update: Update the configurations of the installed environment. 
-           validate: Validate the installtion of the environment. 
-           reset: Reset the environment to default configurations. 
-           create: Create environment script. 
-           set: Change the BeSman config variables. 
-           pull: Fetches the playbook from remote to local. 
-           run: Execute available playbooks. 
-           upgrade: Upgrade BeSman to the latest version 
-           rm | remove: Remove BeSman from machine. 
-           status: Display the list of installed environments and its current version 
-          
-         OPTIONS 
-           -env | --environment: For passing the name of the environment script. 
-           -V | --version: For passing the version number. 
-           -P | --playbook: For passing the playbook name 
-           --role: To list the role names 
-          
-        For more details execute below command
-           $ bes help <command name>
-           Choose command name from list of COMMANDS
-  
+## Initial Setup
+
+1. Configure git
+   
+    	$ git config --global user.name "Your username"
+		$ git config --global user.email "your.email@example.com"
+
+2. Set BeSman variable with configured git user name for cloning artifact source code repo and assessment datastore repo.
+
+		$ bes set BESMAN_USER_NAMESPACE <github id/gitlab id>
+
+
+## For Environments
+
+Read about environments from our [environment repo](https://github.com/Be-Secure/besecure-ce-env-repo).
+
+### List 
+
+Use the command to get the available environments for installation.
+		
+	$ bes list -env
+
+
+### Install
+
+From the listed environments(from above list command), choose an environment and its version for installation and run the below command
+
+	$ bes install -env <environment name> -V <version>
+
+Visit [environment repo](https://github.com/Be-Secure/besecure-ce-env-repo) to see how to edit configuration of an environment
+
+### Uninstall
+
+To uninstall an environment run,
+
+	$ bes uninstall -env <environment name> -V <version>
+
+
+`For more, go to environment repository`
+
+## For Playbooks
+
+Read about playbooks from our [playbook repo](https://github.com/Be-Secure/besecure-playbooks-store).
+
+### List
+
+Use the command to get the available playbooks for performing assessments and generate [OSAR](https://be-secure.github.io/bes-schema/assessment-report/#open-source-assessment-report-schema-osar).
+
+	$ bes list -P
+
+### Pull
+
+Before running(execute) a playbook, you need to pull(fetch) it to your local machine,
+
+	$ bes pull -P <playbook name> -V <version>
+
+### Run
+
+To run a playbook to generate OSAR and detailed assessment report,
+
+	$ bes run -P <playbook name> -V <version>
+
+
+## Other commands
+
+To get the complete set of commands run,
+
+	$ bes help
+
+To get more info regarding a command
+
+	$ bes help <command>
 
 You can find more details of the command from the BeSman [webpage](https://be-secure.github.io/Be-Secure/bes-besman-details/)
