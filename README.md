@@ -48,55 +48,21 @@ It also provides seamless support for creating and executing BeS playbooks, enab
   - **launch**: Trigger function which calls all the above functions.
 - The BeS Playbooks are stored and maintained under [besecure-playbooks-store](https://github.com/Be-Secure/besecure-playbooks-store).
 
+<!-- # Developer Guide
+
+**Welcome, Developers!**
+
+We are thrilled to have you here! Thank you for your interest in contributing to our project. Whether you're a seasoned developer or just getting started, your contributions are highly valued and appreciated. This [guide](developer-guide.md) will help you get up and running and provide you with the necessary information to make your development experience as smooth as possible. -->
+
 # Installation
 
-## For Windows
+BeSman is designed to be used in a Linux machine.
 
-BeSman is designed to work with linux machines. So, if you are a windows user, you can use [oah-installer](https://github.com/be-secure/oah-installer), a component of [**OpenAppHack(OAH)**](https://openapphack.github.io/OAH/), to install [oah-shell](https://github.com/be-secure/oah-shell) in the local system and using it to bring up [oah-bes-vm](https://github.com/be-secure/oah-bes-vm), an ubuntu VM, with BeSman installed.
+`Windows users should use an ubuntu VM or WSL.`
 
-### Pre-requisites
-
-- <a href="https://www.virtualbox.org/" target="_blank">Virtual Box</a>
-- <a href="https://www.vagrantup.com/" target="_blank">Vagrant</a>
-- <a href="https://gitforwindows.org/" target="_blank">Git Bash</a>
-
-1.  Open your git bash
-
-2.  Execute the below command to set the correct namespace
-
-        export BES_NAMESPACE=Be-Secure
-
-3.  Install oah-shell
-
-    curl -s https://raw.githubusercontent.com/Be-Secure/oah-installer/master/install.sh | bash
-
-4.  Confirm the installation oah-shell by executing the below command which would list various oah commands
-
-        oah
-
-5.  Execute the below command to get the list of environments
-
-        oah list
-
-    Note: Make sure **oah-bes-vm** is listed. If not, execute step 2 and run the below command
-
-         source ${OAH_DIR}/bin/oah-init
-
-6.  Setup oah-bes-vm for BeSman by executing the below command.
-
-        oah install -v oah-bes-vm
-
-## For Linux
-
-### Pre-requisites
-
-- <a href="https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html" target="_blank">Ansible</a>
-- <a href="https://github.com/cli/cli/blob/trunk/docs/install_linux.md" target="_blank">Github CLI</a>
-
-1.  Download the latest binary
+1.  Download the latest binary and install pre-requisites
 
         curl -L https://raw.githubusercontent.com/Be-Secure/BeSman/dist/dist/get.besman.io | bash
-
 
     If you want to install a specific version, use the following command, replacing X.Y.Z with the desired version:
 
@@ -112,6 +78,29 @@ BeSman is designed to work with linux machines. So, if you are a windows user, y
 
         bes help
 
+## Installation from a Branch
+
+This step is useful for developers,
+
+BeSman also allows you to install the cli from a branch. This is used to quickly test your feature developments or bug fixes.
+
+1. Clone the repo.
+
+		$ git clone https://github.com/<your id>/BeSman
+
+2. Move into BeSman
+	
+		$ cd BeSman
+
+3. Change branch
+   
+		$ git checkout <branch name>
+
+4. Run the quick_install file
+
+		$ ./quick_install.sh
+
+This would install BeSman from your current branch.
 
 # Usage
 
