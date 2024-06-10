@@ -254,6 +254,50 @@ function __bes_help_run {
     __besman_echo_no_colour '  '
 }
 
+function __bes_help_attest {
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'NAME'
+    __besman_echo_no_colour '   attest - To attest the OSAR report '
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'SYNOPSIS  '
+    __besman_echo_yellow '    $ bes attest --file <OSAR file name> --path <Directory path containing OSAR file>'
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'DESCRIPTION'
+    __besman_echo_no_colour '   Used to attest and create the key and signature file for OSAR report.'
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'ARGUMENTS  '
+    __besman_echo_no_colour '   --file (Required) Name of the OSAR file'
+    __besman_echo_no_colour '   --path (Optional) Absolute directory path containing OSAR file.'
+    __besman_echo_no_colour '      If not provided file is expected to be present in current working directory.'
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'EXAMPLE'
+    __besman_echo_no_colour '   bes attest --file fastjson-1.2.24-osar.json'
+    __besman_echo_no_colour '   bes attest --file fastjson-1.2.24-osar.json --path /opt/besecure-assessment-datastore/fastjson/1.2.24/'
+    __besman_echo_no_colour '  '
+}
+
+function __bes_help_verify {
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'NAME'
+    __besman_echo_no_colour '   verify - To verify the OSAR report attestation '
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'SYNOPSIS  '
+    __besman_echo_yellow '    $ bes verify --file <OSAR file name> --path <Directory path containing OSAR,Key,signature and bundle files.>'
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'DESCRIPTION'
+    __besman_echo_no_colour '   Used to verify the attestation of OSAR report.'
+    __besman_echo_no_colour '  '
+     __besman_echo_white 'ARGUMENTS  '
+    __besman_echo_no_colour '   --file (Required) Name of the OSAR file.'
+    __besman_echo_no_colour '   --path (Optional) Absolute path for the directory containing OSAR file along with key and bundle files.'
+    __besman_echo_no_colour '      If not provided files are expected to be present in current working directory.'
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'EXAMPLE'
+    __besman_echo_no_colour '   bes verify --file fastjson-1.2.24-osar.json'
+    __besman_echo_no_colour '   bes verify --file fastjson-1.2.24-osar.json --path /opt/besecure-assessment-datastore/fastjson/1.2.24/'
+    __besman_echo_no_colour '  '
+}
+
 function __bes_help_validate {
     __besman_echo_no_colour '  '
     __besman_echo_white 'NAME'
