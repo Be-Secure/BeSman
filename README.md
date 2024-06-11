@@ -117,7 +117,7 @@ Below are the steps to be performed by the user of BeSman to **setup their machi
 
 		$ bes set BESMAN_USER_NAMESPACE <github id/gitlab id>
 
-3. Fork the required repositories. Read [here](https://github.com/Be-Secure/besecure-ce-env-repo/tree/develop?tab=readme-ov-file#usage).
+3. Fork the required repositories. Read [here](https://github.com/Be-Secure/besecure-ce-env-repo/tree/develop?tab=readme-ov-file#2-set-your-githubgitlab-id).
 
 ## 2. Environment Setup
 
