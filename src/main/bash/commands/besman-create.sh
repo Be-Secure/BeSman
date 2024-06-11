@@ -126,45 +126,39 @@ function __besman_create_env_config_basic() {
 # If you are not using any particular value, remove it or comment it(#).
 #*** - These variables should not be removed, nor left empty.
 
-# BESMAN_ARTIFACT_TYPE - project/ml model/training dataset
-BESMAN_ARTIFACT_TYPE: # project/ml model/training dataset #***
+# project/model/training dataset
+BESMAN_ARTIFACT_TYPE: #***
 
 # BESMAN_ARTIFACT_NAME - name of the artifact under assessment.
 BESMAN_ARTIFACT_NAME: $ossp_name #***
 
-# BESMAN_ARTIFACT_VERSION - version of the artifact under assessment.
-BESMAN_ARTIFACT_VERSION: #Enter the version of the artifact here. #***
+# Version of the artifact under assessment.
+BESMAN_ARTIFACT_VERSION: #***
 
-# BESMAN_ARTIFACT_URL - Source code url of the artifact under assessment.
+# Source code url of the artifact under assessment.
 BESMAN_ARTIFACT_URL: https://github.com/Be-Secure/$ossp_name #***
 
-#BESMAN_ENV_NAME - This variable stores the name of the environment file.
+# This variable stores the name of the environment file.
 BESMAN_ENV_NAME: $environment_name #***
 
-# BESMAN_ARTIFACT_DIR - The path where you wish to clone the source code of the artifact under assessment.
+# The path where you wish to clone the source code of the artifact under assessment.
 # If you wish to change the clone path, provide the complete path.
 BESMAN_ARTIFACT_DIR: \$HOME/\$BESMAN_ARTIFACT_NAME #***
 
-# BESMAN_TOOL_PATH - The path where we download the assessment and other required tools during installation.
+# The path where we download the assessment and other required tools during installation.
 BESMAN_TOOL_PATH: /opt #***
 
-# BESMAN_LAB_TYPE - Organization. This variable indicates the individual's lab affiliation
+# This variable indicates the individual's lab affiliation
 BESMAN_LAB_TYPE: Organization #***
 
-# BESMAN_LAB_NAME - Name of the lab. Default is Be-Secure. This variable indicates the individual's lab affiliation
+# Name of the lab. Default is Be-Secure. This variable indicates the individual's lab affiliation
 BESMAN_LAB_NAME: Be-Secure #***
 
-# BESMAN_ASSESSMENT_DATASTORE_DIR - This is the local dir where we store the assessment reports. Default is home.
+# This is the local dir where we store the assessment reports. Default is home.
 BESMAN_ASSESSMENT_DATASTORE_DIR: \$HOME/besecure-assessment-datastore #***
 
-# BESMAN_ASSESSMENT_DATASTORE_URL - The remote repo where we store the assessment reports.
+# The remote repo where we store the assessment reports.
 BESMAN_ASSESSMENT_DATASTORE_URL: https://github.com/Be-Secure/besecure-assessment-datastore #***
-
-ASSESSMENT_STEP:
-    - sbom
-    - sast
-    - scorecard
-    - criticality_score
 
 EOF
     }
@@ -226,67 +220,62 @@ function __besman_create_env_config() {
 # BESMAN_<var name>: <value>
 # If you are not using any particular value, remove it or comment it(#).
 #*** - These variables should not be removed, nor left empty.
-# BESMAN_ORG - used to mention where you should clone the repo from, default value is Be-Secure
+# used to mention where you should clone the repo from, default value is Be-Secure
 BESMAN_ORG: Be-Secure #***
 
-# BESMAN_ARTIFACT_TYPE - project/ml model/training dataset
-BESMAN_ARTIFACT_TYPE: # project/ml model/training dataset #***
+# project/ml model/training dataset
+BESMAN_ARTIFACT_TYPE: #***
 
-# BESMAN_ARTIFACT_NAME - name of the artifact under assessment.
+# Name of the artifact under assessment.
 BESMAN_ARTIFACT_NAME: $ossp_name #***
 
-# BESMAN_ARTIFACT_VERSION - version of the artifact under assessment.
-BESMAN_ARTIFACT_VERSION: #Enter the version of the artifact here. #***
+# Version of the artifact under assessment.
+BESMAN_ARTIFACT_VERSION: #***
 
-# BESMAN_ARTIFACT_URL - Source code url of the artifact under assessment.
+# Source code url of the artifact under assessment.
 BESMAN_ARTIFACT_URL: https://github.com/Be-Secure/$ossp_name #***
 
-#BESMAN_ENV_NAME - This variable stores the name of the environment file.
+# This variable stores the name of the environment file.
 BESMAN_ENV_NAME: $environment_name #***
 
-# BESMAN_ARTIFACT_DIR - The path where you wish to clone the source code of the artifact under assessment.
+# The path where you wish to clone the source code of the artifact under assessment.
 # If you wish to change the clone path, provide the complete path.
 BESMAN_ARTIFACT_DIR: \$HOME/\$BESMAN_ARTIFACT_NAME #***
 
-# BESMAN_TOOL_PATH - The path where we download the assessment and other required tools during installation.
+# The path where we download the assessment and other required tools during installation.
 BESMAN_TOOL_PATH: /opt #***
 
-# BESMAN_LAB_TYPE - Organization/lab/individual.
+# Organization/lab/individual.
 BESMAN_LAB_TYPE: Organization #***
 
-# BESMAN_LAB_NAME - Name of the owner of the lab. Default is Be-Secure.
+# Name of the owner of the lab. Default is Be-Secure.
 BESMAN_LAB_NAME: Be-Secure #***
 
-# BESMAN_ASSESSMENT_DATASTORE_DIR - This is the local dir where we store the assessment reports. Default is home.
+# This is the local dir where we store the assessment reports. Default is home.
 BESMAN_ASSESSMENT_DATASTORE_DIR: \$HOME/besecure-assessment-datastore #***
 
-# BESMAN_ASSESSMENT_DATASTORE_URL - The remote repo where we store the assessment reports.
+# The remote repo where we store the assessment reports.
 BESMAN_ASSESSMENT_DATASTORE_URL: https://github.com/Be-Secure/besecure-assessment-datastore #***
 
-# BESMAN_ANSIBLE_ROLES_PATH - The path where we download the ansible role of the assessment tools and other utilities
+# The path where we download the ansible role of the assessment tools and other utilities
 BESMAN_ANSIBLE_ROLES_PATH: \$BESMAN_DIR/tmp/\$BESMAN_ARTIFACT_NAME/roles #***
 
-# BESMAN_ANSIBLE_ROLES - The list of tools you wish to install. The tools are installed using ansible roles.
+# The list of tools you wish to install. The tools are installed using ansible roles.
 # To get the list of ansible roles run 
 #   $ bes list --role
-BESMAN_ANSIBLE_ROLES: #add the roles here. format - <Github id>/<repo name>,<Github id>/<repo name>,<Github id>/<repo name>,... #***
+#add the roles here. format - <Github id>/<repo name>,<Github id>/<repo name>,<Github id>/<repo name>,... #***
+BESMAN_ANSIBLE_ROLES: 
 
-# BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH - sets the path of the playbook with which we run the ansible roles.
+# sets the path of the playbook with which we run the ansible roles.
 # Default path is ~/.besman/tmp/<artifact name dir>/
 BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH: \$BESMAN_DIR/tmp/\$BESMAN_ARTIFACT_NAME #***
 
-#BESMAN_ARTIFACT_TRIGGER_PLAYBOOK - Name of the trigger playbook which runs the ansible roles.
+# Name of the trigger playbook which runs the ansible roles.
 BESMAN_ARTIFACT_TRIGGER_PLAYBOOK: besman-\$BESMAN_ARTIFACT_NAME-$env_type-trigger-playbook.yaml #***
 
-# BESMAN_DISPLAY_SKIPPED_ANSIBLE_HOSTS - If the users likes to display all the skipped steps, set it to true.
+# If the users likes to display all the skipped steps, set it to true.
 # Default value is false
 BESMAN_DISPLAY_SKIPPED_ANSIBLE_HOSTS: false #***
-
-ASSESSMENT_STEP:
-    - sbom
-    - sast
-    - scorecard
-    - criticality_score
 
 # The default values of the ansible roles will be present in their respective repos.
 # You can go to https://github.com/Be-Secure/<repo of the ansible role>/blob/main/defaults/main.yml.
