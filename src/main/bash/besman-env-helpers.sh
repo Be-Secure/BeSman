@@ -13,8 +13,7 @@ function __besman_check_value_empty()
 	fi
 	version=$4
 
-
-	if [[ -z $value || "$value" == \#* ]] 
+	if [[ -z "$value" || "$value" == \#* || $value == '""' || $value == "''" ]] 
 	then
 		__besman_echo_red "Missing value for variable $key. Please update the configuration file"
 
@@ -73,9 +72,9 @@ function __besman_source_env_params
 
             key=$(echo "$line" | cut -d ":" -f 1) # For getting the var name
             value=$(echo "$line" | cut -d ":" -f 2- | cut -d " " -f 2) # For getting the value.
-            __besman_check_value_empty "$key" "$value" "$environment" "$version" || return 1
             unset "$key"
             echo "export $key=$value" >> "$tmp_var_file"
+            __besman_check_value_empty "$key" "$value" "$environment" "$version" || return 1
         else
             continue
         fi
