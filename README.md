@@ -137,14 +137,19 @@ If you wish to change the branch, run the below command
 	
 	$ bes set BESMAN_ENV_REPO_BRANCH <branch>/<tag>
 
-### 2.2 Install
+### 2.2 Edit environment configuration(optional)
+
+`IMPORTANT`: If you are using a common environment to assess multiple artifacts, you will have to do this step.
+
+Visit [environment repo](https://github.com/Be-Secure/besecure-ce-env-repo/tree/develop?tab=readme-ov-file#41-edit-environment-configurationoptional) to see how to edit configuration of an environment
+
+
+
+### 2.3 Install
 
 From the listed environments(from above list command), choose an environment and its version for installation and run the below command
 
 	$ bes install -env <environment name> -V <version>
-
-Visit [environment repo](https://github.com/Be-Secure/besecure-ce-env-repo) to see how to edit configuration of an environment
-
 
 ## 3. Playbook Setup
 
