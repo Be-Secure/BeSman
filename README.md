@@ -117,6 +117,7 @@ Below are the steps to be performed by the user of BeSman to **setup their machi
 
 		$ bes set BESMAN_USER_NAMESPACE <github id/gitlab id>
 
+3. Fork the required repositories. Read [here](https://github.com/Be-Secure/besecure-ce-env-repo/tree/develop?tab=readme-ov-file#2-set-your-githubgitlab-id).
 
 ## 2. Environment Setup
 
@@ -128,6 +129,13 @@ Use the command to get the available environments for installation.
 		
 	$ bes list -env
 
+If you wish to change the repo, run the below command
+	
+	$ bes set BESMAN_ENV_REPOS <GitHub Org>/<Repo name>
+ 
+If you wish to change the branch, run the below command
+	
+	$ bes set BESMAN_ENV_REPO_BRANCH <branch>/<tag>
 
 ### 2.2 Install
 
@@ -147,6 +155,14 @@ Read about playbooks from our [playbook repo](https://github.com/Be-Secure/besec
 Use the command to get the available playbooks for performing assessments and generate [OSAR](https://be-secure.github.io/bes-schema/assessment-report/#open-source-assessment-report-schema-osar).
 
 	$ bes list -P
+
+If you wish to change the repo, run the below command
+	
+	$ bes set BESMAN_PLAYBOOK_REPO <GitHub Org>/<Repo name>
+ 
+If you wish to change the branch, run the below command
+	
+	$ bes set BESMAN_PLAYBOOK_REPO_BRANCH <branch>/<tag>
 
 ### 3.2 Pull
 
