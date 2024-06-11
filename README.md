@@ -139,9 +139,9 @@ If you wish to change the branch, run the below command
 
 ### 2.2 Edit environment configuration(optional)
 
-`IMPORTANT`: If you are using a common environment to assess multiple artifacts, you will have to do this step.
+`IMPORTANT`: If you are using a common environment to assess multiple artifacts,this step is required.
 
-Visit [environment repo](https://github.com/Be-Secure/besecure-ce-env-repo/tree/develop?tab=readme-ov-file#41-edit-environment-configurationoptional) to see how to edit configuration of an environment
+Visit [environment repo](https://github.com/Be-Secure/besecure-ce-env-repo/tree/develop?tab=readme-ov-file#41-edit-environment-configuration) to see how to edit configuration of an environment. (Refer section 4.1 only)
 
 
 
