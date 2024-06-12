@@ -141,15 +141,26 @@ If you wish to change the branch, run the below command
 
 `IMPORTANT`: If you are using a common environment to assess multiple artifacts,this step is required.
 
-Visit [environment repo](https://github.com/Be-Secure/besecure-ce-env-repo/tree/develop?tab=readme-ov-file#41-edit-environment-configuration) to see how to edit configuration of an environment. (Refer section 4.1 only)
-
-
+Visit [environment repo](https://github.com/Be-Secure/besecure-ce-env-repo/tree/develop?tab=readme-ov-file#41-edit-environment-configuration) to see how to edit configuration of an environment. 
 
 ### 2.3 Install
 
 From the listed environments(from above list command), choose an environment and its version for installation and run the below command
 
 	$ bes install -env <environment name> -V <version>
+
+### 2.3 Reload environment configuration
+
+The `reload` command reloads the current configuration of the environment.
+
+	$ bes reload
+
+This is useful when,
+
+1. A value for a variable has to be changed for the current environment.
+2. A new terminal is opened.
+
+This command only works when an environment is installed.
 
 ## 3. Playbook Setup
 
