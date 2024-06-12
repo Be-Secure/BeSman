@@ -158,7 +158,7 @@ The `reload` command reloads the current configuration of the environment.
 This is useful when,
 
 1. A value for a variable has to be changed for the current environment.
-2. A new terminal is opened.
+2. Reflecting values in a new terminal session.
 
 This command only works when an environment is installed.
 
