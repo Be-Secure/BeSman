@@ -1,5 +1,38 @@
 #!/usr/bin/env bash
 
+function __besman_check_value_empty()
+{
+	local key=$1
+	local value=$2
+	local environment_name=$3
+	local ossp version
+	if echo "$environment_name" | grep -qE 'RT|BT'; then
+		ossp=$(echo "$environment_name" | sed -E 's/-(RT|BT)-env//')
+	else
+		ossp=$(echo "$environment_name" | cut -d "-" -f 1)
+	fi
+	version=$4
+
+	if [[ -z "$value" || "$value" == \#* || $value == '""' || $value == "''" ]] 
+	then
+		__besman_echo_red "Missing value for variable $key. Please update the configuration file"
+
+		__besman_echo_no_colour ""
+		__besman_echo_no_colour "1. Check if the file $HOME/besman-$environment_name-config.yaml exists in $HOME"
+		__besman_echo_no_colour ""
+		__besman_echo_no_colour "2. If the file does not exist, run the below command to download the file"
+		__besman_echo_no_colour ""
+		__besman_echo_yellow "		wget -P \$HOME https://raw.githubusercontent.com/$BESMAN_ENV_REPOS/$BESMAN_ENV_REPO_BRANCH/$ossp/$version/besman-$environment_name-config.yaml"
+		__besman_echo_no_colour ""
+		__besman_echo_no_colour "3. Open the file $HOME/besman-$environment_name-config.yaml in an editor"
+		__besman_echo_no_colour ""
+		__besman_echo_no_colour "4. Add values to the missing variables"
+		__besman_echo_no_colour ""
+		__besman_echo_white "Please try the installation again after filling the missing values"
+		return 1
+	fi
+}
+
 function __besman_source_env_params
 {
     local  key value line tmp_var_file environment env_config version
@@ -41,6 +74,7 @@ function __besman_source_env_params
             value=$(echo "$line" | cut -d ":" -f 2- | cut -d " " -f 2) # For getting the value.
             unset "$key"
             echo "export $key=$value" >> "$tmp_var_file"
+            __besman_check_value_empty "$key" "$value" "$environment" "$version" || return 1
         else
             continue
         fi

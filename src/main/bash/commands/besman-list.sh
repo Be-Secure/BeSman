@@ -85,15 +85,18 @@ function __besman_list_envs()
 
     if [[ $BESMAN_LOCAL_ENV == "true" ]]; then
 
-        __besman_echo_yellow "Pointing to local dir $BESMAN_LOCAL_ENV_DIR"
+        __besman_echo_yellow "Listing from local dir $BESMAN_LOCAL_ENV_DIR"
         __besman_echo_no_colour ""
-        __besman_echo_white "If you wish to change, run the below command"
+        __besman_echo_white "If you wish to list from remote repo, run the below command"
         __besman_echo_yellow "$ bes set BESMAN_LOCAL_ENV false"
-        __besman_echo_yellow "$ bes set BESMAN_ENV_REPOS <GitHub Org>"
+        __besman_echo_yellow "$ bes set BESMAN_ENV_REPOS <GitHub Org>/<Repo name>"
     else      
-        __besman_echo_yellow "Pointing to $BESMAN_ENV_REPOS; tree - $BESMAN_ENV_REPO_BRANCH"
-        __besman_echo_yellow "If you wish to change the repo run the below command"
-        __besman_echo_yellow "$ bes set BESMAN_ENV_REPOS <GitHub Org>"
+        __besman_echo_yellow "Listing from $BESMAN_ENV_REPOS; branch - $BESMAN_ENV_REPO_BRANCH"
+        __besman_echo_yellow "If you wish to change the repo, run the below command"
+        __besman_echo_yellow "$ bes set BESMAN_ENV_REPOS <GitHub Org>/<Repo name>"
+        __besman_echo_no_colour ""
+        __besman_echo_yellow "If you wish to change the branch, run the below command"
+        __besman_echo_yellow "$ bes set BESMAN_ENV_REPO_BRANCH <branch>/<tag>"
     fi
 }
 function __besman_check_repo_exist()
@@ -245,9 +248,12 @@ function __besman_list_playbooks()
     __besman_echo_no_colour ""
 
     __besman_echo_no_colour ""
-    __besman_echo_yellow "Pointing to $BESMAN_PLAYBOOK_REPO; tree - $BESMAN_PLAYBOOK_REPO_BRANCH"
+    __besman_echo_yellow "Listing from $BESMAN_PLAYBOOK_REPO; branch - $BESMAN_PLAYBOOK_REPO_BRANCH"
     __besman_echo_yellow "If you wish to change the repo run the below command"
     __besman_echo_yellow "$ bes set BESMAN_PLAYBOOK_REPO <GitHub Org>/<Repo name>"
+    __besman_echo_no_colour ""
+    __besman_echo_yellow "If you wish to change the branch run the below command"
+    __besman_echo_yellow "$ bes set BESMAN_PLAYBOOK_REPO_BRANCH <branch>/<tag>"
 
     [[ -f $playbook_details_file ]] && rm "$playbook_details_file"
 
