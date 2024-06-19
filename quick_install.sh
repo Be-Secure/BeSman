@@ -181,7 +181,11 @@ fi
 if [[ -z $(command -v jupyter) ]]
 then
 	echo "Installing jupyter notebook"
-	python3 -m pip install notebook
+	sudo apt-get install jupyter -y
+	jupyter notebook --generate-config
+        #sed -i "s/# c.ServerApp.ip = 'localhost'/c.ServerApp.ip = '0.0.0.0'/g" $HOME/.jupyter/jupyter_notebook_config.py
+        #sed -i "s/# c.ServerApp.open_browser = False/c.ServerApp.open_browser = False/g" $HOME/.jupyter/jupyter_notebook_config.py 
+	#python3 -m pip install notebook
 fi
 
 if ! pip list | grep PyYAML
