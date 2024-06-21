@@ -235,6 +235,13 @@ function __besman_check_if_version_exists
 function __besman_error_rollback
 {
   local environment=$1
+  local ossp
+  if echo "$environment" | grep -qE 'RT|BT'; then
+      ossp=$(echo "$environment" | sed -E 's/-(RT|BT)-env//')
+  else
+      ossp=$(echo "$environment" | cut -d "-" -f 1)
+
+  fi
   if [[ -d $BESMAN_DIR/envs/besman-$environment ]]; then
     rm -rf $BESMAN_DIR/envs/besman-$environment
   fi
@@ -243,6 +250,17 @@ function __besman_error_rollback
     rm -rf $BESMAN_ENV_ROOT
   fi
 
+  if [[ -d $BESMAN_DIR/tmp/$ossp ]] 
+  then
+      rm -rf $BESMAN_DIR/tmp/$ossp
+  fi
+
+  if [[ -f $BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH/$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK ]] 
+  then
+	rm $BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH/$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK
+  fi
+
+  exit 1
 }
 
 function __besman_cve_format_check

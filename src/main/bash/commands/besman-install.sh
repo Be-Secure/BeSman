@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 
 function __bes_install {
+
 	local environment_name env_repo environment_name version_id env_config
 	environment_name=$1
 	version_id=$2
+	trap "__besman_echo_red 'User interrupted';__besman_error_rollback $environment_name" SIGINT
 
 	# If environmnet not installed.
 	if [[ ! -d "${BESMAN_DIR}/envs/besman-${environment_name}/$version_id" ]]; then
@@ -59,7 +61,7 @@ function __bes_install {
 
 	fi
 	unset return_val env_repo environment_name namespace version_id
-
+	trap - SIGINT
 }
 
 function __besman_get_local_env() {
