@@ -5,7 +5,7 @@ function __bes_install {
 	local environment_name env_repo environment_name version_id env_config
 	environment_name=$1
 	version_id=$2
-	trap "__besman_echo_red 'User interrupted';__besman_error_rollback $environment_name" SIGINT
+	trap "__besman_echo_red ''; __besman_echo_red 'User interrupted'; __besman_echo_red ''; __besman_error_rollback $environment_name || return 1" SIGINT
 
 	# If environmnet not installed.
 	if [[ ! -d "${BESMAN_DIR}/envs/besman-${environment_name}/$version_id" ]]; then
@@ -105,7 +105,7 @@ function __besman_manage_install_out {
 	else
 
 		__besman_echo_red "Installation failed"
-		__besman_error_rollback "$environment"
+		__besman_error_rollback "$environment" || return 1
 
 	fi
 
