@@ -26,7 +26,7 @@ function bes {
 			rm | remove)
 				args=("${args[@]}" "$1")
 			;;
-			-env | -V | --environment | --version | --playbook | -P | --role)         
+			-env | -V | --environment | --version | --playbook | -P | --role | --file | --path)         
 				opts=("${opts[@]}" "$1") ## -env | -V 
 			;; 
         	*)
@@ -79,11 +79,21 @@ function bes {
 			__besman_validate_version_format $version || return 1
 			__bes_$command $environment $version
 			;;
-		status | upgrade | remove)
+		status | upgrade | remove | reload)
 			[[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
 			[[ "${#opts[@]}" -ne 0 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
 			__bes_"$command"
 			;;
+		attest)
+			([[ "${#args[@]}" -lt 2 ]] || [[ "${#args[@]}" -gt 3 ]]) && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
+			([[ "${#opts[@]}" -lt 1 ]] || [[ "${#opts[@]}" -gt 2 ]]) && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
+                        __bes_"$command"  "${opts[@]}" "${args[@]}"
+			;;
+		verify)
+			([[ "${#args[@]}" -lt 2 ]] || [[ "${#args[@]}" -gt 3 ]]) && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
+                        ([[ "${#opts[@]}" -lt 1 ]] || [[ "${#opts[@]}" -gt 2 ]]) && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
+                        __bes_"$command" "${opts[@]}" "${args[@]}"
+                        ;;
 		help)
 			[[ "${#args[@]}" -ne 1 && "${#args[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
 			[[ "${#opts[@]}" -ne 0 ]] && __besman_echo_red "Incorrect syntax" && __bes_help && return 1
@@ -118,6 +128,12 @@ function bes {
 					help)
 						__bes_help_help
 					;;
+					attest)
+                                                __bes_help_attest
+                                        ;;
+					verify)
+                                                __bes_help_verify
+                                        ;;
 					version)
 						__bes_help_version
 					;;
@@ -135,6 +151,9 @@ function bes {
 					;;
 					pull)
 						__bes_help_pull
+					;;
+					reload)
+						__bes_help_reload
 					;;
 					*)
 					__besman_echo_red "Unrecognized argument: ${args[1]}" && __bes_help && return 1

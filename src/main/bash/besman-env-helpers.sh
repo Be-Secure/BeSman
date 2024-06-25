@@ -1,23 +1,58 @@
 #!/usr/bin/env bash
 
-function __besman_source_env_params {
-	local key value line tmp_var_file environment env_config
-	environment=$1
-	env_config="besman-$environment-config.yaml"
-
-	# checks whether user configuration exists
-	if [[ -f $HOME/$env_config ]]; then
-
-		export BESMAN_ENV_CONFIG_FILE_PATH=$HOME/$env_config
-		__besman_echo_yellow "Sourcing user config parameters from $BESMAN_ENV_CONFIG_FILE_PATH"
-
-	elif [[ -f $BESMAN_DIR/tmp/$env_config ]]; then
-		export BESMAN_ENV_CONFIG_FILE_PATH=$BESMAN_DIR/tmp/$env_config
-		__besman_echo_yellow "Sourcing default config parameters"
+function __besman_check_value_empty()
+{
+	local key=$1
+	local value=$2
+	local environment_name=$3
+	local ossp version
+	if echo "$environment_name" | grep -qE 'RT|BT'; then
+		ossp=$(echo "$environment_name" | sed -E 's/-(RT|BT)-env//')
 	else
-		__besman_download_default_configations "$environment" || return 1
-		export BESMAN_ENV_CONFIG_FILE_PATH=$BESMAN_DIR/tmp/$env_config
-		__besman_echo_yellow "Sourcing default config parameters"
+		ossp=$(echo "$environment_name" | cut -d "-" -f 1)
+	fi
+	version=$4
+
+	if [[ -z "$value" || "$value" == \#* || $value == '""' || $value == "''" ]] 
+	then
+		__besman_echo_red "Missing value for variable $key. Please update the configuration file"
+
+		__besman_echo_no_colour ""
+		__besman_echo_no_colour "1. Check if the file $HOME/besman-$environment_name-config.yaml exists in $HOME"
+		__besman_echo_no_colour ""
+		__besman_echo_no_colour "2. If the file does not exist, run the below command to download the file"
+		__besman_echo_no_colour ""
+		__besman_echo_yellow "		wget -P \$HOME https://raw.githubusercontent.com/$BESMAN_ENV_REPOS/$BESMAN_ENV_REPO_BRANCH/$ossp/$version/besman-$environment_name-config.yaml"
+		__besman_echo_no_colour ""
+		__besman_echo_no_colour "3. Open the file $HOME/besman-$environment_name-config.yaml in an editor"
+		__besman_echo_no_colour ""
+		__besman_echo_no_colour "4. Add values to the missing variables"
+		__besman_echo_no_colour ""
+		__besman_echo_white "Please try the installation again after filling the missing values"
+		return 1
+	fi
+}
+
+function __besman_source_env_params
+{
+    local  key value line tmp_var_file environment env_config version
+    environment=$1
+    version=$2
+    env_config="besman-$environment-config.yaml"
+    
+    # checks whether user configuration exists
+    if [[ -f $HOME/$env_config ]]; then
+        
+      export BESMAN_ENV_CONFIG_FILE_PATH=$HOME/$env_config
+      __besman_echo_yellow "Sourcing user config parameters from $BESMAN_ENV_CONFIG_FILE_PATH"
+    
+    elif [[ -f $BESMAN_DIR/tmp/$env_config ]]; then
+      export BESMAN_ENV_CONFIG_FILE_PATH=$BESMAN_DIR/tmp/$env_config
+      __besman_echo_yellow "Sourcing default config parameters"
+    else
+		__besman_download_default_configations "$environment" "$version" || return 1
+      export BESMAN_ENV_CONFIG_FILE_PATH=$BESMAN_DIR/tmp/$env_config
+      __besman_echo_yellow "Sourcing default config parameters"
 	fi
 
 	# creating a temporary shell script file for exporting variables from config file.
@@ -32,18 +67,19 @@ function __besman_source_env_params {
 		fi
 		if echo "$line" | grep -qe "^BESMAN_"; then # Check to export only environment variables starting with BESMAN_
 
-			key=$(echo "$line" | cut -d ":" -f 1)                      # For getting the var name
-			value=$(echo "$line" | cut -d ":" -f 2- | cut -d " " -f 2) # For getting the value.
-			unset "$key"
-			echo "export $key=$value" >>"$tmp_var_file"
-		else
-			continue
-		fi
-
-	done <"$BESMAN_ENV_CONFIG_FILE_PATH"
-
-	source "$tmp_var_file"
-	[[ -f $tmp_var_file ]] && rm "$tmp_var_file"
+            key=$(echo "$line" | cut -d ":" -f 1) # For getting the var name
+            value=$(echo "$line" | cut -d ":" -f 2- | cut -d " " -f 2) # For getting the value.
+            unset "$key"
+            echo "export $key=$value" >> "$tmp_var_file"
+            __besman_check_value_empty "$key" "$value" "$environment" "$version" || return 1
+        else
+            continue
+        fi
+        
+    done < "$BESMAN_ENV_CONFIG_FILE_PATH"
+    
+    source "$tmp_var_file"
+    [[ -f $tmp_var_file ]] && rm "$tmp_var_file"
 
 }
 
@@ -264,7 +300,9 @@ function __besman_download_default_configations() {
 	env_repo_namespace=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 1)
 	env_repo=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 2)
 	environment_name=$1
-	if echo "$environment_name" | grep -qE 'RT|BT'; then
+  version_id=$2
+	if  echo "$environment_name" | grep -qE 'RT|BT'
+	then
 		ossp=$(echo "$environment_name" | sed -E 's/-(RT|BT)-env//')
 	else
 		ossp=$(echo "$environment_name" | cut -d "-" -f 1)

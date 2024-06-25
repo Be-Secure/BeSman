@@ -178,10 +178,15 @@ EOF
 		python3 -m pip install notebook
 	fi
 
-	if ! pip list | grep PyYAML; then
-		echo "Installing pyYAML"
-		python3 -m pip install pyYAML
-	fi
+if [[ -z $(command -v jupyter) ]]
+then
+	echo "Installing jupyter notebook"
+	sudo apt-get install jupyter -y
+	jupyter notebook --generate-config
+        #sed -i "s/# c.ServerApp.ip = 'localhost'/c.ServerApp.ip = '0.0.0.0'/g" $HOME/.jupyter/jupyter_notebook_config.py
+        #sed -i "s/# c.ServerApp.open_browser = False/c.ServerApp.open_browser = False/g" $HOME/.jupyter/jupyter_notebook_config.py 
+	#python3 -m pip install notebook
+fi
 
 	echo "Installing BeSMAN scripts..."
 

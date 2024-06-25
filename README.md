@@ -48,55 +48,21 @@ It also provides seamless support for creating and executing BeS playbooks, enab
   - **launch**: Trigger function which calls all the above functions.
 - The BeS Playbooks are stored and maintained under [besecure-playbooks-store](https://github.com/Be-Secure/besecure-playbooks-store).
 
+<!-- # Developer Guide
+
+**Welcome, Developers!**
+
+We are thrilled to have you here! Thank you for your interest in contributing to our project. Whether you're a seasoned developer or just getting started, your contributions are highly valued and appreciated. This [guide](developer-guide.md) will help you get up and running and provide you with the necessary information to make your development experience as smooth as possible. -->
+
 # Installation
 
-## For Windows
+BeSman is designed to be used in a Linux machine.
 
-BeSman is designed to work with linux machines. So, if you are a windows user, you can use [oah-installer](https://github.com/be-secure/oah-installer), a component of [**OpenAppHack(OAH)**](https://openapphack.github.io/OAH/), to install [oah-shell](https://github.com/be-secure/oah-shell) in the local system and using it to bring up [oah-bes-vm](https://github.com/be-secure/oah-bes-vm), an ubuntu VM, with BeSman installed.
+`Windows users should use an ubuntu VM or WSL.`
 
-### Pre-requisites
-
-- <a href="https://www.virtualbox.org/" target="_blank">Virtual Box</a>
-- <a href="https://www.vagrantup.com/" target="_blank">Vagrant</a>
-- <a href="https://gitforwindows.org/" target="_blank">Git Bash</a>
-
-1.  Open your git bash
-
-2.  Execute the below command to set the correct namespace
-
-        export BES_NAMESPACE=Be-Secure
-
-3.  Install oah-shell
-
-    curl -s https://raw.githubusercontent.com/Be-Secure/oah-installer/master/install.sh | bash
-
-4.  Confirm the installation oah-shell by executing the below command which would list various oah commands
-
-        oah
-
-5.  Execute the below command to get the list of environments
-
-        oah list
-
-    Note: Make sure **oah-bes-vm** is listed. If not, execute step 2 and run the below command
-
-         source ${OAH_DIR}/bin/oah-init
-
-6.  Setup oah-bes-vm for BeSman by executing the below command.
-
-        oah install -v oah-bes-vm
-
-## For Linux
-
-### Pre-requisites
-
-- <a href="https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html" target="_blank">Ansible</a>
-- <a href="https://github.com/cli/cli/blob/trunk/docs/install_linux.md" target="_blank">Github CLI</a>
-
-1.  Download the latest binary
+1.  Download the latest binary and install pre-requisites
 
         curl -L https://raw.githubusercontent.com/Be-Secure/BeSman/dist/dist/get.besman.io | bash
-
 
     If you want to install a specific version, use the following command, replacing X.Y.Z with the desired version:
 
@@ -112,46 +78,151 @@ BeSman is designed to work with linux machines. So, if you are a windows user, y
 
         bes help
 
+## Installation from a Branch
+
+This step is useful for developers,
+
+BeSman also allows you to install the cli from a branch. This is used to quickly test your feature developments or bug fixes.
+
+1. Clone the repo.
+
+		$ git clone https://github.com/<your id>/BeSman
+
+2. Move into BeSman
+	
+		$ cd BeSman
+
+3. Change branch
+   
+		$ git checkout <branch name>
+
+4. Run the quick_install file
+
+		$ ./quick_install.sh
+
+This would install BeSman from your current branch.
+
 # Usage
 
-        NAME
-           bes - The cli for BeSman  
-          
-        SYNOPSIS  
-           bes [command] [options] [ [environment name] | [playbook name] | [version] ] 
-          
-        DESCRIPTION
-           BeSman (pronounced as ‘B-e-S-man’) is a command-line utility designed for creating and provisioning customized security environments.
-           It helps security professionals to reduce the turn around time for assessment of Open Source projects, AI Models, Model Datasets
-           leaving them focus on the assessment task rather than setting up environment for it.
-           BeSman also provides seamless support for creating and executing BeS playbooks, enabling users to automate complex workflows and tasks.
-           With BeSman, users can efficiently manage and execute playbooks, streamlining their processes and enhancing productivity.
-          
-         COMMANDS 
-           help: Display the help command 
-           list: List available environments, playbooks, roles. 
-           install: Install available environments. 
-           uninstall: Uninstall the installed environment. 
-           update: Update the configurations of the installed environment. 
-           validate: Validate the installtion of the environment. 
-           reset: Reset the environment to default configurations. 
-           create: Create environment script. 
-           set: Change the BeSman config variables. 
-           pull: Fetches the playbook from remote to local. 
-           run: Execute available playbooks. 
-           upgrade: Upgrade BeSman to the latest version 
-           rm | remove: Remove BeSman from machine. 
-           status: Display the list of installed environments and its current version 
-          
-         OPTIONS 
-           -env | --environment: For passing the name of the environment script. 
-           -V | --version: For passing the version number. 
-           -P | --playbook: For passing the playbook name 
-           --role: To list the role names 
-          
-        For more details execute below command
-           $ bes help <command name>
-           Choose command name from list of COMMANDS
-  
+Below are the steps to be performed by the user of BeSman to **setup their machine**, **install an environment** and **run a playbook** to generate the assessment reports and [OSAR](https://be-secure.github.io/bes-schema/assessment-report/#open-source-assessment-report-schema-osar).
+
+## 1. Initial Setup
+
+1. Configure git
+   
+    	$ git config --global user.name "Your username"
+		$ git config --global user.email "your.email@example.com"
+
+2. Set BeSman variable with configured git user name for cloning artifact source code repo and assessment datastore repo.
+
+		$ bes set BESMAN_USER_NAMESPACE <github id/gitlab id>
+
+3. Fork the required repositories. Read [here](https://github.com/Be-Secure/besecure-ce-env-repo/tree/develop?tab=readme-ov-file#2-set-your-githubgitlab-id).
+
+## 2. Environment Setup
+
+Read about environments from our [environment repo](https://github.com/Be-Secure/besecure-ce-env-repo).
+
+### 2.1 List
+
+Use the command to get the available environments for installation.
+		
+	$ bes list -env
+
+If you wish to change the repo, run the below command
+	
+	$ bes set BESMAN_ENV_REPOS <GitHub Org>/<Repo name>
+ 
+If you wish to change the branch, run the below command
+	
+	$ bes set BESMAN_ENV_REPO_BRANCH <branch>/<tag>
+
+### 2.2 Edit environment configuration(optional)
+
+`IMPORTANT`: If you are using a common environment to assess multiple artifacts,this step is required.
+
+Visit [environment repo](https://github.com/Be-Secure/besecure-ce-env-repo/tree/develop?tab=readme-ov-file#41-edit-environment-configuration) to see how to edit configuration of an environment. 
+
+### 2.3 Install
+
+From the listed environments(from above list command), choose an environment and its version for installation and run the below command
+
+	$ bes install -env <environment name> -V <version>
+
+### 2.3 Reload environment configuration
+
+The `reload` command reloads the current configuration of the environment.
+
+	$ bes reload
+
+This is useful when,
+
+1. A value for a variable has to be changed for the current environment.
+2. Reflecting values in a new terminal session.
+
+This command only works when an environment is installed.
+
+## 3. Playbook Setup
+
+Read about playbooks from our [playbook repo](https://github.com/Be-Secure/besecure-playbooks-store).
+
+### 3.1 List
+
+Use the command to get the available playbooks for performing assessments and generate [OSAR](https://be-secure.github.io/bes-schema/assessment-report/#open-source-assessment-report-schema-osar).
+
+	$ bes list -P
+
+If you wish to change the repo, run the below command
+	
+	$ bes set BESMAN_PLAYBOOK_REPO <GitHub Org>/<Repo name>
+ 
+If you wish to change the branch, run the below command
+	
+	$ bes set BESMAN_PLAYBOOK_REPO_BRANCH <branch>/<tag>
+
+### 3.2 Pull
+
+Before running(execute) a playbook, you need to pull(fetch) it to your local machine,
+
+	$ bes pull -P <playbook name> -V <version>
+
+### 3.3 Run
+
+To run a playbook to generate [OSAR](https://be-secure.github.io/bes-schema/assessment-report/#open-source-assessment-report-schema-osar) and detailed assessment report,
+
+	$ bes run -P <playbook name> -V <version>
+
+## 4. Attestation of OSAR
+
+The user can run the `attest` command to attest the [OSAR](https://be-secure.github.io/bes-schema/assessment-report/#open-source-assessment-report-schema-osar) generated by the organization/individual/lab to verify the authenticity of report by any another lab/organization/individual interested in the reports generated by the former.
+
+	$ bes attest --file <osar file name> --path <complete path to dir containing osar file>
+
+	eg: bes attest --file fastjson-1.2.24-osar.json --path ~/besecure-assessment-datastore/fastjson/1.2.24/
+
+# Verification of OSAR
+
+The user can use the `verify` command to verify the authenticity of the OSAR generated by a lab/organization/individual.
+
+**Pre-requisites**
+
+1. Install BeSman.
+2. Download the OSAR file, public key and `.bundle` files into the same directory.
+
+**Usage**
+
+	$ bes verify --file <osar file name> --path <complete path to the directory containing downloaded files>
+
+	eg: bes verify --file fastjson-1.2.24-osar.json --path ~/besecure-assessment-datastore/fastjson/1.2.24/
+
+## Other commands
+
+To get the complete set of commands run,
+
+	$ bes help
+
+To get more info regarding a command
+
+	$ bes help <command>
 
 You can find more details of the command from the BeSman [webpage](https://be-secure.github.io/Be-Secure/bes-besman-details/)
