@@ -50,8 +50,7 @@ function __besman_source_env_params {
 function __besman_handle_interruption()
 {
 	__besman_echo_red "\nOperation halted" 
-	# return 1
-	exit 1
+	return 1
 }
 
 function __besman_unset_env_parameters_and_cleanup() {
