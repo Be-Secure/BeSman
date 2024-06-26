@@ -89,11 +89,11 @@ function __besman_list_envs()
         __besman_echo_no_colour ""
         __besman_echo_white "If you wish to list from remote repo, run the below command"
         __besman_echo_yellow "$ bes set BESMAN_LOCAL_ENV false"
-        __besman_echo_yellow "$ bes set BESMAN_ENV_REPOS <GitHub Org>/<Repo name>"
+        __besman_echo_yellow "$ bes set BESMAN_ENV_REPO <GitHub Org>/<Repo name>"
     else      
-        __besman_echo_yellow "Listing from $BESMAN_ENV_REPOS; branch - $BESMAN_ENV_REPO_BRANCH"
+        __besman_echo_yellow "Listing from $BESMAN_ENV_REPO; branch - $BESMAN_ENV_REPO_BRANCH"
         __besman_echo_yellow "If you wish to change the repo, run the below command"
-        __besman_echo_yellow "$ bes set BESMAN_ENV_REPOS <GitHub Org>/<Repo name>"
+        __besman_echo_yellow "$ bes set BESMAN_ENV_REPO <GitHub Org>/<Repo name>"
         __besman_echo_no_colour ""
         __besman_echo_yellow "If you wish to change the branch, run the below command"
         __besman_echo_yellow "$ bes set BESMAN_ENV_REPO_BRANCH <branch>/<tag>"
@@ -103,8 +103,8 @@ function __besman_check_repo_exist()
 {
     local namespace repo response repo_url
     [[ $BESMAN_LOCAL_ENV == "true" ]] && return 0
-    namespace=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 1)
-    repo=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 2)
+    namespace=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 1)
+    repo=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 2)
     repo_url="https://api.github.com/repos/$namespace/$repo"
 
     response=$(curl --head --silent "$repo_url" | head -n 1 | awk '{print $2}')
@@ -130,8 +130,8 @@ function __besman_update_list()
     else
             
         local org repo path 
-        org=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 1)
-        repo=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 2)
+        org=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 1)
+        repo=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 2)
         branch=$BESMAN_ENV_REPO_BRANCH
         bes_list="$BESMAN_DIR/var/list.txt"
         path="https://raw.githubusercontent.com/$org/$repo/$branch/list.txt"

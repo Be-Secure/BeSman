@@ -153,7 +153,7 @@ function __bes_help_set {
     printf "%-30s %-65s %-25s\n" "BESMAN_CODE_COLLAB_URL" "URL of the code collab platform" "https://github.com or GitLab URL"
     printf "%-30s %-65s %-25s\n" "BESMAN_VCS" "Version control system used for repo management" "Git or GH"
     printf "%-30s %-65s %-25s\n" "BESMAN_NAMESPACE" "Namepace for BeS operations" "GitHub or GitLab namespace"
-    printf "%-30s %-65s %-25s\n" "BESMAN_ENV_REPOS" "Repo from which user install env scripts" "namespace/repo_name"
+    printf "%-30s %-65s %-25s\n" "BESMAN_ENV_REPO" "Repo from which user install env scripts" "namespace/repo_name"
     printf "%-30s %-65s %-25s\n" "BESMAN_ENV_REPO_BRANCH" "Branch/tag of the repo from which user install env scripts" "branch_name or tag"
     printf "%-30s %-65s %-25s\n" "BESMAN_PLAYBOOK_REPO" "Repo from which user pull playbooks" "namespace/repo_name"
     printf "%-30s %-65s %-25s\n" "BESMAN_PLAYBOOK_REPO_BRANCH" "Branch/tag of the repo from which user pulls playbook" "branch_name or tag"

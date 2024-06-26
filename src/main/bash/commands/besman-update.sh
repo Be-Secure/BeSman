@@ -34,7 +34,7 @@ function __bes_update {
 	# 	local env_repos namespace repo_name remote_list_url cached_list diff delta flag=0
 	# 	cached_list=$BESMAN_DIR/var/list.txt
 	# 	#sort -u $BESMAN_DIR/var/list.txt  >> $HOME/sorted_local_list.txt
-	# 	env_repos=$(echo $BESMAN_ENV_REPOS | sed 's/,/ /g')
+	# 	env_repos=$(echo $BESMAN_ENV_REPO | sed 's/,/ /g')
 
 	# 	for i in ${env_repos[@]}; do
 	# 		namespace=$(echo $i | cut -d "/" -f 1)
@@ -123,7 +123,7 @@ function __bes_update {
 }
 ##check this again
 function check_value_for_repo_env_var {
-	if [[ -z $BESMAN_ENV_REPOS ]]; then
+	if [[ -z $BESMAN_ENV_REPO ]]; then
 		__besman_echo_no_colour "No user repos found"
 		return 1
 	fi

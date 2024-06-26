@@ -57,9 +57,9 @@ function __besman_update_env_value()
     local variable_name new_value
     variable_name=$1
     new_value=$2
-    if [[ $variable_name == "BESMAN_ENV_REPOS" && $(echo "$new_value" | sed 's|/| |g' | wc -w) -eq 2 ]]; then
+    if [[ $variable_name == "BESMAN_ENV_REPO" && $(echo "$new_value" | sed 's|/| |g' | wc -w) -eq 2 ]]; then
         sed -i "s|\($variable_name *= *\).*|\1$new_value|" "$file_path"
-    elif [[ $variable_name == "BESMAN_ENV_REPOS" && $(echo "$new_value" | sed 's|/| |g' | wc -w) -eq 1 ]]; then
+    elif [[ $variable_name == "BESMAN_ENV_REPO" && $(echo "$new_value" | sed 's|/| |g' | wc -w) -eq 1 ]]; then
         sed -i "s|\($variable_name *= *\).*|\1$new_value/besecure-ce-env-repo|" "$file_path"
     else
         sed -i "s|\($variable_name *= *\).*|\1$new_value|" "$file_path"

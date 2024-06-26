@@ -17,7 +17,7 @@ function quick_install() {
 
 	BESMAN_NAMESPACE="Be-Secure"
 	BESMAN_VERSION="$(git branch --show-current)"
-	BESMAN_ENV_REPOS="$BESMAN_NAMESPACE/besecure-ce-env-repo"
+	BESMAN_ENV_REPO="$BESMAN_NAMESPACE/besecure-ce-env-repo"
 
 	if [ -z "$BESMAN_DIR" ]; then
 		export BESMAN_DIR="$HOME/.besman"
@@ -229,7 +229,7 @@ fi
 		echo "BESMAN_NAMESPACE=$BESMAN_NAMESPACE"
 		echo "BESMAN_INTERACTIVE_USER_MODE=true"
 		echo "BESMAN_DIR=$HOME/.besman"
-		echo "BESMAN_ENV_REPOS=$BESMAN_ENV_REPOS"
+		echo "BESMAN_ENV_REPO=$BESMAN_ENV_REPO"
 		echo "BESMAN_ENV_REPO_BRANCH=master"
 		echo "BESMAN_PLAYBOOK_REPO=$BESMAN_NAMESPACE/besecure-playbooks-store"
 		echo "BESMAN_PLAYBOOK_REPO_BRANCH=main"
