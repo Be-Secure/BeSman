@@ -33,6 +33,7 @@ __besman_echo_no_colour '   verify: Verify the OSAR report attestation '
 __besman_echo_no_colour '   rm | remove: Remove BeSman from machine. '
 __besman_echo_no_colour '   status: Display the list of installed environments and its current version '
 __besman_echo_no_colour '   reload: Reloads the configuration of the current environment '
+__besman_echo_no_colour '   config: Downloads the environment configuration'
 __besman_echo_no_colour '  '
 __besman_echo_white ' OPTIONS '
 __besman_echo_no_colour '   -env | --environment: For passing the name of the environment script. '
@@ -91,6 +92,25 @@ function __bes_help_uninstall {
     __besman_echo_no_colour '  $ bes uninstall -env zaproxy-BT-env'
     __besman_echo_no_colour '  '
 }
+
+function __bes_help_config {
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'NAME'
+    __besman_echo_no_colour '   config - To download environment config file '
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'SYNOPSIS  '
+    __besman_echo_yellow '  $ bes config -env <environment name> -V <version>'
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'DESCRIPTION'
+    __besman_echo_no_colour '   This command can be used to download'
+    __besman_echo_no_colour '   an environment configuration for making'
+    __besman_echo_no_colour '   changes in environment configuration.'
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'EXAMPLE'
+    __besman_echo_no_colour '  $ bes config -env fastjson-RT-env -V <version>'
+    __besman_echo_no_colour '  '
+}
+
 
 function __bes_help_list {
     __besman_echo_no_colour '  '
@@ -170,17 +190,17 @@ function __bes_help_create {
     __besman_echo_no_colour '  '
     __besman_echo_white 'SYNOPSIS  '
     __besman_echo_no_colour '   For environments which relies on ansible role '
-    __besman_echo_yellow '      $ bes create -env <environment>  <version>'
+    __besman_echo_yellow '      $ bes create -env <environment> -V <version>'
     __besman_echo_no_colour '  '
     __besman_echo_no_colour '   For environments with only the skeletal code '
-    __besman_echo_yellow '      $ bes create -env <environment> <version> basic '
+    __besman_echo_yellow '      $ bes create -env <environment> -V <version> basic '
     __besman_echo_no_colour '  '
     __besman_echo_white 'DESCRIPTION'
     __besman_echo_no_colour '   It creates environment scripts.'
     __besman_echo_no_colour '  '
     __besman_echo_white 'EXAMPLE'
-    __besman_echo_no_colour '  bes create -env fastjson-RT-env 0.0.3'
-    __besman_echo_no_colour '  bes create -env fastjson-RT-env 0.0.3 basic'
+    __besman_echo_no_colour '  bes create -env fastjson-RT-env -V  0.0.3'
+    __besman_echo_no_colour '  bes create -env fastjson-RT-env -V 0.0.3 basic'
     __besman_echo_no_colour '  '
 }
 
