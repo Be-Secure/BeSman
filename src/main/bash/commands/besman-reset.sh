@@ -44,8 +44,8 @@ function __besman_get_default_config_file()
     local environment env_config_path env_repo_namespace env_repo version
     environment=$1
     env_config_path=$2
-    env_repo_namespace=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 1)
-	env_repo=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 2)
+    env_repo_namespace=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 1)
+	env_repo=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 2)
 	env_type=$(echo "$environment" | rev | cut -d "-" -f 2 | rev)
 	if  echo "$environment" | grep -qE 'RT|BT'
 	then

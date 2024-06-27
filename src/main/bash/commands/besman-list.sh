@@ -35,9 +35,12 @@ fi
 }
 function __besman_list_envs()
 {
-    local current_version current_env installed_annotation remote_annotation
-    __besman_check_repo_exist || return 1
-    __besman_update_list
+    local current_version current_env installed_annotation remote_annotation local_list
+
+    local_list="$BESMAN_DIR/tmp/list.txt"
+
+    # __besman_check_repo_exist || return 1
+    __besman_update_list || return 1
     # __besman_echo_no_colour "Github Org    Repo                             Environment     Version"
     # __besman_echo_no_colour "-----------------------------------------------------------------------------------"
 
@@ -48,29 +51,35 @@ function __besman_list_envs()
     remote_annotation=$(__besman_echo_yellow "^")
     
     # For listing environments
-    printf "%-14s %-32s %-25s %-8s\n" "Github Org" "Repo" "Environment" "Version"
-    __besman_echo_no_colour "-----------------------------------------------------------------------------------"
+    printf "%-25s %15s %15s\n" "Environment" "Author" "Version"
+    __besman_echo_no_colour "-----------------------------------------------------------"
 
+
+    [[ -f "$BESMAN_DIR/tmp/environment_details.txt" ]] && cp "$BESMAN_DIR/tmp/environment_details.txt" "$local_list" && rm "$BESMAN_DIR/tmp/environment_details.txt"
     
-    sed -i '/^$/d' "$BESMAN_DIR/var/list.txt"
-    sorted_list=$(sort "$BESMAN_DIR/var/list.txt")
-    echo "$sorted_list" > "$BESMAN_DIR/var/list.txt"
+    
+
+    sed -i '/^$/d' "$local_list"
+    sorted_list=$(sort "$local_list")
+    echo "$sorted_list" > "$local_list"
     OLD_IFS=$IFS
-    IFS="/"
+    IFS=" "
       
-    while read -r line; 
+    while read -r line;
     do 
-        converted_line=$(echo "$line" | sed 's|,|/|g')
-        read -r org repo env version <<< "$converted_line"
+        # converted_line=$(echo "$line" | sed 's|,|/|g')
+        read -r env author version <<< "$line"
+
+        # echo "line=$line"
         if [[ ("$env" == "$current_env") && ("$version" == "$current_version") ]] 
         then
-            printf "%-14s %-32s %-25s %-8s\n" "$org" "$repo" "$env" "$version$installed_annotation"
+            printf "%-25s %15s %25s\n" "$env" "$author" "$version$installed_annotation"
         else
-            printf "%-14s %-32s %-25s %-8s\n" "$org" "$repo" "$env" "$version$remote_annotation"
+            printf "%-25s %15s %25s\n" "$env" "$author" "$version$remote_annotation"
             
         fi
         
-    done < "$BESMAN_DIR/var/list.txt"
+    done < "$local_list"
     IFS=$OLD_IFS
 
     __besman_echo_no_colour ""
@@ -85,17 +94,18 @@ function __besman_list_envs()
 
     if [[ $BESMAN_LOCAL_ENV == "true" ]]; then
 
-        __besman_echo_yellow "Listing from local dir $BESMAN_LOCAL_ENV_DIR"
+        __besman_echo_white "Listing from local dir $(__besman_echo_yellow "$BESMAN_LOCAL_ENV_DIR")"
         __besman_echo_no_colour ""
         __besman_echo_white "If you wish to list from remote repo, run the below command"
         __besman_echo_yellow "$ bes set BESMAN_LOCAL_ENV false"
-        __besman_echo_yellow "$ bes set BESMAN_ENV_REPOS <GitHub Org>/<Repo name>"
+        __besman_echo_yellow "$ bes set BESMAN_ENV_REPO <GitHub Org>/<Repo name>"
     else      
-        __besman_echo_yellow "Listing from $BESMAN_ENV_REPOS; branch - $BESMAN_ENV_REPO_BRANCH"
-        __besman_echo_yellow "If you wish to change the repo, run the below command"
-        __besman_echo_yellow "$ bes set BESMAN_ENV_REPOS <GitHub Org>/<Repo name>"
+        __besman_echo_white "Listing from $(__besman_echo_yellow "$BESMAN_ENV_REPO"); branch - $(__besman_echo_yellow "$BESMAN_ENV_REPO_BRANCH")"
         __besman_echo_no_colour ""
-        __besman_echo_yellow "If you wish to change the branch, run the below command"
+        __besman_echo_white "If you wish to change the repo, run the below command"
+        __besman_echo_yellow "$ bes set BESMAN_ENV_REPO <GitHub Org>/<Repo name>"
+        __besman_echo_no_colour ""
+        __besman_echo_white "If you wish to change the branch, run the below command"
         __besman_echo_yellow "$ bes set BESMAN_ENV_REPO_BRANCH <branch>/<tag>"
     fi
 }
@@ -103,8 +113,8 @@ function __besman_check_repo_exist()
 {
     local namespace repo response repo_url
     [[ $BESMAN_LOCAL_ENV == "true" ]] && return 0
-    namespace=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 1)
-    repo=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 2)
+    namespace=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 1)
+    repo=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 2)
     repo_url="https://api.github.com/repos/$namespace/$repo"
 
     response=$(curl --head --silent "$repo_url" | head -n 1 | awk '{print $2}')
@@ -121,7 +131,17 @@ function __besman_update_list()
     local bes_list
     if [[ ( -n $BESMAN_LOCAL_ENV ) && ( $BESMAN_LOCAL_ENV == "true" )]]; then
         local env_dir_list bes_list
-        [[ -z $BESMAN_LOCAL_ENV_DIR ]] && __besman_echo_red "Please set the local env dir first" && return 1
+        if [[ -z $BESMAN_LOCAL_ENV_DIR ]]
+        then
+            __besman_echo_red "Could not find your local environment dir"
+            __besman_echo_no_colour ""
+            __besman_echo_white "Use the below command to set it first"
+            __besman_echo_no_colour ""
+            __besman_echo_yellow "$ bes set BESMAN_LOCAL_ENV_DIR <complete path to your local env dir>"
+            __besman_echo_no_colour ""
+
+            return 1
+        fi 
         [[ ! -d $BESMAN_LOCAL_ENV_DIR ]] && __besman_echo_red "Could not find dir $BESMAN_LOCAL_ENV_DIR" && return 1
 
         env_dir_list=$(< "$BESMAN_LOCAL_ENV_DIR/list.txt")
@@ -129,13 +149,18 @@ function __besman_update_list()
         echo "$env_dir_list" > "$bes_list"
     else
             
-        local org repo path 
-        org=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 1)
-        repo=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 2)
-        branch=$BESMAN_ENV_REPO_BRANCH
-        bes_list="$BESMAN_DIR/var/list.txt"
-        path="https://raw.githubusercontent.com/$org/$repo/$branch/list.txt"
-        __besman_secure_curl "$path" > "$bes_list"
+        # local org repo path 
+        # org=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 1)
+        # repo=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 2)
+        # branch=$BESMAN_ENV_REPO_BRANCH
+        # bes_list="$BESMAN_DIR/var/list.txt"
+        # # path="https://raw.githubusercontent.com/$org/$repo/$branch/list.txt"
+        # # __besman_secure_curl "$path" > "$bes_list"
+        local env_script_file="$BESMAN_DIR/scripts/besman-get-env-list.py"
+        [[ ! -f $env_script_file ]] && __besman_echo_red "Could not find script file $env_script_file" && return 1
+
+        python3 $env_script_file
+
     fi
 
 }

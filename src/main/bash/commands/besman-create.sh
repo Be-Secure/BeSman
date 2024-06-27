@@ -6,6 +6,8 @@ function __bes_create {
     local type=$1 #stores the type of the input - playbook/environment
     local return_val
 
+    trap "__besman_echo_red '\nUser interrupted';__besman_handle_interruption || return 1" SIGINT
+    
     # Checks whether the $type is playbook or not
     if [[ $type == "--playbook" || $type == "-P" ]]; then
 
@@ -51,6 +53,8 @@ function __bes_create {
 
         unset vuln env ext target_path return_val purpose
     else
+        trap "__besman_echo_red '\nUser interrupted';__besman_handle_interruption || return 1" SIGINT
+
         # bes create -env fastjson-RT-env
         # $1 would be the type - env/playbook
         local environment_name overwrite template_type version ossp env_file_name
@@ -65,7 +69,7 @@ function __bes_create {
 
         fi
         env_file_name="besman-$environment_name.sh"
-        __besman_set_variables
+        __besman_set_variables || return 1
         env_file_path=$BESMAN_LOCAL_ENV_DIR/$ossp/$version/$env_file_name
         config_file_path=$BESMAN_LOCAL_ENV_DIR/$ossp/$version/besman-$environment_name-config.yaml
         mkdir -p "$BESMAN_LOCAL_ENV_DIR/$ossp/$version"
@@ -83,10 +87,10 @@ function __bes_create {
         if [[ (-n "$template_type") && ("$template_type" == "basic") ]]; then
 
             __besman_create_env_basic "$env_file_path" || return 1
-            __besman_create_env_config_basic "$environment_name" "$version"
+            __besman_create_env_config_basic "$environment_name" "$version" || return 1
         elif [[ -z "$template_type" ]]; then
             __besman_create_env_with_config "$env_file_path"
-            __besman_create_env_config "$environment_name" "$version"
+            __besman_create_env_config "$environment_name" "$version" || return 1
 
         fi
 
@@ -112,7 +116,7 @@ function __besman_create_env_config_basic() {
             if [[ ("$overwrite" == "") || ("$overwrite" == "y") || ("$overwrite" == "Y") ]]; then
                 rm "$config_file_path"
             else
-                return
+                return 2
             fi
         fi
         [[ ! -f $config_file_path ]] && touch "$config_file_path" && __besman_echo_yellow "Creating new config file $config_file_path"
@@ -189,6 +193,7 @@ function __besman_set_variables() {
     while [[ (-z $path) || (! -d $path) ]]; do
         read -rp "Enter the complete path to your local environment directory: " path
     done
+    [[ -z $path ]] && __besman_echo_red "No path provided" && return 1
     __bes_set "BESMAN_LOCAL_ENV_DIR" "$path"
 
 }
@@ -207,7 +212,7 @@ function __besman_create_env_config() {
         if [[ ("$overwrite" == "") || ("$overwrite" == "y") || ("$overwrite" == "Y") ]]; then
             rm "$config_file_path"
         else
-            return
+            return 2
         fi
     fi
     [[ ! -f $config_file_path ]] && touch "$config_file_path" && __besman_echo_yellow "Creating new config file $config_file_path"

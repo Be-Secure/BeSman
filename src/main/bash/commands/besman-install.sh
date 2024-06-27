@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 
 function __bes_install {
+
 	local environment_name env_repo environment_name version_id env_config
 	environment_name=$1
 	version_id=$2
+	trap "__besman_echo_red ''; __besman_echo_red 'User interrupted'; __besman_echo_red ''; __besman_error_rollback $environment_name || return 1" SIGINT
 
 	# If environmnet not installed.
 	if [[ ! -d "${BESMAN_DIR}/envs/besman-${environment_name}/$version_id" ]]; then
@@ -59,7 +61,7 @@ function __bes_install {
 
 	fi
 	unset return_val env_repo environment_name namespace version_id
-
+	trap - SIGINT
 }
 
 function __besman_get_local_env() {
@@ -103,7 +105,7 @@ function __besman_manage_install_out {
 	else
 
 		__besman_echo_red "Installation failed"
-		__besman_error_rollback "$environment"
+		__besman_error_rollback "$environment" || return 1
 
 	fi
 
@@ -113,8 +115,8 @@ function __besman_get_remote_env {
 
 	# This code fetches the environment and its config file from env repo
 	local environment_name env_repo_namespace env_repo ossp env_url default_config_path replace curl_flag
-	env_repo_namespace=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 1)
-	env_repo=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 2)
+	env_repo_namespace=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 1)
+	env_repo=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 2)
 	environment_name=$1
 	env_type=$(echo "$environment_name" | rev | cut -d "-" -f 2 | rev)
 
