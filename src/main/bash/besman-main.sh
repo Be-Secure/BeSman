@@ -144,6 +144,9 @@ function bes {
 					help)
 						__bes_help_help
 					;;
+					config)
+						__bes_help_config
+					;;
 					attest)
                                                 __bes_help_attest
                                         ;;
