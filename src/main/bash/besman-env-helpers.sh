@@ -17,18 +17,22 @@ function __besman_check_value_empty()
 	then
 		__besman_echo_red "Missing value for variable $key. Please update the configuration file"
 
-		__besman_echo_no_colour ""
-		__besman_echo_no_colour "1. Check if the file $HOME/besman-$environment_name-config.yaml exists in $HOME"
-		__besman_echo_no_colour ""
-		__besman_echo_no_colour "2. If the file does not exist, run the below command to download the file"
-		__besman_echo_no_colour ""
-		__besman_echo_yellow "		wget -P \$HOME https://raw.githubusercontent.com/$BESMAN_ENV_REPO/$BESMAN_ENV_REPO_BRANCH/$ossp/$version/besman-$environment_name-config.yaml"
-		__besman_echo_no_colour ""
-		__besman_echo_no_colour "3. Open the file $HOME/besman-$environment_name-config.yaml in an editor"
-		__besman_echo_no_colour ""
-		__besman_echo_no_colour "4. Add values to the missing variables"
-		__besman_echo_no_colour ""
-		__besman_echo_white "Please try the installation again after filling the missing values"
+		__besman_echo_white "\nDownload the below command to download the configuration file"
+
+		__besman_echo_yellow "$ bes config -env $environment_name -V $version\n"
+
+		# __besman_echo_no_colour ""
+		# __besman_echo_no_colour "1. Check if the file $HOME/besman-$environment_name-config.yaml exists in $HOME"
+		# __besman_echo_no_colour ""
+		# __besman_echo_no_colour "2. If the file does not exist, run the below command to download the file"
+		# __besman_echo_no_colour ""
+		# __besman_echo_yellow "		wget -P \$HOME https://raw.githubusercontent.com/$BESMAN_ENV_REPO/$BESMAN_ENV_REPO_BRANCH/$ossp/$version/besman-$environment_name-config.yaml"
+		# __besman_echo_no_colour ""
+		# __besman_echo_no_colour "3. Open the file $HOME/besman-$environment_name-config.yaml in an editor"
+		# __besman_echo_no_colour ""
+		# __besman_echo_no_colour "4. Add values to the missing variables"
+		# __besman_echo_no_colour ""
+		# __besman_echo_white "Please try the installation again after filling the missing values"
 		return 1
 	fi
 }

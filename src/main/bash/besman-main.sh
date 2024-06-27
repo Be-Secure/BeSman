@@ -79,6 +79,22 @@ function bes {
 			__besman_validate_version_format $version || return 1
 			__bes_$command $environment $version
 			;;
+		config)
+			[[ ${#opts[@]} -gt 2 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_install && return 1
+			[[ ${#args[@]} -gt 3 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_install && return 1
+
+			if [[ ${#args[@]} -eq 1 ]]
+			then
+				__bes_$command
+			else
+				[[ -z ${args[2]} ]] && __besman_echo_red "Incorrect syntax" && __bes_help_config && return 1
+				__besman_validate_environment $environment || return 1
+				__besman_check_if_version_exists $environment $version || return 1
+				__besman_validate_version_format $version || return 1
+				__bes_$command $environment $version
+			fi
+
+			;;
 		status | upgrade | remove | reload)
 			[[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
 			[[ "${#opts[@]}" -ne 0 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
@@ -127,6 +143,9 @@ function bes {
 					;;
 					help)
 						__bes_help_help
+					;;
+					config)
+						__bes_help_config
 					;;
 					attest)
                                                 __bes_help_attest

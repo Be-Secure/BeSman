@@ -37,7 +37,7 @@ function __besman_list_envs()
 {
     local current_version current_env installed_annotation remote_annotation local_list
 
-    local_list="$BESMAN_DIR/tmp/list.txt"
+    local_list="$BESMAN_DIR/var/list.txt"
 
     # __besman_check_repo_exist || return 1
     __besman_update_list || return 1
