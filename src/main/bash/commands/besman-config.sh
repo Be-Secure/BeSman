@@ -27,8 +27,14 @@ function __bes_config()
         config_file=besman-$environment_name-config.yaml
         config_url="https://raw.githubusercontent.com/$BESMAN_ENV_REPO/$BESMAN_ENV_REPO_BRANCH/$ossp/$version/$config_file"
         
-        [[ -f "$HOME/$config_file" ]] && __besman_prompt_user "$config_file" || return 1
+        # if [[ -f $HOME/$config_file ]] 
+        # then
+        #     __besman_prompt_user "$config_file"
+        #     [[ "$?" != "0" ]] && return 1
 
+        # fi  
+        # [[ -f $HOME/$config_file ]] && __besman_prompt_user "$config_file" || return 1
+        [[ -f $HOME/$config_file ]] && rm "$HOME/$config_file"
         __besman_check_url_valid "$config_url" || return 1
         __besman_echo_white "Downloading config file from $(__besman_echo_yellow "$BESMAN_ENV_REPO"); branch - $(__besman_echo_yellow "$BESMAN_ENV_REPO_BRANCH")"
 
