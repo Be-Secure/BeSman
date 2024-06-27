@@ -131,7 +131,7 @@ Use the command to get the available environments for installation.
 
 If you wish to change the repo, run the below command
 	
-	$ bes set BESMAN_ENV_REPOS <GitHub Org>/<Repo name>
+	$ bes set BESMAN_ENV_REPO <GitHub Org>/<Repo name>
  
 If you wish to change the branch, run the below command
 	

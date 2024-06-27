@@ -22,7 +22,7 @@ function __besman_check_value_empty()
 		__besman_echo_no_colour ""
 		__besman_echo_no_colour "2. If the file does not exist, run the below command to download the file"
 		__besman_echo_no_colour ""
-		__besman_echo_yellow "		wget -P \$HOME https://raw.githubusercontent.com/$BESMAN_ENV_REPOS/$BESMAN_ENV_REPO_BRANCH/$ossp/$version/besman-$environment_name-config.yaml"
+		__besman_echo_yellow "		wget -P \$HOME https://raw.githubusercontent.com/$BESMAN_ENV_REPO/$BESMAN_ENV_REPO_BRANCH/$ossp/$version/besman-$environment_name-config.yaml"
 		__besman_echo_no_colour ""
 		__besman_echo_no_colour "3. Open the file $HOME/besman-$environment_name-config.yaml in an editor"
 		__besman_echo_no_colour ""
@@ -297,8 +297,8 @@ function __besman_validate_assessment {
 
 function __besman_download_default_configations() {
 	local environment_name env_repo_namespace env_repo ossp env_url default_config_path curl_flag config_url
-	env_repo_namespace=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 1)
-	env_repo=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 2)
+	env_repo_namespace=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 1)
+	env_repo=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 2)
 	environment_name=$1
   version_id=$2
 	if  echo "$environment_name" | grep -qE 'RT|BT'

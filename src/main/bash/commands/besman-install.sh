@@ -115,8 +115,8 @@ function __besman_get_remote_env {
 
 	# This code fetches the environment and its config file from env repo
 	local environment_name env_repo_namespace env_repo ossp env_url default_config_path replace curl_flag
-	env_repo_namespace=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 1)
-	env_repo=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 2)
+	env_repo_namespace=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 1)
+	env_repo=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 2)
 	environment_name=$1
 	env_type=$(echo "$environment_name" | rev | cut -d "-" -f 2 | rev)
 
