@@ -1,6 +1,7 @@
 import requests
 import os
 import json
+import sys
 
 # Get environment variables
 env_repo = os.environ.get("BESMAN_ENV_REPO")
@@ -14,7 +15,7 @@ url = f'https://raw.githubusercontent.com/{env_repo}/{branch}/environment-metada
 
 try:
     # Load data
-    if local_env == "true":
+    if local_env == "True":
         # Load local JSON file
         with open(os.path.join(local_env_dir, 'environment-metadata.json'), 'r') as local_file:
             data = json.load(local_file)
@@ -40,11 +41,16 @@ try:
     with open(output_file_path, "w") as tmp_file:
         tmp_file.write("\n".join(extracted_info))
 
+    sys.exit(0)  # Exit with a success code
 except requests.exceptions.RequestException as e:
     print(f"Error fetching data: {e}")
+    sys.exit(1)  # Exit with an error code
 except (KeyError, TypeError, json.JSONDecodeError) as e:
     print(f"Error parsing JSON: {e}")
+    sys.exit(2)  # Exit with an error code
 except IOError as e:
     print(f"Error writing to file: {e}")
+    sys.exit(3)  # Exit with an error code
 except Exception as e:
     print(f"An unexpected error occurred: {e}")
+    sys.exit(4)  # Exit with an error code

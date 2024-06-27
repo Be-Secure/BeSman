@@ -39,7 +39,7 @@ function __besman_list_envs()
 
     local_list="$BESMAN_DIR/var/list.txt"
 
-    # __besman_check_repo_exist || return 1
+    __besman_check_repo_exist || return 1
     __besman_update_list || return 1
     # __besman_echo_no_colour "Github Org    Repo                             Environment     Version"
     # __besman_echo_no_colour "-----------------------------------------------------------------------------------"
@@ -128,7 +128,7 @@ function __besman_check_repo_exist()
 
 function __besman_update_list()
 {
-    local bes_list
+    local bes_list exit_code
     if [[ ( -n $BESMAN_LOCAL_ENV ) && ( $BESMAN_LOCAL_ENV == "true" )]]; then
         local env_dir_list bes_list
         if [[ -z $BESMAN_LOCAL_ENV_DIR ]]
@@ -161,6 +161,23 @@ function __besman_update_list()
 
         python3 $env_script_file
 
+        exit_code=$?
+
+        if [[ $exit_code -eq 0 ]]; then
+            return 0
+        elif [[ $exit_code -eq 1 ]]; then
+            __besman_echo_red "Error fetching data."
+            return 1
+        elif [[ $exit_code -eq 2 ]]; then
+            __besman_echo_red "Error parsing JSON."
+            return 1
+        elif [[ $exit_code -eq 3 ]]; then
+            __besman_echo_red "Error writing to file."
+            return 1
+        else
+            __besman_echo_red "An unexpected error occurred."
+            return 1
+        fi
     fi
 
 }
