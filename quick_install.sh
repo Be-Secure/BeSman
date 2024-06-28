@@ -278,12 +278,15 @@ fi
 		echo "Updated existing ${besman_zshrc}"
 	fi
 
-	bash "$BESMAN_DIR/bin/besman-init.sh"
+	source "$BESMAN_DIR/bin/besman-init.sh"
 
 	if [[ "$?" != "0" ]]; then
 		echo -e "\n\033[1;31mInstallation failed\033[0m\n"
 	else
 		echo -e "\n\033[0;32mSuccessfully installed BeSman from branch $BESMAN_VERSION\033[0m\n"
 	fi
+
+	bes set BESMAN_ENV_REPO_BRANCH develop
+	bes set BESMAN_LOCAL_ENV_DIR /home/arunsuresh/besecure-ce-env-repo
 }
 quick_install "$1"
