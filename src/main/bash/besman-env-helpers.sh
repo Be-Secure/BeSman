@@ -89,7 +89,8 @@ function __besman_source_env_params
 
 function __besman_handle_interruption()
 {
-	__besman_echo_red "\nOperation halted" 
+	__besman_echo_red "\nOperation halted"
+	trap - SIGINT
 	return 1
 }
 
@@ -279,7 +280,7 @@ function __besman_error_rollback {
 	if [[ -f $BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH/$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK ]]; then
 		rm $BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH/$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK
 	fi
-
+	trap - SIGINT
 	return 1
 
 }
