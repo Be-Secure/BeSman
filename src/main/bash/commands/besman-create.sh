@@ -112,6 +112,7 @@ function __besman_update_metadata()
     local playbook_version
     local playbook_tmp_file="$BESMAN_DIR/tmp/playbook_details.txt"
     local playbook_for_metadata="$BESMAN_DIR/tmp/playbook_for_metadata.txt"
+    local author_details="$BESMAN_DIR/tmp/author_details.txt"
     __besman_echo_white "Updating metadata..."
 
     [[ ! -f $BESMAN_DIR/scripts/besman-generate-env-metadata.py ]] && __besman_echo_red "Missing script $BESMAN_DIR/scripts/besman-generate-env-metadata.py" && return 1
@@ -141,7 +142,8 @@ function __besman_update_metadata()
             __besman_echo_white "Please use one from below"
             __besman_echo_yellow "\nLab/User/Organization\n"
         else
-            echo "$playbook_name $playbook_version" >> $playbook_for_metadata
+            echo "$author_name $author_type" >> "$author_details"
+            break
         fi
         
     done
@@ -157,9 +159,11 @@ function __besman_update_metadata()
         while true 
         do
             read -rp "Enter playbook name from above:" playbook_name
-            if [[ -z $playbook_name]] 
+            if [[ -z "$playbook_name" ]] 
             then
                 __besman_echo_red "\nYou should enter a value\n"
+            else
+                break
             fi
         
         done
@@ -167,22 +171,39 @@ function __besman_update_metadata()
         while true
         do
             read -rp "Enter playbook version:" playbook_version
-            if [[ -z $playbook_version]] 
+            if [[ -z $playbook_version ]] 
             then
                 __besman_echo_red "\nYou should enter a value\n"
+            else
+
+                break
             fi
         
         done
 
         __besman_check_playbook_valid "$playbook_name" "$playbook_version"
 
+        __besman_check_playbook_exist ""
+
         if [[ "$?" == "1" ]] 
         then
-            __besman_echo_red "Playbook $playbook_name with version $playbook_version is not valid"
+            __besman_echo_red "Playbook $(__besman_echo_yellow "$playbook_name") with version $(__besman_echo_yellow "$playbook_version") is not valid"
         else
-
-            break
+            echo "$playbook_name $playbook_version" >>  "$playbook_for_metadata"
         fi
+
+        while true 
+        do
+            __besman_prompt_user_for_metadata "Do you wish to add another playbook?"
+
+            if [[ "$?" == "1" ]] 
+            then
+                break
+            fi
+
+
+        done
+        
 
     done
  
