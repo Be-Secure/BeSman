@@ -98,8 +98,21 @@ function __bes_create {
     __besman_update_env_dir_list "$environment_name" "$version"
     __besman_echo_no_colour ""
     __besman_update_metadata "$environment_name" "$version" || return 1
+
+
+    __besman_cleanup_tmp_files
     __besman_open_file_vscode "$env_file_path" "$config_file_path" || return 1
 
+}
+
+function __besman_cleanup_tmp_files()
+{
+    local files=("$BESMAN_DIR/tmp/playbook_details.txt" "$BESMAN_DIR/tmp/playbook_for_metadata.txt" "$BESMAN_DIR/tmp/author_details.txt")
+
+    for file in "${files[@]}"
+    do
+        [[ -f "$file" ]] && rm "$file"
+    done
 }
 
 function __besman_update_metadata()
@@ -113,9 +126,12 @@ function __besman_update_metadata()
     local playbook_tmp_file="$BESMAN_DIR/tmp/playbook_details.txt"
     local playbook_for_metadata="$BESMAN_DIR/tmp/playbook_for_metadata.txt"
     local author_details="$BESMAN_DIR/tmp/author_details.txt"
+    local script_file="$BESMAN_DIR/scripts/besman-generate-env-metadata.py"
+
+
     __besman_echo_white "Updating metadata..."
 
-    [[ ! -f $BESMAN_DIR/scripts/besman-generate-env-metadata.py ]] && __besman_echo_red "Missing script $BESMAN_DIR/scripts/besman-generate-env-metadata.py" && return 1
+    [[ ! -f $script_file ]] && __besman_echo_red "Missing script $script_file" && return 1
 
     __besman_echo_yellow "Enter the author details"
 
@@ -148,9 +164,6 @@ function __besman_update_metadata()
         
     done
     
-    echo "Author name: $author_name"
-    echo "Author type: $author_type"
-
     __besman_get_playbook_details || return 1
     __besman_echo_yellow "\nChoose playbooks from the below list"
     __besman_print_playbook_details "$playbook_tmp_file"
@@ -183,30 +196,54 @@ function __besman_update_metadata()
 
         __besman_check_playbook_valid "$playbook_name" "$playbook_version"
 
-        __besman_check_playbook_exist ""
 
         if [[ "$?" == "1" ]] 
         then
             __besman_echo_red "Playbook $(__besman_echo_yellow "$playbook_name") with version $(__besman_echo_yellow "$playbook_version") is not valid"
         else
-            echo "$playbook_name $playbook_version" >>  "$playbook_for_metadata"
+            __besman_check_for_duplicate "$playbook_for_metadata" "$playbook_name" "$playbook_version"
+
+            if [[ "$?" != "1" ]] 
+            then
+                echo "$playbook_name $playbook_version" >>  "$playbook_for_metadata"
+            fi
         fi
 
-        while true 
-        do
-            __besman_prompt_user_for_metadata "Do you wish to add another playbook?"
 
-            if [[ "$?" == "1" ]] 
-            then
-                break
-            fi
+        __besman_prompt_user_for_metadata "Do you wish to add another playbook?"
 
-
-        done
-        
+        if [[ "$?" == "1" ]] 
+        then
+            break
+        fi
 
     done
+
+    python3 "$script_file" --environment "$environment" --version "$version"
+
+    if [[ "$?" != "0" ]] 
+    then
+        __besman_echo_red "Something went wront" 
+        return 1
+    fi
  
+}
+
+
+
+function __besman_check_for_duplicate()
+{
+    local file=$1
+    local playbook_name=$2
+    local playbook_version=$3
+
+    # Checking for file and returning if it does not existing. Otherwise the grep down below will throw error.
+    [[ ! -f "$file" ]] && return 2
+    if grep -q "$playbook_name $playbook_version" "$file" 
+    then
+        __besman_echo_red "Playbook $(__besman_echo_yellow "$playbook_name") with version $(__besman_echo_yellow "$playbook_version") already added"
+        return 1
+    fi
 }
 
 function __besman_check_playbook_valid() {
@@ -252,7 +289,7 @@ function __besman_print_playbook_details()
 
 function __besman_prompt_user_for_metadata()
 {
-    local text
+    local text=$1
 
     while true; do
         read -rp "$text (y/Y/n/N): " prompt

@@ -288,7 +288,6 @@ fi
 
 	bes set BESMAN_ENV_REPO_BRANCH develop
 	bes set BESMAN_LOCAL_ENV_DIR "$HOME/besecure-ce-env-repo"
-	set -x
 	bes create -env sample-RT-env -V 0.0.1
 }
 quick_install "$1"
