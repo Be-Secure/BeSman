@@ -97,8 +97,220 @@ function __bes_create {
     fi
     __besman_update_env_dir_list "$environment_name" "$version"
     __besman_echo_no_colour ""
+    __besman_update_metadata "$environment_name" "$version" || return 1
+
+
+    __besman_cleanup_tmp_files
     __besman_open_file_vscode "$env_file_path" "$config_file_path" || return 1
 
+}
+
+function __besman_cleanup_tmp_files()
+{
+    local files=("$BESMAN_DIR/tmp/playbook_details.txt" "$BESMAN_DIR/tmp/playbook_for_metadata.txt" "$BESMAN_DIR/tmp/author_details.txt")
+
+    for file in "${files[@]}"
+    do
+        [[ -f "$file" ]] && rm "$file"
+    done
+}
+
+function __besman_update_metadata()
+{
+    local environment=$1
+    local env_version=$2
+    local author_name
+    local author_type
+    local playbook_name
+    local playbook_version
+    local playbook_tmp_file="$BESMAN_DIR/tmp/playbook_details.txt"
+    local playbook_for_metadata="$BESMAN_DIR/tmp/playbook_for_metadata.txt"
+    local author_details="$BESMAN_DIR/tmp/author_details.txt"
+    local script_file="$BESMAN_DIR/scripts/besman-generate-env-metadata.py"
+
+
+    __besman_echo_white "Updating metadata..."
+
+    [[ ! -f $script_file ]] && __besman_echo_red "Missing script $script_file" && return 1
+
+    __besman_echo_yellow "Enter the author details"
+
+    while true 
+    do
+        read -rp "Enter author name:" author_name
+
+        if [[ -z $author_name ]] 
+        then
+            __besman_echo_red "You should enter a value!!!"
+        else
+            break 
+        fi
+            
+    done
+
+    while true
+    do
+        read -rp "Enter author type(Lab/User/Organization):" author_type
+
+        if [[  $author_type != "Lab" && $author_type != "User" && $author_type != "Organization" ]] 
+        then
+            __besman_echo_red "Incorrect value.\n"
+            __besman_echo_white "Please use one from below"
+            __besman_echo_yellow "\nLab/User/Organization\n"
+        else
+            echo "$author_name $author_type" >> "$author_details"
+            break
+        fi
+        
+    done
+    
+    __besman_get_playbook_details || return 1
+    __besman_echo_yellow "\nChoose playbooks from the below list\n"
+    __besman_print_playbook_details "$playbook_tmp_file"
+    __besman_echo_no_colour ""
+    while true 
+    do
+        while true 
+        do
+            read -rp "Enter playbook name from above:" playbook_name
+            if [[ -z "$playbook_name" ]] 
+            then
+                __besman_echo_red "\nYou should enter a value\n"
+            else
+                break
+            fi
+        
+        done
+
+        while true
+        do
+            read -rp "Enter playbook version:" playbook_version
+            if [[ -z $playbook_version ]] 
+            then
+                __besman_echo_red "\nYou should enter a value\n"
+            else
+
+                break
+            fi
+        
+        done
+
+        __besman_check_playbook_valid "$playbook_name" "$playbook_version"
+
+
+        if [[ "$?" == "1" ]] 
+        then
+            __besman_echo_red "Playbook $(__besman_echo_yellow "$playbook_name") with version $(__besman_echo_yellow "$playbook_version") is not valid"
+        else
+            __besman_check_for_duplicate "$playbook_for_metadata" "$playbook_name" "$playbook_version"
+
+            if [[ "$?" != "1" ]] 
+            then
+                echo "$playbook_name $playbook_version" >>  "$playbook_for_metadata"
+            fi
+        fi
+
+
+        __besman_prompt_user_for_metadata "Do you wish to add another playbook?"
+
+        if [[ "$?" == "1" ]] 
+        then
+            break
+        else
+            __besman_echo_yellow "\nChoose playbooks from the below list\n"
+            __besman_print_playbook_details "$playbook_tmp_file"
+            __besman_echo_no_colour ""
+        fi
+
+    done
+
+    python3 "$script_file" --environment "$environment" --version "$env_version"
+
+    if [[ "$?" != "0" ]] 
+    then
+        __besman_echo_red "Something went wront" 
+        return 1
+    fi
+ 
+}
+
+
+
+function __besman_check_for_duplicate()
+{
+    local file=$1
+    local playbook_name=$2
+    local playbook_version=$3
+
+    # Checking for file and returning if it does not existing. Otherwise the grep down below will throw error.
+    [[ ! -f "$file" ]] && return 2
+    if grep -q "$playbook_name $playbook_version" "$file" 
+    then
+        __besman_echo_red "Playbook $(__besman_echo_yellow "$playbook_name") with version $(__besman_echo_yellow "$playbook_version") already added"
+        return 1
+    fi
+}
+
+function __besman_check_playbook_valid() {
+    local playbook_name=$1
+    local playbook_version=$2
+    local playbook_tmp_file="$BESMAN_DIR/tmp/playbook_details.txt"
+    local playbook_details
+
+    if [[ ! -f $playbook_tmp_file ]]; then
+        __besman_echo_red "Playbook details file not found: $playbook_tmp_file"
+        return 1
+    fi
+
+    playbook_details=$(cut -d " " -f 1,2 "$playbook_tmp_file")
+
+    if echo "$playbook_details" | grep -q "$playbook_name.*$playbook_version"; then
+        return 0
+    else
+       return 1
+    fi
+}
+function __besman_print_playbook_details()
+{
+    local playbook_tmp_file="$1"
+    local playbook_details=$(cat $playbook_tmp_file | cut -d " " -f 1,2)
+
+     printf "%-25s %-10s\n" "Name" "Version"
+    __besman_echo_no_colour "--------------------------------"
+
+    OLD_IFS=$IFS
+    IFS=" "
+      
+    while read -r line; 
+    do 
+        # converted_line=$(echo "$line" | sed 's|,|/|g')
+        read -r name version <<< "$line"
+        printf "%-25s %-10s\n" "$name" "$version"
+        
+    done <<< $playbook_details
+    IFS=$OLD_IFS
+
+}
+
+function __besman_prompt_user_for_metadata()
+{
+    local text=$1
+
+    while true; do
+        read -rp "$text (y/Y/n/N): " prompt
+        case $prompt in
+            [Yy]* )
+                # Add your replacement logic here
+                return 0
+                ;;
+            [Nn]* )
+                return 1
+                ;;
+            * )
+                __besman_echo_red "Invalid input. Please enter 'y' or 'n'."
+                ;;
+        esac
+    done
 }
 
 function __besman_create_env_config_basic() {
@@ -379,7 +591,7 @@ function __besman_reset
 
 }
 EOF
-    __besman_echo_white "Created env file $environment_name under $BESMAN_DIR/envs"
+    __besman_echo_white "Created env file $environment_name under $env_file_path"
 
 }
 

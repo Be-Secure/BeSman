@@ -278,12 +278,14 @@ fi
 		echo "Updated existing ${besman_zshrc}"
 	fi
 
-	bash "$BESMAN_DIR/bin/besman-init.sh"
+	source "$BESMAN_DIR/bin/besman-init.sh"
 
 	if [[ "$?" != "0" ]]; then
 		echo -e "\n\033[1;31mInstallation failed\033[0m\n"
 	else
 		echo -e "\n\033[0;32mSuccessfully installed BeSman from branch $BESMAN_VERSION\033[0m\n"
 	fi
+
+
 }
 quick_install "$1"
