@@ -235,12 +235,18 @@ function __besman_list_roles()
 function __besman_get_playbook_details()
 {
     local scripts_file
-
+    local environment=$1
+    local version=$2
     scripts_file="$BESMAN_DIR/scripts/besman-get-playbook-details.py"
 
     [[ ! -f "$scripts_file" ]] && __besman_echo_red "Could not find $scripts_file" && return 1
 
-    python3 "$scripts_file"
+    if [[ -z $environment || -z $version ]] 
+    then
+        python3 "$scripts_file" --master_list True
+    else
+        python3 "$scripts_file" --environment "$environment" --version "$version"
+    fi
 }
 
 function __besman_list_playbooks()
@@ -249,9 +255,19 @@ function __besman_list_playbooks()
 
     local playbook_details_file playbook_details local_annotation remote_annotation
 
+    [[ ! -f "$BESMAN_DIR/var/current" || -z $(cat "$BESMAN_DIR/var/current") ]] && __besman_echo_red "Missing environment" && __besman_echo_white "\nInstall an environment to get the list of compatible playbooks" && return 1
+
+    local current_env=$(cat "$BESMAN_DIR/var/current")
+
+    [[ -z $current_env ]] && __besman_echo_red "Could not find installed environment" && return 1
+
+    [[ ! -d "$BESMAN_DIR/envs/besman-$current_env" ]] && __besman_echo_red "Could not find installed environment" && return 1
+    
+    local current_env_version=$(cat "$BESMAN_DIR/envs/besman-$current_env/current")
+
     playbook_details_file="$BESMAN_DIR/tmp/playbook_details.txt"
 
-    __besman_get_playbook_details || return 1
+    __besman_get_playbook_details "$current_env" "$current_env_version" || return 1
 
     playbook_details=$(cat "$playbook_details_file")
 
