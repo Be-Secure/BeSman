@@ -118,7 +118,7 @@ function __besman_cleanup_tmp_files()
 function __besman_update_metadata()
 {
     local environment=$1
-    local version=$2
+    local env_version=$2
     local author_name
     local author_type
     local playbook_name
@@ -165,8 +165,9 @@ function __besman_update_metadata()
     done
     
     __besman_get_playbook_details || return 1
-    __besman_echo_yellow "\nChoose playbooks from the below list"
+    __besman_echo_yellow "\nChoose playbooks from the below list\n"
     __besman_print_playbook_details "$playbook_tmp_file"
+    __besman_echo_no_colour ""
     while true 
     do
         while true 
@@ -215,11 +216,15 @@ function __besman_update_metadata()
         if [[ "$?" == "1" ]] 
         then
             break
+        else
+            __besman_echo_yellow "\nChoose playbooks from the below list\n"
+            __besman_print_playbook_details "$playbook_tmp_file"
+            __besman_echo_no_colour ""
         fi
 
     done
 
-    python3 "$script_file" --environment "$environment" --version "$version"
+    python3 "$script_file" --environment "$environment" --version "$env_version"
 
     if [[ "$?" != "0" ]] 
     then
@@ -586,7 +591,7 @@ function __besman_reset
 
 }
 EOF
-    __besman_echo_white "Created env file $environment_name under $BESMAN_DIR/envs"
+    __besman_echo_white "Created env file $environment_name under $env_file_path"
 
 }
 
