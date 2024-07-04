@@ -235,23 +235,44 @@ function __besman_list_roles()
 function __besman_get_playbook_details()
 {
     local scripts_file
-
+    local environment=$1
+    local version=$2
     scripts_file="$BESMAN_DIR/scripts/besman-get-playbook-details.py"
 
     [[ ! -f "$scripts_file" ]] && __besman_echo_red "Could not find $scripts_file" && return 1
 
-    python3 "$scripts_file"
-}
+    if [[ -z $environment || -z $version ]] 
+    then
+        python3 "$scripts_file" --master_list True
+    else
+        python3 "$scripts_file" --environment "$environment" --version "$version"
+    fi
 
+    if [[ "$?" != "0" ]] 
+    then
+        __besman_echo_red "Error while fetching playbook details"
+        return 1
+    fi
+}
 function __besman_list_playbooks()
 {
 
 
     local playbook_details_file playbook_details local_annotation remote_annotation
 
+    [[ ! -f "$BESMAN_DIR/var/current" || -z $(cat "$BESMAN_DIR/var/current") ]] && __besman_echo_red "Missing environment" && __besman_echo_white "\nInstall an environment to get the list of compatible playbooks" && return 1
+
+    local current_env=$(cat "$BESMAN_DIR/var/current")
+
+    [[ -z $current_env ]] && __besman_echo_red "Could not find installed environment" && return 1
+
+    [[ ! -d "$BESMAN_DIR/envs/besman-$current_env" ]] && __besman_echo_red "Could not find installed environment" && return 1
+    
+    local current_env_version=$(cat "$BESMAN_DIR/envs/besman-$current_env/current")
+
     playbook_details_file="$BESMAN_DIR/tmp/playbook_details.txt"
 
-    __besman_get_playbook_details || return 1
+    __besman_get_playbook_details "$current_env" "$current_env_version" || return 1
 
     playbook_details=$(cat "$playbook_details_file")
 
@@ -259,7 +280,8 @@ function __besman_list_playbooks()
 
     local_annotation=$(__besman_echo_red "+")
     remote_annotation=$(__besman_echo_yellow "^")
-    
+    printf "\n%-15s Compatible playbooks for $current_env $current_env_version"
+    __besman_echo_white "\n=======================================================================\n"
     printf "%-25s %-10s %-15s %-8s\n" "Name" "Version" "Type" "Author"
     __besman_echo_no_colour "----------------------------------------------------------------------"
 

@@ -10,6 +10,15 @@ besman_dir = os.environ.get("BESMAN_DIR")
 local_env = os.environ.get("BESMAN_LOCAL_ENV")
 local_env_dir = os.environ.get("BESMAN_LOCAL_ENV_DIR")
 
+if not env_repo:
+    print("check")
+    print("BESMAN_ENV_REPO var is not set")
+    sys.exit(1)
+elif local_env is True and not local_env_dir:
+    print("BESMAN_LOCAL_ENV_DIR var is not set")
+    sys.exit(1)
+
+
 # Construct the URL
 url = f'https://raw.githubusercontent.com/{env_repo}/{branch}/environment-metadata.json'
 
@@ -24,16 +33,16 @@ try:
         response = requests.get(url)
         response.raise_for_status()  # Raise an exception for bad responses (4xx or 5xx)
         data = response.json()
-
+        # print(data)
     # Extract information
     extracted_info = []
-    for environment in data.get('environments', []):
-        name = environment.get('name')
-        author_name = environment.get('author', {}).get('name')
-        version_tags = [version.get('tag') for version in environment.get('version', [])]
+    for environment in data['environments']:
+        name = environment['name']
+        author_name = environment['author']['name']
+        version_tags = environment['version']['tag']
 
-        for tag in version_tags:
-            extracted_info.append(f"{name} {author_name} {tag}")
+        # for tag in version_tags:
+        extracted_info.append(f"{name} {author_name} {version_tags}")
 
     # Write the extracted information to a file
     output_file_path = os.path.join(besman_dir, "tmp", "environment_details.txt")
