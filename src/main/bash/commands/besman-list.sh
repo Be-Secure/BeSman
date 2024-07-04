@@ -247,8 +247,13 @@ function __besman_get_playbook_details()
     else
         python3 "$scripts_file" --environment "$environment" --version "$version"
     fi
-}
 
+    if [[ "$?" != "0" ]] 
+    then
+        __besman_echo_red "Error while fetching playbook details"
+        return 1
+    fi
+}
 function __besman_list_playbooks()
 {
 
@@ -275,7 +280,8 @@ function __besman_list_playbooks()
 
     local_annotation=$(__besman_echo_red "+")
     remote_annotation=$(__besman_echo_yellow "^")
-    
+    printf "\n%-15s Compatible playbooks for $current_env $current_env_version"
+    __besman_echo_white "\n=======================================================================\n"
     printf "%-25s %-10s %-15s %-8s\n" "Name" "Version" "Type" "Author"
     __besman_echo_no_colour "----------------------------------------------------------------------"
 

@@ -64,6 +64,8 @@ def get_env_compatible_playbooks(environment, version):
         for env in data["environments"]:
             if env['name'] == environment and env['version']['tag'] == version:
                 return env['compatible_playbooks']
+        print(f"Could not find metadata for {environment} {version}")
+        return []
     except requests.RequestException as e:
         print(f"Failed to fetch environment details for {environment} {version}: {e}")
         return []
@@ -77,7 +79,6 @@ def main(environment, version):
             save_playbook_details_to_file(playbook_metadata)
     #     print("Playbook details saved successfully.")
     else:
-        print("something went wrong.")
         sys.exit(1)
 
 if __name__ == "__main__":
@@ -87,7 +88,6 @@ if __name__ == "__main__":
     parser.add_argument('--master_list', help='Get master list')
     args = parser.parse_args()
     if args.master_list:
-        print("================masterlist======================")
         get_master_list()
     else:
         main(args.environment, args.version)
