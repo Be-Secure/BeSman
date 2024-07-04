@@ -143,10 +143,13 @@ function __besman_update_list()
             return 1
         fi 
         [[ ! -d $BESMAN_LOCAL_ENV_DIR ]] && __besman_echo_red "Could not find dir $BESMAN_LOCAL_ENV_DIR" && return 1
+        local env_script_file="$BESMAN_DIR/scripts/besman-get-env-list.py"
+        [[ ! -f $env_script_file ]] && __besman_echo_red "Could not find script file $env_script_file" && return 1
 
-        env_dir_list=$(< "$BESMAN_LOCAL_ENV_DIR/list.txt")
-        bes_list=$BESMAN_DIR/var/list.txt
-        echo "$env_dir_list" > "$bes_list"
+        python3 $env_script_file
+        # env_dir_list=$(< "$BESMAN_LOCAL_ENV_DIR/list.txt")
+        # bes_list=$BESMAN_DIR/var/list.txt
+        # echo "$env_dir_list" > "$bes_list"
     else
             
         # local org repo path 
