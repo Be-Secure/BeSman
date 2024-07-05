@@ -219,11 +219,6 @@ then
 	python3 -m pip install notebook
 fi
 
-if ! pip list | grep PyYAML
-then
-  echo "Installing pyYAML"
-  python3 -m pip install pyYAML
-fi
 
 if [[ "$solaris" == true ]]; then
 	echo "Looking for gsed..."

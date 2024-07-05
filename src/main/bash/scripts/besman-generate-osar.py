@@ -1,7 +1,6 @@
 import json
 import os
 import sys
-import yaml
 
 
 def criticality_score_parser(user_data):
