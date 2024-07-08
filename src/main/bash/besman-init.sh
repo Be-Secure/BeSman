@@ -7,6 +7,8 @@ function __besman_set_user_configs
 	#fi
 # The functions sets all the user configs specified in the user-config.cfg file
 	if [[ ! -f $HOME/.besman/etc/user-config.cfg ]]; then
+		echo -e "\e[31mMissing init file\e[0m"
+		echo "Try re-installing or please raise a bug"
 		return 1
 	else
 		source $HOME/.besman/etc/user-config.cfg
@@ -23,6 +25,9 @@ function __besman_set_user_configs
 		export $user_config_param=$user_config_values
 	done < $HOME/.besman/etc/user-config.cfg
 }
+function __besman_source_init()
+{
+
 __besman_set_user_configs || return 1
 [ -f $HOME/tmp.txt ] && rm $HOME/tmp.txt 
 unset user_config_param user_config_values user_configs
@@ -102,7 +107,10 @@ unset scripts f
 # Load the besman config if it exists.
 if [ -f "${BESMAN_DIR}/etc/config" ]; then
 	source "${BESMAN_DIR}/etc/config"
+	[[ "$?" != "0" ]] && return 1
 fi
 
 unset OLD_IFS candidate_name candidate_dir
 export PATH
+}
+__besman_source_init || return 1

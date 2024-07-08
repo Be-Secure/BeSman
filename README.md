@@ -60,21 +60,31 @@ BeSman is designed to be used in a Linux machine.
 
 `Windows users should use an ubuntu VM or WSL.`
 
-1.  Download the latest binary and install pre-requisites
+## Install latest stable version
 
-        curl -L https://raw.githubusercontent.com/Be-Secure/BeSman/dist/dist/get.besman.io | bash
+1. Open your terminal
 
-    If you want to install a specific version, use the following command, replacing X.Y.Z with the desired version:
+2.  Run the below command
 
-        export BESMAN_VERSION=X.Y.Z
-        
-        curl -L https://raw.githubusercontent.com/Be-Secure/BeSman/dist/dist/get.besman.io | bash
-
-2.  Source the files into memory
-
-        source $HOME/.besman/bin/besman-init.sh
+        source <(curl -L https://raw.githubusercontent.com/Be-Secure/BeSman/dist/dist/get.besman.io)
 
 3.  Run the below command to confirm installation
+
+        bes help
+
+## Install a different version
+
+1. Go to our [release](https://github.com/Be-Secure/BeSman/releases) page and find the version you wish to install.
+
+2. Open your terminal and export the version
+
+		export BESMAN_VERSION=<paste the version here>
+        
+3. Run the below command to install 
+		
+		source <(curl -L https://raw.githubusercontent.com/Be-Secure/BeSman/dist/dist/get.besman.io)
+
+4.  Run the below command to confirm installation
 
         bes help
 
@@ -86,19 +96,19 @@ BeSman also allows you to install the cli from a branch. This is used to quickly
 
 1. Clone the repo.
 
-		$ git clone https://github.com/<your id>/BeSman
+		git clone https://github.com/<your id>/BeSman
 
 2. Move into BeSman
 	
-		$ cd BeSman
+		cd BeSman
 
 3. Change branch
    
-		$ git checkout <branch name>
+		git checkout <branch name>
 
 4. Run the quick_install file
 
-		$ ./quick_install.sh
+		source quick_install.sh
 
 This would install BeSman from your current branch.
 
