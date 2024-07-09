@@ -142,7 +142,11 @@ function __besman_update_metadata()
         if [[ -z $author_name ]] 
         then
             __besman_echo_red "You should enter a value!!!"
+        elif [[ $(echo "$author_name" | wc -w) -ne 1 ]]
+        then
+            __besman_echo_red "Expecting the github/gitlab id of the user/lab/org without space"
         else
+
             break 
         fi
             
