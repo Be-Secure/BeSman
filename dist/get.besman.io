@@ -2,6 +2,9 @@
 
 #Install: stable
 
+function __bes_install_besman()
+{
+	
 # Global variables
 BESMAN_PLATFORM=$(uname)
 export BESMAN_SERVICE="https://raw.githubusercontent.com"
@@ -10,9 +13,9 @@ export BESMAN_SERVICE="https://raw.githubusercontent.com"
 # BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
 
 BESMAN_NAMESPACE="Be-Secure"
-BESMAN_VERSION="${BESMAN_VERSION:-0.4.0}"
+# BESMAN_VERSION="${BESMAN_VERSION:-0.5.0-rc1}"
 
-BESMAN_ENV_REPOS="$BESMAN_NAMESPACE/besecure-ce-env-repo"
+BESMAN_ENV_REPO="$BESMAN_NAMESPACE/besecure-ce-env-repo"
 # BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
 
 if [[ -z $(command -v jq) ]]
@@ -21,13 +24,18 @@ then
 	sudo apt update && sudo apt install jq -y
 fi
 
-echo "Checking version number"
-release=$(curl -s --insecure --silent "https://api.github.com/repos/$BESMAN_NAMESPACE/BeSman/releases" | jq -r '.[].tag_name' | grep "^$BESMAN_VERSION$")
-if [[ -z $release ]] 
+if [[ -z "$BESMAN_VERSION" ]] 
 then
-    echo "Version $release is not a valid version of $BESMAN_NAMESPACE/BeSman"
-	exit 1
+	echo "Fetching the latest stable version"
+	version=$(curl -s --insecure --silent "https://api.github.com/repos/$BESMAN_NAMESPACE/BeSman/releases" | jq -r '.[].tag_name' | tr ' ' '\n' | grep -v -E 'v?[0-9]+\.[0-9]+\.[0-9]+-(alpha|beta|rc)\.?([0-9]+)?' | head -n 1)
+	export BESMAN_VERSION="$version"
+else
+	echo "Checking if version $BESMAN_VERSION is valid..."
+	release=$(curl -s --insecure --silent "https://api.github.com/repos/$BESMAN_NAMESPACE/BeSman/releases" | jq -r '.[].tag_name' | grep "^$BESMAN_VERSION$")
+	[[ -z $release ]] && echo -e "\e[31m$release is not a valid version of $BESMAN_NAMESPACE/BeSman\e[0m" && return 1
 fi
+
+
 
 if [[ -z "$BESMAN_DIR" ]]; then
     export BESMAN_DIR="$HOME/.besman"
@@ -101,7 +109,7 @@ esac
 # 	#echo " Execute  after installing figlet."
 # 	#echo "======================================================================================================"
 # 	#echo ""
-# 	#exit 1
+# 	#return 1
 # fi
 
 
@@ -118,13 +126,9 @@ if [ -d $BESMAN_DIR/bin ]; then
 	echo ""
 	echo "    ${BESMAN_DIR}"
 	echo ""
-	echo " Please consider running the following if you need to upgrade."
-	echo ""
-	echo "    $ bes selfupdate force"
-	echo ""
 	echo "======================================================================================================"
 	echo ""
-	exit 0
+	return 1
 fi
 echo ' BBBBBBBBBBBBBBBBB                         SSSSSSSSSSSSSSS                                                             '
 echo ' B::::::::::::::::B                      SS:::::::::::::::S                                                            '
@@ -153,7 +157,7 @@ if [ -z $(which unzip) ]; then
 	#echo " Restart after installing unzip."
 	#echo "======================================================================================================"
 	#echo ""
-	#exit 1
+	#return 1
 fi
 
 echo "Looking for zip..."
@@ -167,7 +171,7 @@ if [ -z $(which zip) ]; then
 	#echo " Restart after installing zip."
 	#echo "======================================================================================================"
 	#echo ""
-	#exit 1
+	#return 1
 fi
 
 echo "Looking for curl..."
@@ -182,7 +186,7 @@ if [ -z $(which curl) ]; then
 	#echo " Restart after installing curl."
 	#echo "======================================================================================================"
 	#echo ""
-	#exit 1
+	#return 1
 fi
 
 if [[ -z $(which ansible) ]]; then
@@ -212,18 +216,9 @@ fi
 if [[ -z $(command -v jupyter) ]]
 then
 	echo "Installing jupyter notebook"
-        sudo apt-get install jupyter -y
-        jupyter notebook --generate-config
-        #sed -i "s/# c.ServerApp.ip = 'localhost'/c.ServerApp.ip = '0.0.0.0'/g" $HOME/.jupyter/jupyter_notebook_config.py
-        #sed -i "s/# c.ServerApp.open_browser = False/c.ServerApp.open_browser = False/g" $HOME/.jupyter/jupyter_notebook_config.py
 	python3 -m pip install notebook
 fi
 
-if ! pip list | grep PyYAML
-then
-  echo "Installing pyYAML"
-  python3 -m pip install pyYAML
-fi
 
 if [[ "$solaris" == true ]]; then
 	echo "Looking for gsed..."
@@ -238,7 +233,7 @@ if [[ "$solaris" == true ]]; then
 		echo " Restart after installing gsed."
 		echo "======================================================================================================"
 		echo ""
-		exit 1
+		return 1
 	fi
 else
 	echo "Looking for sed..."
@@ -251,7 +246,7 @@ else
 		echo " Restart after installing sed."
 		echo "======================================================================================================"
 		echo ""
-		exit 1
+		return 1
 	fi
 fi
 
@@ -300,7 +295,7 @@ touch "$besman_user_config_file"
     echo "BESMAN_NAMESPACE=$BESMAN_NAMESPACE"
     echo "BESMAN_INTERACTIVE_USER_MODE=true"
     echo "BESMAN_DIR=$HOME/.besman"
-    echo "BESMAN_ENV_REPOS=$BESMAN_ENV_REPOS"
+    echo "BESMAN_ENV_REPO=$BESMAN_ENV_REPO"
     echo "BESMAN_ENV_REPO_BRANCH=master"
     echo "BESMAN_PLAYBOOK_REPO=$BESMAN_NAMESPACE/besecure-playbooks-store"
     echo "BESMAN_PLAYBOOK_REPO_BRANCH=main"
@@ -326,7 +321,7 @@ if [[ -z "$ARCHIVE_OK" ]]; then
 	echo "* easy sign up: https://github.com/"
 	echo "https://github.com/${BESMAN_NAMESPACE}/BeSman/issues"
 	rm -rf "$BESMAN_DIR"
-	exit 2
+	return 1
 fi
 
 echo "Extract script archive..."
@@ -374,16 +369,26 @@ if [[ -z $(grep 'besman-init.sh' "$besman_zshrc") ]]; then
     echo "Updated existing ${besman_zshrc}"
 fi
 
-echo -e "\n\n\nAll done!\n\n"
+source "${BESMAN_DIR}/bin/besman-init.sh"
 
-echo "Please open a new terminal, or run the following in the existing one:"
-echo ""
-echo "    source \"${BESMAN_DIR}/bin/besman-init.sh\""
+if [[ "$?" != "0" ]] 
+then
+	echo -e "\e[31mFailed to install BeSman $BESMAN_VERSION\e[0m"
+else
+	echo -e "\e[32mSuccessfully installed BeSman $BESMAN_VERSION\e[0m"
+fi
+# echo -e "\n\n\nAll done!\n\n"
 
-echo "    "
-echo "Then issue the following command:"
-echo ""
-echo "    bes help"
-echo ""
+# echo "Please open a new terminal, or run the following in the existing one:"
+# echo ""
+# echo "    source \"${BESMAN_DIR}/bin/besman-init.sh\""
 
-echo "Enjoy!!!"
+# echo "    "
+# echo "Then issue the following command:"
+# echo ""
+# echo "    bes help"
+# echo ""
+
+# echo "Enjoy!!!"
+}
+__bes_install_besman || return 1
