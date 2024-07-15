@@ -2,39 +2,38 @@
 
 function __bes_list {
 
-local flag=$1
-local env sorted_list
+    local flag=$1
+    local env sorted_list
 
-# For listing playbooks
-if [[ ( -n $flag ) && ( ( $flag == "--playbook" ) || ( $flag == "-P" ) ) ]]; then
+    # For listing playbooks
+    if [[ (-n $flag) && (($flag == "--playbook") || ($flag == "-P")) ]]; then
 
-    __besman_list_playbooks
+        __besman_list_playbooks
 
-elif [[ ( -n $flag ) && ( $flag == "--role" ) ]]; then
+    elif [[ (-n $flag) && ($flag == "--role") ]]; then
 
-    __besman_list_roles
-elif [[ ( -n $flag ) && ( ( $flag == "--environment" ) || ( $flag == "-env" ) ) ]]; then
+        __besman_list_roles
+    elif [[ (-n $flag) && (($flag == "--environment") || ($flag == "-env")) ]]; then
 
-    __besman_list_envs
+        __besman_list_envs
 
-else
-    
-    __besman_echo_white "---------------------------ENVIRONMENTS-----------------------------------------------"
-    __besman_echo_no_colour ""
-    __besman_list_envs
-    __besman_echo_no_colour ""
-    __besman_echo_white "---------------------------PLAYBOOKS--------------------------------------------------"
-    __besman_echo_no_colour ""
-    __besman_list_playbooks
-    __besman_echo_no_colour ""
-    __besman_echo_white "---------------------------ROLES------------------------------------------------------"
-    __besman_echo_no_colour ""
-    __besman_list_roles
-    __besman_echo_no_colour ""
-fi
+    else
+
+        __besman_echo_white "---------------------------ENVIRONMENTS-----------------------------------------------"
+        __besman_echo_no_colour ""
+        __besman_list_envs
+        __besman_echo_no_colour ""
+        __besman_echo_white "---------------------------PLAYBOOKS--------------------------------------------------"
+        __besman_echo_no_colour ""
+        __besman_list_playbooks
+        __besman_echo_no_colour ""
+        __besman_echo_white "---------------------------ROLES------------------------------------------------------"
+        __besman_echo_no_colour ""
+        __besman_list_roles
+        __besman_echo_no_colour ""
+    fi
 }
-function __besman_list_envs()
-{
+function __besman_list_envs() {
     local current_version current_env installed_annotation remote_annotation local_list
 
     local_list="$BESMAN_DIR/var/list.txt"
@@ -44,42 +43,37 @@ function __besman_list_envs()
     # __besman_echo_no_colour "Github Org    Repo                             Environment     Version"
     # __besman_echo_no_colour "-----------------------------------------------------------------------------------"
 
-    [[ -f "$BESMAN_DIR/var/current" ]] &&  current_env=$(cat "$BESMAN_DIR/var/current")
+    [[ -f "$BESMAN_DIR/var/current" ]] && current_env=$(cat "$BESMAN_DIR/var/current")
     [[ -f "$BESMAN_DIR/envs/besman-$current_env/current" ]] && current_version=$(cat "$BESMAN_DIR/envs/besman-$current_env/current")
 
     installed_annotation=$(__besman_echo_red "*")
     remote_annotation=$(__besman_echo_yellow "^")
-    
+
     # For listing environments
     printf "%-25s %15s %15s\n" "Environment" "Author" "Version"
     __besman_echo_no_colour "-----------------------------------------------------------"
 
-
     [[ -f "$BESMAN_DIR/tmp/environment_details.txt" ]] && cp "$BESMAN_DIR/tmp/environment_details.txt" "$local_list" && rm "$BESMAN_DIR/tmp/environment_details.txt"
-    
-    
 
     sed -i '/^$/d' "$local_list"
     sorted_list=$(sort "$local_list")
-    echo "$sorted_list" > "$local_list"
+    echo "$sorted_list" >"$local_list"
     OLD_IFS=$IFS
     IFS=" "
-      
-    while read -r line;
-    do 
+
+    while read -r line; do
         # converted_line=$(echo "$line" | sed 's|,|/|g')
-        read -r env author version <<< "$line"
+        read -r env author version <<<"$line"
 
         # echo "line=$line"
-        if [[ ("$env" == "$current_env") && ("$version" == "$current_version") ]] 
-        then
+        if [[ ("$env" == "$current_env") && ("$version" == "$current_version") ]]; then
             printf "%-25s %15s %25s\n" "$env" "$author" "$version$installed_annotation"
         else
             printf "%-25s %15s %25s\n" "$env" "$author" "$version$remote_annotation"
-            
+
         fi
-        
-    done < "$local_list"
+
+    done <"$local_list"
     IFS=$OLD_IFS
 
     __besman_echo_no_colour ""
@@ -99,7 +93,7 @@ function __besman_list_envs()
         __besman_echo_white "If you wish to list from remote repo, run the below command"
         __besman_echo_yellow "$ bes set BESMAN_LOCAL_ENV false"
         __besman_echo_yellow "$ bes set BESMAN_ENV_REPO <GitHub Org>/<Repo name>"
-    else      
+    else
         __besman_echo_white "Listing from $(__besman_echo_yellow "$BESMAN_ENV_REPO"); branch - $(__besman_echo_yellow "$BESMAN_ENV_REPO_BRANCH")"
         __besman_echo_no_colour ""
         __besman_echo_white "If you wish to change the repo, run the below command"
@@ -109,8 +103,7 @@ function __besman_list_envs()
         __besman_echo_yellow "$ bes set BESMAN_ENV_REPO_BRANCH <branch>/<tag>"
     fi
 }
-function __besman_check_repo_exist()
-{
+function __besman_check_repo_exist() {
     local namespace repo response repo_url
     [[ $BESMAN_LOCAL_ENV == "true" ]] && return 0
     namespace=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 1)
@@ -126,13 +119,11 @@ function __besman_check_repo_exist()
 
 }
 
-function __besman_update_list()
-{
+function __besman_update_list() {
     local bes_list exit_code
-    if [[ ( -n $BESMAN_LOCAL_ENV ) && ( $BESMAN_LOCAL_ENV == "true" )]]; then
+    if [[ (-n $BESMAN_LOCAL_ENV) && ($BESMAN_LOCAL_ENV == "true") ]]; then
         local env_dir_list bes_list
-        if [[ -z $BESMAN_LOCAL_ENV_DIR ]]
-        then
+        if [[ -z $BESMAN_LOCAL_ENV_DIR ]]; then
             __besman_echo_red "Could not find your local environment dir"
             __besman_echo_no_colour ""
             __besman_echo_white "Use the below command to set it first"
@@ -141,7 +132,7 @@ function __besman_update_list()
             __besman_echo_no_colour ""
 
             return 1
-        fi 
+        fi
         [[ ! -d $BESMAN_LOCAL_ENV_DIR ]] && __besman_echo_red "Could not find dir $BESMAN_LOCAL_ENV_DIR" && return 1
         local env_script_file="$BESMAN_DIR/scripts/besman-get-env-list.py"
         [[ ! -f $env_script_file ]] && __besman_echo_red "Could not find script file $env_script_file" && return 1
@@ -151,8 +142,8 @@ function __besman_update_list()
         # bes_list=$BESMAN_DIR/var/list.txt
         # echo "$env_dir_list" > "$bes_list"
     else
-            
-        # local org repo path 
+
+        # local org repo path
         # org=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 1)
         # repo=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 2)
         # branch=$BESMAN_ENV_REPO_BRANCH
@@ -186,17 +177,14 @@ function __besman_update_list()
 }
 
 # Function to extract repository names from a JSON response
-function __besman_extract_repo_names()
-{
-  echo "$1" | grep -oP '"full_name": "\K[^"]+'
+function __besman_extract_repo_names() {
+    echo "$1" | grep -oP '"full_name": "\K[^"]+'
 }
 
-
-function __besman_list_roles()
-{
+function __besman_list_roles() {
     local api_url repo_names all_repo_names page_num ansible_roles
 
-        if [[ -z "$BESMAN_GH_TOKEN" ]]; then
+    if [[ -z "$BESMAN_GH_TOKEN" ]]; then
         __besman_echo_yellow "Github token missing. Please use the below command to export the token"
         __besman_echo_no_colour ""
         __besman_echo_no_colour "$ bes set BESMAN_GH_TOKEN <copied token>"
@@ -222,21 +210,18 @@ function __besman_list_roles()
     done
 
     ansible_roles=$(echo "$all_repo_names" | grep "ansible-role-*")
-    
+
     printf "%-14s %10s \n" "Github Org" "Repo"
     __besman_echo_no_colour "-----------------------------------"
-    for i in $ansible_roles
-    do
+    for i in $ansible_roles; do
         converted_i=$(echo "$i" | sed "s|/| |g")
-        read -r org repo <<< "$converted_i"
+        read -r org repo <<<"$converted_i"
         printf "%-14s %-32s \n" "$org" "$repo"
     done
-    
 
 }
 
-function __besman_get_playbook_details()
-{
+function __besman_get_playbook_details() {
     local scripts_file
     local environment=$1
     local version=$2
@@ -244,22 +229,18 @@ function __besman_get_playbook_details()
 
     [[ ! -f "$scripts_file" ]] && __besman_echo_red "Could not find $scripts_file" && return 1
 
-    if [[ -z $environment || -z $version ]] 
-    then
+    if [[ -z $environment || -z $version ]]; then
         python3 "$scripts_file" --master_list True
     else
         python3 "$scripts_file" --environment "$environment" --version "$version"
     fi
 
-    if [[ "$?" != "0" ]] 
-    then
+    if [[ "$?" != "0" ]]; then
         __besman_echo_red "Error while fetching playbook details"
         return 1
     fi
 }
-function __besman_list_playbooks()
-{
-
+function __besman_list_playbooks() {
 
     local playbook_details_file playbook_details local_annotation remote_annotation
 
@@ -270,7 +251,7 @@ function __besman_list_playbooks()
     [[ -z $current_env ]] && __besman_echo_red "Could not find installed environment" && return 1
 
     [[ ! -d "$BESMAN_DIR/envs/besman-$current_env" ]] && __besman_echo_red "Could not find installed environment" && return 1
-    
+
     local current_env_version=$(cat "$BESMAN_DIR/envs/besman-$current_env/current")
 
     playbook_details_file="$BESMAN_DIR/tmp/playbook_details.txt"
@@ -279,7 +260,7 @@ function __besman_list_playbooks()
 
     playbook_details=$(cat "$playbook_details_file")
 
-    [[ ( ! -f "$playbook_details_file" ) || ( -z $playbook_details ) ]] && __besman_echo_red "Could not find playbook details" && return 1
+    [[ (! -f "$playbook_details_file") || (-z $playbook_details) ]] && __besman_echo_red "Could not find playbook details" && return 1
 
     local_annotation=$(__besman_echo_red "+")
     remote_annotation=$(__besman_echo_yellow "^")
@@ -290,38 +271,41 @@ function __besman_list_playbooks()
 
     OLD_IFS=$IFS
     IFS=" "
-      
-    while read -r line; 
-    do 
+
+    while read -r line; do
         # converted_line=$(echo "$line" | sed 's|,|/|g')
-        read -r name version type author <<< "$line"
-        if [[ -f "$BESMAN_PLAYBOOK_DIR/besman-$name-$version-playbook.sh" ]] 
-        then
-            
+        read -r name version type author <<<"$line"
+        if [[ -f "$BESMAN_PLAYBOOK_DIR/besman-$name-$version-playbook.sh" ]]; then
+
             printf "%-25s %-10s %-15s %-8s\n" "$name" "$version" "$type" "$author$local_annotation"
         else
             printf "%-25s %-10s %-15s %-8s\n" "$name" "$version" "$type" "$author$remote_annotation"
 
         fi
-        
-    done <<< "$playbook_details"
+
+    done <<<"$playbook_details"
     IFS=$OLD_IFS
 
-    __besman_echo_no_colour ""
-    __besman_echo_no_colour "======================================================================="
-    __besman_echo_no_colour "$remote_annotation - remote playbook"
-    __besman_echo_no_colour "$local_annotation - local playbook"
-    __besman_echo_no_colour "======================================================================="
-    __besman_echo_no_colour ""
+    if [[ $BESMAN_LOCAL_ENV == "false" ]]; then
 
-    __besman_echo_no_colour ""
-    __besman_echo_yellow "Listing from $BESMAN_PLAYBOOK_REPO; branch - $BESMAN_PLAYBOOK_REPO_BRANCH"
-    __besman_echo_yellow "If you wish to change the repo run the below command"
-    __besman_echo_yellow "$ bes set BESMAN_PLAYBOOK_REPO <GitHub Org>/<Repo name>"
-    __besman_echo_no_colour ""
-    __besman_echo_yellow "If you wish to change the branch run the below command"
-    __besman_echo_yellow "$ bes set BESMAN_PLAYBOOK_REPO_BRANCH <branch>/<tag>"
+        __besman_echo_no_colour ""
+        __besman_echo_no_colour "======================================================================="
+        __besman_echo_no_colour "$remote_annotation - remote playbook"
+        __besman_echo_no_colour "$local_annotation - local playbook"
+        __besman_echo_no_colour "======================================================================="
+        __besman_echo_no_colour ""
 
-    [[ -f $playbook_details_file ]] && rm "$playbook_details_file"
+        __besman_echo_no_colour ""
+        __besman_echo_white "Listing from $(__besman_echo_yellow "$BESMAN_PLAYBOOK_REPO"); branch - $(__besman_echo_yellow "$BESMAN_PLAYBOOK_REPO_BRANCH")"
+        __besman_echo_white "If you wish to change the repo run the below command"
+        __besman_echo_yellow "$ bes set BESMAN_PLAYBOOK_REPO <GitHub Org>/<Repo name>"
+        __besman_echo_no_colour ""
+        __besman_echo_white "If you wish to change the branch run the below command"
+        __besman_echo_yellow "$ bes set BESMAN_PLAYBOOK_REPO_BRANCH <branch>/<tag>"
+
+        [[ -f $playbook_details_file ]] && rm "$playbook_details_file"
+    else
+        __besman_echo_white "\n"
+    fi
 
 }

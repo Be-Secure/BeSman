@@ -1,7 +1,7 @@
 import argparse
 import requests
 import os
-# import json
+import json
 import sys
 def get_master_list():
     playbook_repo = os.environ.get("BESMAN_PLAYBOOK_REPO")
@@ -53,23 +53,41 @@ def save_playbook_details_to_file(playbooks):
 
 def get_env_compatible_playbooks(environment, version):
 
-    env_repo = os.environ.get("BESMAN_ENV_REPO")
-    env_repo_branch = os.environ.get("BESMAN_ENV_REPO_BRANCH")
-    url = f'https://raw.githubusercontent.com/{env_repo}/{env_repo_branch}/environment-metadata.json'
+    local_env_flag = os.environ.get("BESMAN_LOCAL_ENV")
+    if local_env_flag == "false":
+        env_repo = os.environ.get("BESMAN_ENV_REPO")
+        env_repo_branch = os.environ.get("BESMAN_ENV_REPO_BRANCH")
+        url = f'https://raw.githubusercontent.com/{env_repo}/{env_repo_branch}/environment-metadata.json'
 
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        data = response.json()
-        for env in data["environments"]:
-            if env['name'] == environment and env['version']['tag'] == version:
-                return env['compatible_playbooks']
-        print(f"Could not find metadata for {environment} {version}")
-        return []
-    except requests.RequestException as e:
-        print(f"Failed to fetch environment details for {environment} {version}: {e}")
-        return []
-        
+        try:
+            response = requests.get(url)
+            response.raise_for_status()
+            data = response.json()
+        except requests.RequestException as e:
+            print(f"Failed to fetch environment details for {environment} {version}: {e}")
+            return []
+    else:
+        env_dir = os.environ.get("BESMAN_LOCAL_ENV_DIR")
+        metadata_path = os.path.join(env_dir, "environment-metadata.json")
+
+        try:
+            with open(metadata_path, 'r') as file:
+                data = json.load(file)
+        except FileNotFoundError:
+            print("File not found error: Please check the file path.")
+            return []
+        except json.JSONDecodeError:
+            print("JSON decoding error: The file does not contain valid JSON data.")
+            return []
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return []
+
+    for env in data["environments"]:
+        if env['name'] == environment and env['version']['tag'] == version:
+            return env['compatible_playbooks']
+    print(f"Could not find metadata for {environment} {version}")
+    return []
 
 def main(environment, version):
     playbooks = get_env_compatible_playbooks(environment, version)
