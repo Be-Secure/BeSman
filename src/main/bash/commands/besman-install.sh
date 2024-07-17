@@ -168,13 +168,24 @@ function __besman_show_lab_association_prompt() {
 	# 	__besman_echo_no_colour ""
 	# 	return 1
 	# fi
-	if [[ $BESMAN_LAB_NAME == "Be-Secure" ]]; then
+	if [[ $BESMAN_LAB_NAME == "Be-Secure" && ! -f $HOME/besman-$environment-config.yaml ]]; then
 		__besman_echo_yellow "Going with default lab association - Be-Secure Commuinity Lab"
 		read -rp "Do you wish to change the lab association (y/n)?:" user_input
 		if [[ $user_input == "y" ]]; then
-			__besman_echo_white "\nDownload the below command to download the configuration file"
+			__besman_echo_white "\Use the below command to download the configuration file"
 
 			__besman_echo_yellow "$ bes config -env $environment_name -V $version\n"
+			__besman_echo_white "Open the file in your editor and change the value for $(__besman_echo_yellow "BESMAN_LAB_NAME") and $(__besman_echo_yellow "BESMAN_LAB_TYPE")\n"
+			return 1
+		fi
+	elif  [[ $BESMAN_LAB_NAME == "Be-Secure" && -f $HOME/besman-$environment-config.yaml ]] 
+	then
+		
+		__besman_echo_yellow "Going with default lab association - Be-Secure Commuinity Lab"
+		read -rp "Do you wish to change the lab association (y/n)?:" user_input
+		if [[ $user_input == "y" ]]; then
+			__besman_echo_white "\nOpen the below file in your editor and change the value for $(__besman_echo_yellow "BESMAN_LAB_NAME") and $(__besman_echo_yellow "BESMAN_LAB_TYPE")\n"
+			__besman_echo_yellow "$HOME/besman-$environment-config.yaml \n"
 			return 1
 		fi
 	fi
