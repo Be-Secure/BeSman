@@ -17,9 +17,20 @@ function __besman_check_value_empty()
 	then
 		__besman_echo_red "Missing value for variable $key. Please update the configuration file"
 
+		if [[ ! -f $HOME/besman-$environment_name-config.yaml ]] 
+		then
+			
 		__besman_echo_white "\nDownload the below command to download the configuration file"
 
 		__besman_echo_yellow "$ bes config -env $environment_name -V $version\n"
+
+		else
+			
+			__besman_echo_white "\nOpen the below file in your editor and fill in the missing values\n"
+
+			__besman_echo_yellow "$HOME/besman-$environment_name-config.yaml\n"
+		fi
+
 
 		# __besman_echo_no_colour ""
 		# __besman_echo_no_colour "1. Check if the file $HOME/besman-$environment_name-config.yaml exists in $HOME"
