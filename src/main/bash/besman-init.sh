@@ -7,7 +7,7 @@ function __besman_set_user_configs
 	#fi
 # The functions sets all the user configs specified in the user-config.cfg file
 	if [[ ! -f $HOME/.besman/etc/user-config.cfg ]]; then
-		echo -e "\e[31mMissing init file\e[0m"
+		echo -e "\e[31mMissing user config file\e[0m"
 		echo "Try re-installing or please raise a bug"
 		return 1
 	else

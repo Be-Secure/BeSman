@@ -110,7 +110,7 @@ function __besman_check_repo_exist() {
     repo=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 2)
     repo_url="https://api.github.com/repos/$namespace/$repo"
 
-    response=$(curl --head --silent "$repo_url" | head -n 1 | awk '{print $2}')
+    response=$(curl --head --insecure --silent "$repo_url" | head -n 1 | awk '{print $2}')
 
     if [ "$response" -ne 200 ]; then
         __besman_echo_red "Repository $repo does not exist under $namespace"
