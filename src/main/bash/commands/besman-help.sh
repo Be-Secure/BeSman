@@ -28,14 +28,20 @@ __besman_echo_no_colour '   set: Change the BeSman config variables. '
 __besman_echo_no_colour '   pull: Fetches the playbook from remote to local. '
 __besman_echo_no_colour '   run: Execute available playbooks. '
 __besman_echo_no_colour '   upgrade: Upgrade BeSman to the latest version '
+__besman_echo_no_colour '   attest: Attest the OSAR report '
+__besman_echo_no_colour '   verify: Verify the OSAR report attestation '
 __besman_echo_no_colour '   rm | remove: Remove BeSman from machine. '
 __besman_echo_no_colour '   status: Display the list of installed environments and its current version '
+__besman_echo_no_colour '   reload: Reloads the configuration of the current environment '
+__besman_echo_no_colour '   config: Downloads the environment configuration'
 __besman_echo_no_colour '  '
 __besman_echo_white ' OPTIONS '
 __besman_echo_no_colour '   -env | --environment: For passing the name of the environment script. '
 __besman_echo_no_colour '   -V | --version: For passing the version number. '
 __besman_echo_no_colour '   -P | --playbook: For passing the playbook name '
 __besman_echo_no_colour '   --role: To list the role names '
+__besman_echo_no_colour '   --file: Filename to be attested or verified '
+__besman_echo_no_colour '   --path: Path to the file to be attested or verified '
 __besman_echo_no_colour '  '
 __besman_echo_white 'For more details execute below command'
 __besman_echo_yellow '   $ bes help <command name>'
@@ -86,6 +92,25 @@ function __bes_help_uninstall {
     __besman_echo_no_colour '  $ bes uninstall -env zaproxy-BT-env'
     __besman_echo_no_colour '  '
 }
+
+function __bes_help_config {
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'NAME'
+    __besman_echo_no_colour '   config - To download environment config file '
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'SYNOPSIS  '
+    __besman_echo_yellow '  $ bes config -env <environment name> -V <version>'
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'DESCRIPTION'
+    __besman_echo_no_colour '   This command can be used to download'
+    __besman_echo_no_colour '   an environment configuration for making'
+    __besman_echo_no_colour '   changes in environment configuration.'
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'EXAMPLE'
+    __besman_echo_no_colour '  $ bes config -env fastjson-RT-env -V <version>'
+    __besman_echo_no_colour '  '
+}
+
 
 function __bes_help_list {
     __besman_echo_no_colour '  '
@@ -148,7 +173,7 @@ function __bes_help_set {
     printf "%-30s %-65s %-25s\n" "BESMAN_CODE_COLLAB_URL" "URL of the code collab platform" "https://github.com or GitLab URL"
     printf "%-30s %-65s %-25s\n" "BESMAN_VCS" "Version control system used for repo management" "Git or GH"
     printf "%-30s %-65s %-25s\n" "BESMAN_NAMESPACE" "Namepace for BeS operations" "GitHub or GitLab namespace"
-    printf "%-30s %-65s %-25s\n" "BESMAN_ENV_REPOS" "Repo from which user install env scripts" "namespace/repo_name"
+    printf "%-30s %-65s %-25s\n" "BESMAN_ENV_REPO" "Repo from which user install env scripts" "namespace/repo_name"
     printf "%-30s %-65s %-25s\n" "BESMAN_ENV_REPO_BRANCH" "Branch/tag of the repo from which user install env scripts" "branch_name or tag"
     printf "%-30s %-65s %-25s\n" "BESMAN_PLAYBOOK_REPO" "Repo from which user pull playbooks" "namespace/repo_name"
     printf "%-30s %-65s %-25s\n" "BESMAN_PLAYBOOK_REPO_BRANCH" "Branch/tag of the repo from which user pulls playbook" "branch_name or tag"
@@ -165,17 +190,17 @@ function __bes_help_create {
     __besman_echo_no_colour '  '
     __besman_echo_white 'SYNOPSIS  '
     __besman_echo_no_colour '   For environments which relies on ansible role '
-    __besman_echo_yellow '      $ bes create -env <environment>  <version>'
+    __besman_echo_yellow '      $ bes create -env <environment> -V <version>'
     __besman_echo_no_colour '  '
     __besman_echo_no_colour '   For environments with only the skeletal code '
-    __besman_echo_yellow '      $ bes create -env <environment> <version> basic '
+    __besman_echo_yellow '      $ bes create -env <environment> -V <version> basic '
     __besman_echo_no_colour '  '
     __besman_echo_white 'DESCRIPTION'
     __besman_echo_no_colour '   It creates environment scripts.'
     __besman_echo_no_colour '  '
     __besman_echo_white 'EXAMPLE'
-    __besman_echo_no_colour '  bes create -env fastjson-RT-env 0.0.3'
-    __besman_echo_no_colour '  bes create -env fastjson-RT-env 0.0.3 basic'
+    __besman_echo_no_colour '  bes create -env fastjson-RT-env -V  0.0.3'
+    __besman_echo_no_colour '  bes create -env fastjson-RT-env -V 0.0.3 basic'
     __besman_echo_no_colour '  '
 }
 
@@ -253,6 +278,50 @@ function __bes_help_run {
     __besman_echo_no_colour '  '
 }
 
+function __bes_help_attest {
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'NAME'
+    __besman_echo_no_colour '   attest - To attest the OSAR report '
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'SYNOPSIS  '
+    __besman_echo_yellow '    $ bes attest --file <OSAR file name> --path <Directory path containing OSAR file>'
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'DESCRIPTION'
+    __besman_echo_no_colour '   Used to attest and create the key and signature file for OSAR report.'
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'ARGUMENTS  '
+    __besman_echo_no_colour '   --file (Required) Name of the OSAR file'
+    __besman_echo_no_colour '   --path (Optional) Absolute directory path containing OSAR file.'
+    __besman_echo_no_colour '      If not provided file is expected to be present in current working directory.'
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'EXAMPLE'
+    __besman_echo_no_colour '   bes attest --file fastjson-1.2.24-osar.json'
+    __besman_echo_no_colour '   bes attest --file fastjson-1.2.24-osar.json --path /opt/besecure-assessment-datastore/fastjson/1.2.24/'
+    __besman_echo_no_colour '  '
+}
+
+function __bes_help_verify {
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'NAME'
+    __besman_echo_no_colour '   verify - To verify the OSAR report attestation '
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'SYNOPSIS  '
+    __besman_echo_yellow '    $ bes verify --file <OSAR file name> --path <Directory path containing OSAR,Key,signature and bundle files.>'
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'DESCRIPTION'
+    __besman_echo_no_colour '   Used to verify the attestation of OSAR report.'
+    __besman_echo_no_colour '  '
+     __besman_echo_white 'ARGUMENTS  '
+    __besman_echo_no_colour '   --file (Required) Name of the OSAR file.'
+    __besman_echo_no_colour '   --path (Optional) Absolute path for the directory containing OSAR file along with key and bundle files.'
+    __besman_echo_no_colour '      If not provided files are expected to be present in current working directory.'
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'EXAMPLE'
+    __besman_echo_no_colour '   bes verify --file fastjson-1.2.24-osar.json'
+    __besman_echo_no_colour '   bes verify --file fastjson-1.2.24-osar.json --path /opt/besecure-assessment-datastore/fastjson/1.2.24/'
+    __besman_echo_no_colour '  '
+}
+
 function __bes_help_validate {
     __besman_echo_no_colour '  '
     __besman_echo_white 'NAME'
@@ -305,5 +374,17 @@ function __bes_help_pull {
     __besman_echo_no_colour '  '
     __besman_echo_white 'EXAMPLE'
     __besman_echo_no_colour '   bes pull --playbook spdx-sbom-generator -V 0.0.1'
+    __besman_echo_no_colour '  '
+}
+
+function __bes_help_reload()
+{
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'NAME'
+    __besman_echo_no_colour '   reload - Reloads the configuration of the current environment.'
+    __besman_echo_no_colour '            Useful when using a common environment for multiple artifacts.'
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'SYNOPSIS  '
+    __besman_echo_yellow '    $ bes reload'
     __besman_echo_no_colour '  '
 }

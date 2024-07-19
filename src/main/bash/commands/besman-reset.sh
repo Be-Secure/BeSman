@@ -2,10 +2,12 @@
 
 function __bes_reset
 {
-    local environment 
+    local environment version
 	local roles_config_file=$BESMAN_ARTIFACT_TRIGGER_PLAYBOOK_PATH/$BESMAN_ARTIFACT_NAME-roles-config.yml
     environment=$1
     env_config="besman-$environment-config.yaml"
+    version=$(cat "${BESMAN_DIR}/envs/besman-${environment}/current")
+
     if [[ ! -d "$BESMAN_DIR/envs/besman-$environment" ]]; then
         __besman_echo_red "Please install the environment first"
     fi
@@ -19,7 +21,7 @@ function __bes_reset
 
     fi
     __besman_get_default_config_file "$environment" "$env_config_path"
-    __besman_source_env_params "$environment"
+    __besman_source_env_params "$environment" "$version"
     [[ -f "$roles_config_file" ]] && rm "$roles_config_file"
     __besman_create_roles_config_file
     __besman_echo_yellow "Resetting..."
@@ -42,8 +44,8 @@ function __besman_get_default_config_file()
     local environment env_config_path env_repo_namespace env_repo version
     environment=$1
     env_config_path=$2
-    env_repo_namespace=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 1)
-	env_repo=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 2)
+    env_repo_namespace=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 1)
+	env_repo=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 2)
 	env_type=$(echo "$environment" | rev | cut -d "-" -f 2 | rev)
 	if  echo "$environment" | grep -qE 'RT|BT'
 	then

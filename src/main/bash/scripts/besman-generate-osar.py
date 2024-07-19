@@ -106,6 +106,33 @@ def sonar_parser(user_data):
     result_list = count_severity(vul_list)
     return result_list
 
+def watchtower_parser(user_data):
+    vuln_list = []
+    vulns = user_data["Total Model Vulnerabilities Found"]
+    
+    for serverity, count in vulns.items():
+        vuln = {
+            "feature": "Vulnerability",
+            "aspect": "Severity",
+            "attribute": serverity,
+            "value": count
+        }
+        vuln_list.append(vuln)
+    return vuln_list
+
+def counterfit_parser(user_data):
+    result_list = []
+    attact_details = user_data["attack_details"]
+    category = attact_details["attack_category"]
+    success = user_data["success"][0]
+    result = {
+            "feature": "Attack",
+            "aspect": category,
+            "attribute": "Success",
+            "value": success
+        }
+    result_list.append(result)
+    return result_list
 
 def read_json_file(filename):
     try:
@@ -193,7 +220,9 @@ tool_processors = {
     "spdx-sbom-generator": sbom_parser,
     "scorecard": scorecard_parser,
     "fossology": fossology_parser,
-    "criticality_score": criticality_score_parser
+    "criticality_score": criticality_score_parser,
+    "watchtower": watchtower_parser,
+    "counterfit": counterfit_parser
 }
 
 
@@ -218,6 +247,7 @@ def main():
         "EXECUTION_DURATION",
         "DETAILED_REPORT_PATH",
         "BESMAN_ASSESSMENT_DATASTORE_URL",
+        "BESMAN_ASSESSMENT_DATASTORE_DIR",
         "OSAR_PATH"
     ]
 
@@ -244,8 +274,8 @@ def main():
     execution_duration = os.environ.get("EXECUTION_DURATION")
     report_output_path = os.environ.get("DETAILED_REPORT_PATH")
     beslab_assessment_datastore_url = os.environ.get("BESMAN_ASSESSMENT_DATASTORE_URL")
-
-
+    assessment_datastore_dir = os.environ.get("BESMAN_ASSESSMENT_DATASTORE_DIR")
+    
     osar_path = os.environ.get("OSAR_PATH")
 
     # Read and parse the JSON file(user data e.g. sonar-scan-json, snyk, sbom etc...) specified by report_output_path
@@ -263,11 +293,11 @@ def main():
         print(f"Unsupported tool_name. Available tools support : {available_tools}")
         sys.exit(1)
 
-    # Find the index of "besecure-assessment-datastore"
-    index = report_output_path.find("besecure-assessment-datastore")
-    # Extract the portion of the path after "besecure-assessment-datastore"
+    # Find the index of assessment_datastore_dir
+    index = report_output_path.find(assessment_datastore_dir)
+    # Extract the portion of the path after assessment_datastore_dir
     if index != -1:
-        remaining_path = report_output_path[index + len("besecure-assessment-datastore") + 1:]
+        remaining_path = report_output_path[index + len(assessment_datastore_dir) + 1:]
     else:
         print(f"Wrong DETAILED_REPORT_PATH. Please pass the correct path to besecure-assessment-datastore")
         sys.exit(1)

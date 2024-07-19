@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 
 function __bes_install {
+
 	local environment_name env_repo environment_name version_id env_config
 	environment_name=$1
 	version_id=$2
+	trap "__besman_echo_red ''; __besman_echo_red 'User interrupted'; __besman_echo_red ''; __besman_error_rollback $environment_name || return 1" SIGINT
 
 	# If environmnet not installed.
 	if [[ ! -d "${BESMAN_DIR}/envs/besman-${environment_name}/$version_id" ]]; then
@@ -26,7 +28,7 @@ function __bes_install {
 
 
 		mv "${BESMAN_DIR}/envs/besman-${environment_name}.sh" "${BESMAN_DIR}/envs/besman-${environment_name}/$version_id/"
-		__besman_source_env_params "$environment_name"
+		__besman_source_env_params "$environment_name" "$version_id"
 		if [[ $? -eq 1 ]]; then
 			__besman_error_rollback "$environment_name"
 			__besman_manage_install_out "$return_val" "$environment_name"
@@ -59,7 +61,7 @@ function __bes_install {
 
 	fi
 	unset return_val env_repo environment_name namespace version_id
-
+	trap - SIGINT
 }
 
 function __besman_get_local_env() {
@@ -103,7 +105,7 @@ function __besman_manage_install_out {
 	else
 
 		__besman_echo_red "Installation failed"
-		__besman_error_rollback "$environment"
+		__besman_error_rollback "$environment" || return 1
 
 	fi
 
@@ -113,8 +115,8 @@ function __besman_get_remote_env {
 
 	# This code fetches the environment and its config file from env repo
 	local environment_name env_repo_namespace env_repo ossp env_url default_config_path replace curl_flag
-	env_repo_namespace=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 1)
-	env_repo=$(echo "$BESMAN_ENV_REPOS" | cut -d "/" -f 2)
+	env_repo_namespace=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 1)
+	env_repo=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 2)
 	environment_name=$1
 	env_type=$(echo "$environment_name" | rev | cut -d "-" -f 2 | rev)
 
@@ -146,41 +148,44 @@ function __besman_show_lab_association_prompt() {
 		ossp=$(echo "$environment_name" | cut -d "-" -f 1)
 
 	fi
-	if [[ -z "$BESMAN_LAB_NAME" ]]; then
-		__besman_echo_red "Lab name is missing."
-		__besman_echo_yellow "Please use the below command to export it."
-		__besman_echo_no_colour ""
-		__besman_echo_white "$ export BESMAN_LAB_NAME=<Name of the lab>"
-		__besman_echo_no_colour ""
-		__besman_echo_yellow "OR"
-		__besman_echo_no_colour ""
-		__besman_echo_no_colour "1. Check if the file $HOME/besman-$environment_name-config.yaml exists in $HOME"
-		__besman_echo_no_colour ""
-		__besman_echo_no_colour "2. If the file does not exist, run the below command to download the file"
-		__besman_echo_no_colour ""
-		__besman_echo_yellow "		wget -P \$HOME https://raw.githubusercontent.com/$BESMAN_NAMESPACE/besecure-ce-env-repo/master/$ossp/$version/besman-$environment_name-config.yaml"
-		__besman_echo_no_colour ""
-		__besman_echo_no_colour "3. Open the file $HOME/besman-$environment_name-config.yaml in an editor"
-		__besman_echo_no_colour ""
-		__besman_echo_white "	 4. Edit the variables - BESMAN_LAB_NAME and BESMAN_LAB_TYPE"
-		__besman_echo_no_colour ""
-		return 1
-	fi
-	if [[ $BESMAN_LAB_NAME == "Be-Secure" ]]; then
+	# if [[ -z "$BESMAN_LAB_NAME" ]]; then
+	# 	__besman_echo_red "Lab name is missing."
+	# 	__besman_echo_yellow "Please use the below command to export it."
+	# 	__besman_echo_no_colour ""
+	# 	__besman_echo_white "$ export BESMAN_LAB_NAME=<Name of the lab>"
+	# 	__besman_echo_no_colour ""
+	# 	__besman_echo_yellow "OR"
+	# 	__besman_echo_no_colour ""
+	# 	__besman_echo_no_colour "1. Check if the file $HOME/besman-$environment_name-config.yaml exists in $HOME"
+	# 	__besman_echo_no_colour ""
+	# 	__besman_echo_no_colour "2. If the file does not exist, run the below command to download the file"
+	# 	__besman_echo_no_colour ""
+	# 	__besman_echo_yellow "		wget -P \$HOME https://raw.githubusercontent.com/$BESMAN_NAMESPACE/besecure-ce-env-repo/master/$ossp/$version/besman-$environment_name-config.yaml"
+	# 	__besman_echo_no_colour ""
+	# 	__besman_echo_no_colour "3. Open the file $HOME/besman-$environment_name-config.yaml in an editor"
+	# 	__besman_echo_no_colour ""
+	# 	__besman_echo_white "	 4. Edit the variables - BESMAN_LAB_NAME and BESMAN_LAB_TYPE"
+	# 	__besman_echo_no_colour ""
+	# 	return 1
+	# fi
+	if [[ $BESMAN_LAB_NAME == "Be-Secure" && ! -f $HOME/besman-$environment-config.yaml ]]; then
 		__besman_echo_yellow "Going with default lab association - Be-Secure Commuinity Lab"
 		read -rp "Do you wish to change the lab association (y/n)?:" user_input
 		if [[ $user_input == "y" ]]; then
-			__besman_echo_no_colour ""
-			__besman_echo_no_colour "1. Check if the file $HOME/besman-$environment_name-config.yaml exists in $HOME"
-			__besman_echo_no_colour ""
-			__besman_echo_no_colour "2. If the file does not exist, run the below command to download the file"
-			__besman_echo_no_colour ""
-			__besman_echo_yellow "		wget -P \$HOME https://raw.githubusercontent.com/$BESMAN_NAMESPACE/besecure-ce-env-repo/master/$ossp/$version/besman-$environment_name-config.yaml"
-			__besman_echo_no_colour ""
-			__besman_echo_no_colour "3. Open the file $HOME/besman-$environment_name-config.yaml in an editor"
-			__besman_echo_no_colour ""
-			__besman_echo_white "	 4. Edit the variables - BESMAN_LAB_NAME and BESMAN_LAB_TYPE"
-			__besman_echo_no_colour ""
+			__besman_echo_white "\Use the below command to download the configuration file"
+
+			__besman_echo_yellow "$ bes config -env $environment_name -V $version\n"
+			__besman_echo_white "Open the file in your editor and change the value for $(__besman_echo_yellow "BESMAN_LAB_NAME") and $(__besman_echo_yellow "BESMAN_LAB_TYPE")\n"
+			return 1
+		fi
+	elif  [[ $BESMAN_LAB_NAME == "Be-Secure" && -f $HOME/besman-$environment-config.yaml ]] 
+	then
+		
+		__besman_echo_yellow "Going with default lab association - Be-Secure Commuinity Lab"
+		read -rp "Do you wish to change the lab association (y/n)?:" user_input
+		if [[ $user_input == "y" ]]; then
+			__besman_echo_white "\nOpen the below file in your editor and change the value for $(__besman_echo_yellow "BESMAN_LAB_NAME") and $(__besman_echo_yellow "BESMAN_LAB_TYPE")\n"
+			__besman_echo_yellow "$HOME/besman-$environment-config.yaml \n"
 			return 1
 		fi
 	fi
