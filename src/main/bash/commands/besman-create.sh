@@ -380,6 +380,12 @@ BESMAN_ASSESSMENT_DATASTORE_DIR: \$HOME/besecure-assessment-datastore #***
 # The remote repo where we store the assessment reports.
 BESMAN_ASSESSMENT_DATASTORE_URL: https://github.com/Be-Secure/besecure-assessment-datastore #***
 
+ASSESSMENT_STEP:
+    - sbom
+    - sast
+    - scorecard
+    - criticality_score
+
 EOF
     }
 
