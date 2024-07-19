@@ -13,7 +13,7 @@ export BESMAN_SERVICE="https://raw.githubusercontent.com"
 # BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
 
 BESMAN_NAMESPACE="Be-Secure"
-# BESMAN_VERSION="${BESMAN_VERSION:-0.5.0-rc1}"
+# BESMAN_VERSION="${BESMAN_VERSION:-0.5.0}"
 
 BESMAN_ENV_REPO="$BESMAN_NAMESPACE/besecure-ce-env-repo"
 # BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
@@ -309,6 +309,7 @@ echo "Download script archive..."
 
 # once move to besman namespace needs to update besman-latest.zip 
 #curl -sL --location --progress-bar "${BESMAN_SERVICE}/${BESMAN_NAMESPACE}/BESman/dist/dist/besman-latest.zip" > "$besman_zip_file"
+curl -sL --location --progress-bar "${BESMAN_SERVICE}/${BESMAN_NAMESPACE}/BeSman/dist/dist/besman-$BESMAN_VERSION.zip" > "$besman_zip_file"
 curl -sL --location --progress-bar "${BESMAN_SERVICE}/${BESMAN_NAMESPACE}/BeSman/dist/dist/besman-$BESMAN_VERSION.zip" > "$besman_zip_file"
 #cp "/vagrant/ProEnv/besman-latest.zip"  "$besman_zip_file"
 
