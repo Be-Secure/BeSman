@@ -10,7 +10,7 @@
 # make GitHub consider this file invalid if not commented.
 
 # For any changes, Unless a later match takes precedence, these maintainer will be requested for review
-*       @asa1997 @harimohanr @samirparhi-dev @bananth2008 @anilsingla @pramit-d
+*       @asa1997 @harimohanr @samirparhi-dev @bananth2008 @anilsingla @pramit-d @sudhirverma
 
 # For docs and other md files
 *.md   @asa1997 @harimohanr @panickervinod
