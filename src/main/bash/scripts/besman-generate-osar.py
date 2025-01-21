@@ -67,6 +67,17 @@ def sbom_parser(user_data):
     }
     return [result]
 
+def cdx_sbom_parser(user_data):
+    total_packages = len(user_data.get('components', []))
+    result = {
+        "feature": "Dependency",
+        "aspect": "Count",
+        "attribute": "N/A",
+        "value": total_packages
+    }
+    return [result]
+
+
 
 def count_severity(vul_list):
     severity_counts = {}
@@ -222,7 +233,8 @@ tool_processors = {
     "fossology": fossology_parser,
     "criticality_score": criticality_score_parser,
     "watchtower": watchtower_parser,
-    "counterfit": counterfit_parser
+    "counterfit": counterfit_parser,
+    "cyclonedx-sbom-generator": cdx_sbom_parser
 }
 
 
