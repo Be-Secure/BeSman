@@ -7,7 +7,8 @@ function __bes_install {
 	version_id=$2
 	if [[ -z $version_id ]]
 	then
-		version_id=$(__besman_get_latest_env_versionn "$environment_name")
+		version_id=$(__besman_get_latest_env_version "$environment_name" || return 1)
+
 		__besman_echo_yellow "No version specified. Using latest version $version_id"
 	fi
 	trap "__besman_echo_red ''; __besman_echo_red 'User interrupted'; __besman_echo_red ''; __besman_error_rollback $environment_name || return 1" SIGINT
@@ -197,10 +198,10 @@ function __besman_show_lab_association_prompt() {
 }
 
 function __besman_download_env_repo() {
-	local env_zip_dir="$BESMAN_DIR/tmp"
+	local env_zip_dir="$1"
 	local env_zip="$env_zip_dir/env.zip"
-	local repo_url="$BESMAN_ENV_REPO/archive/refs/heads/$BESMAN_ENV_REPO_BRANCH.zip"
-	local env_repo_name=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 2)
+	local repo_url="$BESMAN_CODE_COLLAB_URL/$BESMAN_ENV_REPO/archive/refs/heads/$BESMAN_ENV_REPO_BRANCH.zip"
+	local env_repo_name="$2"
 	[[ -f "$env_zip" ]] && rm -f "$env_zip"
 	[[ -d "$env_zip_dir/$env_repo_name-$BESMAN_ENV_REPO_BRANCH" ]] && rm -rf "$env_zip_dir/$env_repo_name-$BESMAN_ENV_REPO_BRANCH"
 	curl --insecure -s -L "$repo_url" -o "$env_zip" || {
@@ -214,14 +215,16 @@ function __besman_download_env_repo() {
 	rm -f "$env_zip"
 }
 
-function __besman_get_latest_env_versionn()
+function __besman_get_latest_env_version()
 {
-	local environment_name env_zip_dir latest_version
+	local environment_name env_zip_dir latest_version env_repo_name ossp
 	environment_name=$1
-	
-	__besman_download_env_repo "$environment_name" || return 1
+	env_zip_dir="$BESMAN_DIR/tmp"
+	env_repo_name=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 2)
+	ossp=$(echo "$environment_name" | rev | cut -d "-" -f 3- | rev)
+	__besman_download_env_repo "$env_zip_dir" "$env_repo_name" || return 1
 
-	latest_version=$(ls -v "$env_zip_dir/$env_repo_name-$BESMAN_ENV_REPO_BRANCH/$environment_name" | tail -n1)
+	latest_version=$(find "$env_zip_dir/$env_repo_name-$BESMAN_ENV_REPO_BRANCH/$ossp" -maxdepth 1 -type d | sort -V | tail -n1 | xargs basename)
 
 	echo "$latest_version"
 }
