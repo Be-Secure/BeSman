@@ -82,7 +82,7 @@ function __besman_open_files_in_vscode()
     then
         __besman_echo_yellow "VS code not found"
 
-        __besman_echo_no_color "Please open the below file(s) in your editor manually"
+        __besman_echo_no_colour "Please open the below file(s) in your editor manually"
 
         for i in "${files[@]}"; 
         do
