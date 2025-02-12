@@ -286,7 +286,7 @@ function __besman_list_playbooks() {
     done <<<"$playbook_details"
     IFS=$OLD_IFS
 
-    if [[ $BESMAN_LOCAL_ENV == "false" ]]; then
+    if [[ $BESMAN_LOCAL_PLAYBOOK == "false" ]]; then
 
         __besman_echo_no_colour ""
         __besman_echo_no_colour "======================================================================="

@@ -17,27 +17,64 @@ def get_master_list():
         sys.exit(1)
 
 def fetch_playbook_metadata(playbooks):
-    playbook_repo = os.environ.get("BESMAN_PLAYBOOK_REPO")
-    branch = os.environ.get("BESMAN_PLAYBOOK_REPO_BRANCH")
-    url = f'https://raw.githubusercontent.com/{playbook_repo}/{branch}/playbook-metadata.json'
+    """Fetches playbook metadata from GitHub or a local source."""
+
+    if os.environ.get("BESMAN_LOCAL_PLAYBOOK") == "true":
+        print("Using local playbook source.")  # Indicate local source
+        # Implement your local playbook loading logic here.
+        # This is placeholder example. Replace with your actual implementation.
+        try:
+            # Example: Load from a local JSON file
+            local_metadata_file_path = os.environ.get("BESMAN_LOCAL_PLAYBOOK_DIR")
+            if not local_metadata_file_path:
+                print("Error: BESMAN_LOCAL_PLAYBOOK_DIR environment variable not set.")
+                return []
+
+            local_metadata_file = os.path.join(local_metadata_file_path, "playbook-metadata.json") # Use os.path.join
+
+            if not os.path.exists(local_metadata_file): # Check if file exists
+                print(f"Error: Local metadata file '{local_metadata_file}' not found.")
+                return []
+            
+            with open(local_metadata_file, 'r') as f:
+                data = json.load(f)
+                master_playbooks = data.get('playbooks', [])  # Handle missing 'playbooks' key
+        except FileNotFoundError:
+            print(f"Error: Local metadata file '{local_metadata_file}' not found.")
+            return []
+        except json.JSONDecodeError:
+            print(f"Error: Invalid JSON in local metadata file '{local_metadata_file}'.")
+            return []
+        except Exception as e: # Catch any other exceptions
+            print(f"An error occurred while reading local metadata: {e}")
+            return []
+    else:
+        playbook_repo = os.environ.get("BESMAN_PLAYBOOK_REPO")
+        branch = os.environ.get("BESMAN_PLAYBOOK_REPO_BRANCH")
+        if not playbook_repo or not branch: # Check if env variables are set when not using local
+            print("Error: BESMAN_PLAYBOOK_REPO and BESMAN_PLAYBOOK_REPO_BRANCH environment variables must be set when BESMAN_LOCAL_PLAYBOOK is not true.")
+            return []
+        url = f'https://raw.githubusercontent.com/{playbook_repo}/{branch}/playbook-metadata.json'
+        try:
+            response = requests.get(url)
+            response.raise_for_status()
+            data = response.json()
+            master_playbooks = data.get('playbooks', [])  # Handle missing 'playbooks' key
+        except requests.RequestException as e:
+            print(f"Failed to fetch playbook metadata from GitHub: {e}")
+            return []
+        except (ValueError, KeyError) as e:  # Handle JSON decoding/key errors
+            print(f"Error processing playbook metadata from GitHub: {e}")
+            return []
+
     compatible_playbooks = []
-    try:
-        response = requests.get(url)
-        response.raise_for_status()  # Raise an exception for 4xx and 5xx status codes
-        data = response.json()
-        # return data['playbooks']
-        master_playbooks = data['playbooks']
-    except requests.RequestException as e:
-        print(f"Failed to fetch playbook metadata: {e}")
-        return []
-    
     for playbook in playbooks:
         for pl in master_playbooks:
             if playbook['name'] == pl['name']:
                 for version in playbook['version']:
                     if version == pl['version']:
                         compatible_playbooks.append(pl)
-    # print(compatible_playbooks)
+
     return compatible_playbooks
 
     

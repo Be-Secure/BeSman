@@ -178,15 +178,14 @@ EOF
 		python3 -m pip install notebook
 	fi
 
-if [[ -z $(command -v jupyter) ]]
-then
-	echo "Installing jupyter notebook"
-	sudo apt-get install jupyter -y
-	jupyter notebook --generate-config
-        #sed -i "s/# c.ServerApp.ip = 'localhost'/c.ServerApp.ip = '0.0.0.0'/g" $HOME/.jupyter/jupyter_notebook_config.py
-        #sed -i "s/# c.ServerApp.open_browser = False/c.ServerApp.open_browser = False/g" $HOME/.jupyter/jupyter_notebook_config.py 
-	#python3 -m pip install notebook
-fi
+	if [[ -z $(command -v jupyter) ]]; then
+		echo "Installing jupyter notebook"
+		sudo apt-get install jupyter -y
+		jupyter notebook --generate-config
+		#sed -i "s/# c.ServerApp.ip = 'localhost'/c.ServerApp.ip = '0.0.0.0'/g" $HOME/.jupyter/jupyter_notebook_config.py
+		#sed -i "s/# c.ServerApp.open_browser = False/c.ServerApp.open_browser = False/g" $HOME/.jupyter/jupyter_notebook_config.py
+		#python3 -m pip install notebook
+	fi
 
 	echo "Installing BeSMAN scripts..."
 
@@ -237,6 +236,8 @@ fi
 		echo "BESMAN_OFFLINE_MODE=true"
 		echo "BESMAN_LOCAL_ENV=false"
 		echo "BESMAN_LOCAL_ENV_DIR="
+		echo "BESMAN_LOCAL_PLAYBOOK=false"
+		echo "BESMAN_LOCAL_PLAYBOOK_DIR="
 		echo "BESMAN_PLAYBOOK_DIR=$besman_playbook_dir"
 	} >>"$besman_user_config_file"
 
@@ -285,9 +286,6 @@ fi
 	else
 		echo -e "\n\033[0;32mSuccessfully installed BeSman from branch $BESMAN_VERSION\033[0m\n"
 	fi
-
-
-
 
 }
 quick_install "$1"
