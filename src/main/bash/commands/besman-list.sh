@@ -303,9 +303,17 @@ function __besman_list_playbooks() {
         __besman_echo_white "If you wish to change the branch run the below command"
         __besman_echo_yellow "$ bes set BESMAN_PLAYBOOK_REPO_BRANCH <branch>/<tag>"
 
+        __besman_echo_white "If you wish to load from Local dir, execute below command"
+        __besman_echo_yellow "$ bes set BESMAN_LOCAL_PLAYBOOK true"
+        __besman_echo_yellow "$ bes set BESMAN_LOCAL_PLAYBOOK_DIR 'pass complete path to local playbook dir'"
+
         [[ -f $playbook_details_file ]] && rm "$playbook_details_file"
     else
         __besman_echo_white "\n"
+        __besman_echo_no_colour ""
+        __besman_echo_white "Listing from local playbook directory - $BESMAN_LOCAL_PLAYBOOK_DIR"
+        __besman_echo_white "If you wish to load from Remote, execute below command"
+        __besman_echo_yellow "$ bes set BESMAN_LOCAL_PLAYBOOK false"
     fi
 
 }

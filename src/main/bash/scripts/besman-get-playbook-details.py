@@ -20,12 +20,13 @@ def fetch_playbook_metadata(playbooks):
     """Fetches playbook metadata from GitHub or a local source."""
 
     if os.environ.get("BESMAN_LOCAL_PLAYBOOK") == "true":
-        print("Using local playbook source.")  # Indicate local source
+        
         # Implement your local playbook loading logic here.
         # This is placeholder example. Replace with your actual implementation.
         try:
             # Example: Load from a local JSON file
             local_metadata_file_path = os.environ.get("BESMAN_LOCAL_PLAYBOOK_DIR")
+            #print("Listing from local playbook directory - ", local_metadata_file_path)  # Indicate local source
             if not local_metadata_file_path:
                 print("Error: BESMAN_LOCAL_PLAYBOOK_DIR environment variable not set.")
                 return []
