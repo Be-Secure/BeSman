@@ -24,15 +24,24 @@ def fetch_playbook_metadata(playbooks):
     """Fetches playbook metadata from GitHub or a local source."""
 
     if os.environ.get("BESMAN_LOCAL_PLAYBOOK") == "true":
+<<<<<<< HEAD
         
+=======
+        print("Using local playbook source.")  # Indicate local source
+>>>>>>> 21aeb6d (Run bes-playbook from local (#233))
         # Implement your local playbook loading logic here.
         # This is placeholder example. Replace with your actual implementation.
         try:
             # Example: Load from a local JSON file
             local_metadata_file_path = os.environ.get("BESMAN_LOCAL_PLAYBOOK_DIR")
+<<<<<<< HEAD
             #print("Listing from local playbook directory - ", local_metadata_file_path)  # Indicate local source
             if not local_metadata_file_path:
                 print("Error: BESMAN_LOCA+L_PLAYBOOK_DIR environment variable not set.")
+=======
+            if not local_metadata_file_path:
+                print("Error: BESMAN_LOCAL_PLAYBOOK_DIR environment variable not set.")
+>>>>>>> 21aeb6d (Run bes-playbook from local (#233))
                 return []
 
             local_metadata_file = os.path.join(local_metadata_file_path, "playbook-metadata.json") # Use os.path.join
@@ -59,11 +68,17 @@ def fetch_playbook_metadata(playbooks):
         if not playbook_repo or not branch: # Check if env variables are set when not using local
             print("Error: BESMAN_PLAYBOOK_REPO and BESMAN_PLAYBOOK_REPO_BRANCH environment variables must be set when BESMAN_LOCAL_PLAYBOOK is not true.")
             return []
+<<<<<<< HEAD
         url_constructor = ConstructURL(playbook_repo, branch, 'playbook-metadata.json')
         url = url_constructor.construct_raw_url(playbook_repo, branch, 'playbook-metadata.json')
         # url = f'{raw_url}/playbook-metadata.json'
         try:
             response = requests.get(url, headers=url_constructor.header_function(), timeout=10)
+=======
+        url = f'https://raw.githubusercontent.com/{playbook_repo}/{branch}/playbook-metadata.json'
+        try:
+            response = requests.get(url)
+>>>>>>> 21aeb6d (Run bes-playbook from local (#233))
             response.raise_for_status()
             data = response.json()
             master_playbooks = data.get('playbooks', [])  # Handle missing 'playbooks' key
@@ -81,9 +96,13 @@ def fetch_playbook_metadata(playbooks):
                 for version in playbook['version']:
                     if version == pl['version']:
                         compatible_playbooks.append(pl)
+<<<<<<< HEAD
     if not compatible_playbooks:
         print(f"[ERR]: No compatible playbooks found for the given environment and version.")
         return []
+=======
+
+>>>>>>> 21aeb6d (Run bes-playbook from local (#233))
     return compatible_playbooks
 
     
