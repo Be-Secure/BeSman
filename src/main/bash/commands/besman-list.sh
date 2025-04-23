@@ -264,22 +264,24 @@ function __besman_list_playbooks() {
 
     local_annotation=$(__besman_echo_red "+")
     remote_annotation=$(__besman_echo_yellow "^")
-    printf "\n%-15s Compatible playbooks for $current_env $current_env_version"
-    __besman_echo_white "\n=======================================================================\n"
-    printf "%-25s %-10s %-15s %-8s\n" "Name" "Version" "Type" "Author"
-    __besman_echo_no_colour "----------------------------------------------------------------------"
+    printf "\n%-35s Compatible playbooks for $(__besman_echo_yellow "$current_env" "$current_env_version")"
+    __besman_echo_white "\n=======================================================================================================================\n"
+    printf "\e[1m%-35s %-25s %-8s %-8s %-23s %-30s\e[0m\n" "PLAYBOOK NAME" "INTENT" "VERSION" "TYPE" "AUTHOR" "DESCRIPTION"
+    __besman_echo_no_colour "-------------------------------------------------------------------------------------------------------------------------------------"
 
     OLD_IFS=$IFS
     IFS=" "
 
     while read -r line; do
         # converted_line=$(echo "$line" | sed 's|,|/|g')
-        read -r name version type author <<<"$line"
+        read -r name intent version type author description <<<"$line"
+        # Do not remove space. Used for indentation of description
+        wrapped_desc=$(echo "$description" | fold -w 40 -s | sed '2,$s/^/                                                                                             /')
         if [[ -f "$BESMAN_PLAYBOOK_DIR/besman-$name-$version-playbook.sh" ]]; then
 
-            printf "%-25s %-10s %-15s %-8s\n" "$name" "$version" "$type" "$author$local_annotation"
+            printf "%-35s %-25s %-8s %-8s %-23s %-30s\n\n" "$intent-$name" "$intent" "$version" "$type" "$author$local_annotation" "$wrapped_desc"
         else
-            printf "%-25s %-10s %-15s %-8s\n" "$name" "$version" "$type" "$author$remote_annotation"
+            printf "%-35s %-25s %-8s %-8s %-23s %-30s\n\n" "$intent-$name" "$intent" "$version" "$type" "$author$remote_annotation" "$wrapped_desc"
 
         fi
 
