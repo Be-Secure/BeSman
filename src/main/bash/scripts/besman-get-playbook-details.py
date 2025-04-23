@@ -86,7 +86,7 @@ def save_playbook_details_to_file(playbooks):
     
     with open(file_path, 'w') as file:
         for playbook in playbooks:
-            details = f"{playbook['name']} {playbook['version']} {playbook['type']} {playbook['author']['name']}\n"
+            details = f"{playbook['name']} {playbook['intent']} {playbook['version']} {playbook['type']} {playbook['author']['name']} {playbook['description']}\n"
             file.write(details)
 
 def get_env_compatible_playbooks(environment, version):

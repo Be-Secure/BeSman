@@ -9,7 +9,7 @@ function __bes_run() {
     if [[ -n "$BESMAN_LOCAL_PLAYBOOK" && "$BESMAN_LOCAL_PLAYBOOK" == "true" ]]; then
         # Use local playbook
         if [[ -n "$BESMAN_LOCAL_PLAYBOOK_DIR" ]]; then
-            playbook_file_local="$BESMAN_LOCAL_PLAYBOOK_DIR/playbooks/besman-$playbook_name-$playbook_version-playbook.sh"
+            playbook_file_local="$BESMAN_LOCAL_PLAYBOOK_DIR/playbooks/besman-$playbook_name-playbook-$playbook_version.sh"
 
             if [[ ! -f "$playbook_file_local" ]]; then
                 __besman_echo_red "Error: Local playbook file not found: $playbook_file_local"
@@ -22,7 +22,7 @@ function __bes_run() {
                     __besman_echo_red "Error: Failed to copy playbook to $BESMAN_PLAYBOOK_DIR"
                     return 1
                 }
-                playbook_file="$BESMAN_PLAYBOOK_DIR/besman-$playbook_name-$playbook_version-playbook.sh" # Correct path after copy
+                playbook_file="$BESMAN_PLAYBOOK_DIR/besman-$playbook_name-playbook-$playbook_version.sh" # Correct path after copy
             else
                 __besman_echo_red "BESMAN_PLAYBOOK_DIR is not set."
                 __besman_echo_yellow "bes set BESMAN_PLAYBOOK_DIR <complete path to local playbook dir>"
@@ -34,7 +34,7 @@ function __bes_run() {
             return 1
         fi # This 'fi' was missing
     else   # Fetch from GitHub only if BESMAN_LOCAL_PLAYBOOK is NOT true
-        playbook_file="$BESMAN_PLAYBOOK_DIR/besman-$playbook_name-$playbook_version-playbook.sh"
+        playbook_file="$BESMAN_PLAYBOOK_DIR/besman-$playbook_name-playbook-$playbook_version.sh"
         # __besman_fetch_playbook "$playbook_name" "$playbook_version" || return 1  # Uncomment if needed
     fi
 
