@@ -274,8 +274,7 @@ function __bes_help_run {
     __besman_echo_no_colour '   Used to execute available playbooks in user system.'
     __besman_echo_no_colour '  '
     __besman_echo_white 'EXAMPLE'
-    __besman_echo_no_colour '   bes run --playbook spdx-sbom-generator -V 0.0.1'
-    __besman_echo_no_colour '   bes run --playbook sonar-scanner --version 0.0.1'
+    __besman_echo_no_colour '   bes run --playbook SBOM-spdxSbomGenerator -V 0.0.1'
     __besman_echo_no_colour '  '
 }
 
@@ -374,7 +373,7 @@ function __bes_help_pull {
     __besman_echo_yellow '    $ bes pull --playbook <playbook name> -V <playbook version>'
     __besman_echo_no_colour '  '
     __besman_echo_white 'EXAMPLE'
-    __besman_echo_no_colour '   bes pull --playbook spdx-sbom-generator -V 0.0.1'
+    __besman_echo_no_colour '   bes pull --playbook SBOM-spdxSbomGenerator -V 0.0.1'
     __besman_echo_no_colour '  '
 }
 
