@@ -3,12 +3,18 @@ import requests
 import os
 import json
 import sys
+from besman_python_helper import ConstructURL
+
 def get_master_list():
     playbook_repo = os.environ.get("BESMAN_PLAYBOOK_REPO")
     branch = os.environ.get("BESMAN_PLAYBOOK_REPO_BRANCH")
-    url = f'https://raw.githubusercontent.com/{playbook_repo}/{branch}/playbook-metadata.json'
+    url_constructor = ConstructURL(playbook_repo, branch)
+    raw_url = url_constructor.construct_raw_url(playbook_repo, branch)
+    
+    
+    url = f'{raw_url}/playbook-metadata.json'
     try:
-        response = requests.get(url)
+        response = requests.get(url, timeout=10)
         response.raise_for_status()  # Raise an exception for 4xx and 5xx status codes
         data = response.json()
         save_playbook_details_to_file(data['playbooks'])
@@ -55,9 +61,11 @@ def fetch_playbook_metadata(playbooks):
         if not playbook_repo or not branch: # Check if env variables are set when not using local
             print("Error: BESMAN_PLAYBOOK_REPO and BESMAN_PLAYBOOK_REPO_BRANCH environment variables must be set when BESMAN_LOCAL_PLAYBOOK is not true.")
             return []
-        url = f'https://raw.githubusercontent.com/{playbook_repo}/{branch}/playbook-metadata.json'
+        url_constructor = ConstructURL(playbook_repo, branch)
+        raw_url = url_constructor.construct_raw_url(playbook_repo, branch)
+        url = f'{raw_url}/playbook-metadata.json'
         try:
-            response = requests.get(url)
+            response = requests.get(url, timeout=10)
             response.raise_for_status()
             data = response.json()
             master_playbooks = data.get('playbooks', [])  # Handle missing 'playbooks' key
@@ -95,10 +103,12 @@ def get_env_compatible_playbooks(environment, version):
     if local_env_flag == "false":
         env_repo = os.environ.get("BESMAN_ENV_REPO")
         env_repo_branch = os.environ.get("BESMAN_ENV_REPO_BRANCH")
-        url = f'https://raw.githubusercontent.com/{env_repo}/{env_repo_branch}/environment-metadata.json'
+        url_constructor = ConstructURL(env_repo, env_repo_branch)
+        raw_url = url_constructor.construct_raw_url(env_repo, env_repo_branch)
+        url = f'{raw_url}/environment-metadata.json'
 
         try:
-            response = requests.get(url)
+            response = requests.get(url, timeout=10)
             response.raise_for_status()
             data = response.json()
         except requests.RequestException as e:

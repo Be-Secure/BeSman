@@ -25,7 +25,8 @@ function __bes_config()
 
         fi
         config_file=besman-$environment_name-config.yaml
-        config_url="https://raw.githubusercontent.com/$BESMAN_ENV_REPO/$BESMAN_ENV_REPO_BRANCH/$ossp/$version/$config_file"
+        raw_url=$(__besman_construct_raw_url "$BESMAN_ENV_REPO" "$BESMAN_ENV_REPO_BRANCH")
+        config_url="$raw_url/$ossp/$version/$config_file"
         
         if [[ -f $HOME/$config_file ]] 
         then

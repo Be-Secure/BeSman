@@ -266,7 +266,7 @@ function __besman_check_playbook_valid() {
         return 1
     fi
 
-    playbook_details=$(cut -d " " -f 1,2 "$playbook_tmp_file")
+    playbook_details=$(cut -d " " -f 1,3 "$playbook_tmp_file")
 
     if echo "$playbook_details" | grep -q "$playbook_name.*$playbook_version"; then
         return 0
@@ -277,10 +277,10 @@ function __besman_check_playbook_valid() {
 function __besman_print_playbook_details()
 {
     local playbook_tmp_file="$1"
-    local playbook_details=$(cat $playbook_tmp_file | cut -d " " -f 1,2)
+    local playbook_details=$(cat $playbook_tmp_file | cut -d " " -f 1,2,3)
 
-     printf "%-25s %-10s\n" "Name" "Version"
-    __besman_echo_no_colour "--------------------------------"
+     printf "%-35s %-25s %-10s\n" "Name" Intent "Version"
+    __besman_echo_no_colour "-------------------------------------------------------------------"
 
     OLD_IFS=$IFS
     IFS=" "
@@ -288,8 +288,8 @@ function __besman_print_playbook_details()
     while read -r line; 
     do 
         # converted_line=$(echo "$line" | sed 's|,|/|g')
-        read -r name version <<< "$line"
-        printf "%-25s %-10s\n" "$name" "$version"
+        read -r name intent version <<< "$line"
+        printf "%-35s %-25s %-10s\n" "$name" "$intent" "$version"
         
     done <<< $playbook_details
     IFS=$OLD_IFS

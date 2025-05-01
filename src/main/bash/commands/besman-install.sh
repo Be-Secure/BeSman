@@ -120,9 +120,7 @@ function __besman_manage_install_out {
 function __besman_get_remote_env {
 
 	# This code fetches the environment and its config file from env repo
-	local environment_name env_repo_namespace env_repo ossp env_url default_config_path replace curl_flag
-	env_repo_namespace=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 1)
-	env_repo=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 2)
+	local environment_name ossp env_url default_config_path
 	environment_name=$1
 	env_type=$(echo "$environment_name" | rev | cut -d "-" -f 2 | rev)
 
@@ -133,9 +131,9 @@ function __besman_get_remote_env {
 		ossp=$(echo "$environment_name" | cut -d "-" -f 1)
 
 	fi
-	env_url="https://raw.githubusercontent.com/${env_repo_namespace}/${env_repo}/$BESMAN_ENV_REPO_BRANCH/${ossp}/${version_id}/besman-${environment_name}.sh"
+	raw_url=$(__besman_construct_raw_url "$BESMAN_ENV_REPO" "$BESMAN_ENV_REPO_BRANCH")
+	env_url="$raw_url/${ossp}/${version_id}/besman-${environment_name}.sh"
 	default_config_path=$BESMAN_DIR/tmp/besman-$environment_name-config.yaml
-	curl_flag=true
 	__besman_check_url_valid "$env_url" || return 1
 	__besman_secure_curl "$env_url" >>"${BESMAN_DIR}/envs/besman-${environment_name}.sh"
 
