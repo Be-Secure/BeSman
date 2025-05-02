@@ -35,10 +35,6 @@ function __bes_install_besman() {
 		export BESMAN_DIR="$HOME/.besman"
 	fi
 
-	if [[ -z "$BESMAN_CODE_COLLAB_URL" ]]; then
-		export BESMAN_CODE_COLLAB_URL="https://github.com"
-	fi
-
 	if [[ -z "$BESMAN_VCS" ]]; then
 		export BESMAN_VCS="git"
 	fi
@@ -270,7 +266,8 @@ EOF
 	{
 		echo "BESMAN_VERSION=$BESMAN_VERSION"
 		echo "BESMAN_USER_NAMESPACE="
-		echo "BESMAN_CODE_COLLAB_URL=$BESMAN_CODE_COLLAB_URL"
+		echo "BESMAN_CODE_COLLAB_PLATFORM=github"
+		echo "BESMAN_CODE_COLLAB_URL=https://github.com"
 		echo "BESMAN_VCS=$BESMAN_VCS"
 		echo "BESMAN_ENV_ROOT=$HOME/BeSman_env"
 		echo "BESMAN_NAMESPACE=$BESMAN_NAMESPACE"
@@ -319,7 +316,7 @@ EOF
 
 	mv "${besman_stage_folder}/besman-init.sh" "$besman_bin_folder"
 	mv "$besman_stage_folder"/besman-*.sh "$besman_src_folder"
-	mv "$besman_stage_folder"/besman-*.py* "$besman_scripts_folder"
+	mv "$besman_stage_folder"/besman*.py* "$besman_scripts_folder"
 	mv "$besman_stage_folder"/list.txt "$besman_var_folder"
 	[[ -d ${besman_stage_folder} ]] && rm -rf ${besman_stage_folder}/*
 

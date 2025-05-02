@@ -103,12 +103,13 @@ function __besman_list_envs() {
         __besman_echo_yellow "$ bes set BESMAN_ENV_REPO_BRANCH <branch>/<tag>"
     fi
 }
+
 function __besman_check_repo_exist() {
     local namespace repo response repo_url
     [[ $BESMAN_LOCAL_ENV == "true" ]] && return 0
     namespace=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 1)
     repo=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 2)
-    repo_url="https://api.github.com/repos/$namespace/$repo"
+    repo_url="$BESMAN_CODE_COLLAB_URL/$namespace/$repo"
 
     response=$(curl --head --insecure --silent "$repo_url" | head -n 1 | awk '{print $2}')
 
@@ -279,9 +280,9 @@ function __besman_list_playbooks() {
         wrapped_desc=$(echo "$description" | fold -w 40 -s | sed '2,$s/^/                                                                                             /')
         if [[ -f "$BESMAN_PLAYBOOK_DIR/besman-$name-$version-playbook.sh" ]]; then
 
-            printf "%-35s %-25s %-8s %-8s %-23s %-30s\n\n" "$intent-$name" "$intent" "$version" "$type" "$author$local_annotation" "$wrapped_desc"
+            printf "%-35s %-25s %-8s %-8s %-23s %-30s\n\n" "$name" "$intent" "$version" "$type" "$author$local_annotation" "$wrapped_desc"
         else
-            printf "%-35s %-25s %-8s %-8s %-23s %-30s\n\n" "$intent-$name" "$intent" "$version" "$type" "$author$remote_annotation" "$wrapped_desc"
+            printf "%-35s %-25s %-8s %-8s %-23s %-30s\n\n" "$name" "$intent" "$version" "$type" "$author$remote_annotation" "$wrapped_desc"
 
         fi
 

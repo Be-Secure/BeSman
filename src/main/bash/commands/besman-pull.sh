@@ -59,7 +59,9 @@ function __besman_fetch_playbook {
     local playbook_name="$1"
     local playbook_version="$2"
     local playbook_file="$BESMAN_PLAYBOOK_DIR/besman-$playbook_name-playbook-$playbook_version.sh"
-    local playbook_url="https://raw.githubusercontent.com/$BESMAN_PLAYBOOK_REPO/$BESMAN_PLAYBOOK_REPO_BRANCH/playbooks/besman-$playbook_name-playbook-$playbook_version.sh"
+    local raw_url
+    raw_url=$(__besman_construct_raw_url "$BESMAN_PLAYBOOK_REPO" "$BESMAN_PLAYBOOK_REPO_BRANCH")
+    local playbook_url="$raw_url/playbooks/besman-$playbook_name-playbook-$playbook_version.sh"
 
     if [[ -f "$playbook_file" ]]; then
         return 2
@@ -77,11 +79,29 @@ function __besman_fetch_playbook {
 function __besman_fetch_steps_file() {
     local playbook_name="$1"
     local playbook_version="$2"
-    local API="https://api.github.com/repos/$BESMAN_PLAYBOOK_REPO/contents/playbooks?ref=$BESMAN_PLAYBOOK_REPO_BRANCH"
     local steps_file_base_name="besman-$playbook_name-steps-$playbook_version"
-    local download_url
+    local download_url ext raw_url url flag
+    extensions=(sh md ipynb)
+    raw_url=$(__besman_construct_raw_url "$BESMAN_PLAYBOOK_REPO" "$BESMAN_PLAYBOOK_REPO_BRANCH")
+    for ext in "${extensions[@]}"; do
+        flag=0
+        url="$raw_url/playbooks/$steps_file_base_name.$ext"
+        # --fail/-f makes curl return non‑zero on 404, --head/-I fetches only headers
+        if curl --fail --head "$url" >/dev/null 2>&1; then
+            # curl -L "$url" -o "$NAME.$ext"
+            download_url="$url"
+            flag=1
+            break
+        fi
+    done
+    if [[ $flag -eq 0 ]]; then
+        __besman_echo_red "No matching steps file found for $playbook_name $playbook_version"
+        [[ -f "$BESMAN_PLAYBOOK_DIR/besman-$playbook_name-playbook-$playbook_version.sh" ]] && rm "$BESMAN_PLAYBOOK_DIR/besman-$playbook_name-playbook-$playbook_version.sh"
+        return 1
+    fi
+        
     # to get the extension of the file
-    download_url=$(curl -k -s "$API" | jq -r --arg name "$steps_file_base_name" '.[] | select(.name | test("^" + $name + "\\.(sh|md|ipynb)$")) | .download_url')
+    # download_url=$(curl -k -s "$API" | jq -r --arg name "$steps_file_base_name" '.[] | select(.name | test("^" + $name + "\\.(sh|md|ipynb)$")) | .download_url')
     local steps_file_path="$BESMAN_PLAYBOOK_DIR/${download_url##*/}"
 
     if [[ -n "$download_url" ]]; then

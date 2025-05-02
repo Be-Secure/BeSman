@@ -312,9 +312,7 @@ function __besman_validate_assessment {
 }
 
 function __besman_download_default_configations() {
-	local environment_name env_repo_namespace env_repo ossp env_url default_config_path curl_flag config_url
-	env_repo_namespace=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 1)
-	env_repo=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 2)
+	local environment_name ossp default_config_path config_url
 	environment_name=$1
   version_id=$2
 	if  echo "$environment_name" | grep -qE 'RT|BT'
@@ -324,7 +322,9 @@ function __besman_download_default_configations() {
 		ossp=$(echo "$environment_name" | cut -d "-" -f 1)
 
 	fi
-	config_url="https://raw.githubusercontent.com/${env_repo_namespace}/${env_repo}/$BESMAN_ENV_REPO_BRANCH/${ossp}/${version_id}/besman-$environment_name-config.yaml"
+	raw_url=$(__besman_construct_raw_url "$BESMAN_ENV_REPO" "$BESMAN_ENV_REPO_BRANCH")
+
+	config_url="$raw_url/${ossp}/${version_id}/besman-$environment_name-config.yaml"
 	default_config_path=$BESMAN_DIR/tmp/besman-$environment_name-config.yaml
 
 	[[ -f "$default_config_path" ]] && rm "$default_config_path"

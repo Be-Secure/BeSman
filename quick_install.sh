@@ -23,9 +23,6 @@ function quick_install() {
 		export BESMAN_DIR="$HOME/.besman"
 	fi
 
-	if [[ -z "$BESMAN_CODE_COLLAB_URL" ]]; then
-		export BESMAN_CODE_COLLAB_URL="https://github.com"
-	fi
 
 	if [[ -z "$BESMAN_VCS" ]]; then
 		export BESMAN_VCS="git"
@@ -222,7 +219,8 @@ EOF
 	{
 		echo "BESMAN_VERSION=$BESMAN_VERSION"
 		echo "BESMAN_USER_NAMESPACE="
-		echo "BESMAN_CODE_COLLAB_URL=$BESMAN_CODE_COLLAB_URL"
+		echo "BESMAN_CODE_COLLAB_PLATFORM=github"
+		echo "BESMAN_CODE_COLLAB_URL=https://github.com"
 		echo "BESMAN_VCS=$BESMAN_VCS"
 		echo "BESMAN_ENV_ROOT=$HOME/BeSman_env"
 		echo "BESMAN_NAMESPACE=$BESMAN_NAMESPACE"
@@ -243,7 +241,7 @@ EOF
 
 	cp ./src/main/bash/besman-* "$besman_src_folder"
 	cp ./src/main/bash/commands/besman-* "$besman_src_folder"
-	cp ./src/main/bash/scripts/besman-* "$besman_scripts_folder"
+	cp ./src/main/bash/scripts/besman* "$besman_scripts_folder"
 	mv "$besman_src_folder/besman-init.sh" "$besman_bin_folder"
 
 	touch "$besman_var_folder/list.txt"
