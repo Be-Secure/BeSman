@@ -106,7 +106,7 @@ function __besman_fetch_steps_file() {
 
     if [[ -n "$download_url" ]]; then
         __besman_echo_white "Downloading steps file"
-        __besman_secure_curl "$download_url" >> "$steps_file_path"
+        __besman_secure_curl "$download_url" > "$steps_file_path"
         return 0
     else
         __besman_echo_red "No matching steps file found"
