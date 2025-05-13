@@ -214,33 +214,25 @@ def cse_spear_phishing_parser(user_data):
 ##------------Add parsers for garak result------------------------------
 
 def garak_parser(input_data):
+
     results = []
 
-    # Parse the "leakreplay" category
-    if "leakreplay" in input_data:
-        leakreplay_data = input_data["leakreplay"]
-        total_tests = sum(item["total"] for item in leakreplay_data.values())
-        total_passed = sum(item["passed"] for item in leakreplay_data.values())
-        fail_percentage = ((total_tests - total_passed) / total_tests) * 100
-        results.append({
-            "feature": "Vulnerability",
-            "aspect": "Leakreplay",
-            "attribute": "Fail Percentage",
-            "value": f"{fail_percentage:.2f}"
-        })
-
-    # Parse the "promptinject" category
-    if "promptinject" in input_data:
-        promptinject_data = input_data["promptinject"]
-        total_tests = sum(item["total"] for item in promptinject_data.values())
-        total_passed = sum(item["passed"] for item in promptinject_data.values())
-        fail_percentage = ((total_tests - total_passed) / total_tests) * 100
-        results.append({
-            "feature": "Vulnerability",
-            "aspect": "Prompt Inject",
-            "attribute": "Fail Percentage",
-            "value": f"{fail_percentage:.2f}"
-        })
+    for aspect, tests in input_data.items():
+        total_passed = 0
+        total_cases = 0
+        for test_name, detectors in tests.items():
+            for detector_name, details in detectors.items():
+                total_passed += details["passed"]
+                total_cases += details["total"]
+        
+        if total_cases > 0:
+            fail_percentage = ((total_cases - total_passed) / total_cases) * 100
+            results.append({
+                "feature": "Vulnerability",
+                "aspect": aspect,
+                "attribute": "Fail Percentage",
+                "value": f"{fail_percentage:.2f}"
+            })
 
     return results
 
