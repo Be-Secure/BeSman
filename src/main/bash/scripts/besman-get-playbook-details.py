@@ -14,7 +14,7 @@ def get_master_list():
     
     url = f'{raw_url}/playbook-metadata.json'
     try:
-        response = requests.get(url, timeout=10)
+        response = requests.get(url, headers=url_constructor.header_function, timeout=10)
         response.raise_for_status()  # Raise an exception for 4xx and 5xx status codes
         data = response.json()
         save_playbook_details_to_file(data['playbooks'])
@@ -65,7 +65,7 @@ def fetch_playbook_metadata(playbooks):
         raw_url = url_constructor.construct_raw_url(playbook_repo, branch)
         url = f'{raw_url}/playbook-metadata.json'
         try:
-            response = requests.get(url, timeout=10)
+            response = requests.get(url, headers=url_constructor.header_function, timeout=10)
             response.raise_for_status()
             data = response.json()
             master_playbooks = data.get('playbooks', [])  # Handle missing 'playbooks' key
@@ -108,7 +108,7 @@ def get_env_compatible_playbooks(environment, version):
         url = f'{raw_url}/environment-metadata.json'
 
         try:
-            response = requests.get(url, timeout=10)
+            response = requests.get(url, headers=url_constructor.header_function, timeout=10)
             response.raise_for_status()
             data = response.json()
         except requests.RequestException as e:

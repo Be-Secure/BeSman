@@ -90,10 +90,21 @@ function __besman_link_candidate_version() {
 
 function __besman_check_url_valid()
 {
-	local url response
+	local url response header
 
 	url="$1"
-	response=$(curl --head --silent --output /dev/null --write-out "%{http_code}" "$url")
+	if [[ -n "$BESMAN_ACCESS_TOKEN" ]]; then
+		if [[ "$BESMAN_CODE_COLLAB_PLATFORM" == "github" ]]; then
+			header="Authorization: token $BESMAN_ACCESS_TOKEN"
+		elif [[ "$BESMAN_CODE_COLLAB_PLATFORM" == "gitlab" ]]; then
+			header="PRIVATE-TOKEN: $BESMAN_ACCESS_TOKEN"
+		fi
+	else
+		__besman_echo_warn "No access token provided. Will try unauthenticated request."
+		header=""
+	fi
+
+	response=$(curl -L --head --silent --output /dev/null --write-out "%{http_code}" -H "$header" "$url")
 
 	if [[ $response -eq 200 ]]; then
 		
@@ -101,8 +112,16 @@ function __besman_check_url_valid()
 		return 0
 
 	else
+		if [[ $response -eq 401 ]]; then
+			__besman_echo_error "Authentication failed. Please check your access token for url $url."
+		elif [[ $response -eq 403 ]]; then
+			__besman_echo_error "Access forbidden. Please check your permissions for url $url."
+		elif [[ $response -eq 404 ]]; then
+			__besman_echo_error "URL not found. Please check the URL $url."
+		elif [[ $response -eq 500 ]]; then
+			__besman_echo_error "Server error. Please try again later." 			
+		fi
 
-    	__besman_echo_red "URL $url returned $response"
 		unset url response
 		return 1
 	fi

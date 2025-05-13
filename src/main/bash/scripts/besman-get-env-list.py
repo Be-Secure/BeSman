@@ -24,8 +24,9 @@ def get_env_list():
     besman_dir = os.environ.get("BESMAN_DIR")
     local_env = os.environ.get("BESMAN_LOCAL_ENV")
     local_env_dir = os.environ.get("BESMAN_LOCAL_ENV_DIR")
+    # platform = os.environ.get("BESMAN_CODE_COLLAB_PLATFORM")
+    # token = os.environ.get("BESMAN_ACCESS_TOKEN")
     # Construct the URL
-    
     url_constructor = ConstructURL(env_repo, branch)
 
     # Use the construct_raw_url method
@@ -41,10 +42,8 @@ def get_env_list():
                 data = json.load(local_file)
         else:
             # Fetch JSON from URL
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-            }
-            response = requests.get(url, headers=headers)
+            header = url_constructor.header_function()
+            response = requests.get(url, headers=header, timeout=10)
             response.raise_for_status()  # Raise an exception for bad responses (4xx or 5xx)
             data = response.json()
             # print(data)
