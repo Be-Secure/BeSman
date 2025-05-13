@@ -50,24 +50,31 @@ function __besman_check_value_empty()
 
 function __besman_source_env_params
 {
-    local  key value line tmp_var_file environment env_config version
+    local  key value line tmp_var_file environment env_config version ossp
     environment=$1
     version=$2
     env_config="besman-$environment-config.yaml"
+	if echo "$environment" | grep -qE 'RT|BT'; then
+		ossp=$(echo "$environment" | sed -E 's/-(RT|BT)-env//')
+	else
+		ossp=$(echo "$environment" | cut -d "-" -f 1)
+
+	fi
     
     # checks whether user configuration exists
     if [[ -f $HOME/$env_config ]]; then
         
       export BESMAN_ENV_CONFIG_FILE_PATH=$HOME/$env_config
       __besman_echo_yellow "Sourcing user config parameters from $BESMAN_ENV_CONFIG_FILE_PATH"
-    
+	# checks whether local configuration exists
+    elif [[ "$BESMAN_LOCAL_ENV" == "true" && -f $BESMAN_LOCAL_ENV_DIR/$ossp/$version/$env_config ]];  
+	then
+	  export BESMAN_ENV_CONFIG_FILE_PATH="$BESMAN_LOCAL_ENV_DIR/$ossp/$version/$env_config"
+	  __besman_echo_yellow "Sourcing local config parameters from $BESMAN_ENV_CONFIG_FILE_PATH"
+	# checks whether default configuration exists. this is useful in new shells
     elif [[ -f $BESMAN_DIR/tmp/$env_config ]]; then
       export BESMAN_ENV_CONFIG_FILE_PATH=$BESMAN_DIR/tmp/$env_config
-      __besman_echo_yellow "Sourcing default config parameters"
-    else
-		__besman_download_default_configations "$environment" "$version" || return 1
-      export BESMAN_ENV_CONFIG_FILE_PATH=$BESMAN_DIR/tmp/$env_config
-      __besman_echo_yellow "Sourcing default config parameters"
+      __besman_echo_yellow "Sourcing default config parameters from $BESMAN_ENV_CONFIG_FILE_PATH"
 	fi
 
 	# creating a temporary shell script file for exporting variables from config file.
@@ -97,6 +104,7 @@ function __besman_source_env_params
     [[ -f $tmp_var_file ]] && rm "$tmp_var_file"
 
 }
+
 
 function __besman_handle_interruption()
 {
