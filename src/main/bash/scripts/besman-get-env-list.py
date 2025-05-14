@@ -26,13 +26,14 @@ def get_env_list():
     local_env_dir = os.environ.get("BESMAN_LOCAL_ENV_DIR")
     # platform = os.environ.get("BESMAN_CODE_COLLAB_PLATFORM")
     # token = os.environ.get("BESMAN_ACCESS_TOKEN")
+    file_path = 'environment-metadata.json'
     # Construct the URL
-    url_constructor = ConstructURL(env_repo, branch)
+    url_constructor = ConstructURL(env_repo, branch, file_path)
 
     # Use the construct_raw_url method
-    raw_url = url_constructor.construct_raw_url(env_repo, branch)
+    raw_url = url_constructor.construct_raw_url(env_repo, branch, file_path)
     
-    url = f'{raw_url}/environment-metadata.json'
+    # url = f'{raw_url}/environment-metadata.json'
 
     try:
         # Load data
@@ -43,7 +44,7 @@ def get_env_list():
         else:
             # Fetch JSON from URL
             header = url_constructor.header_function()
-            response = requests.get(url, headers=header, timeout=10)
+            response = requests.get(raw_url, headers=header, timeout=10)
             response.raise_for_status()  # Raise an exception for bad responses (4xx or 5xx)
             data = response.json()
             # print(data)

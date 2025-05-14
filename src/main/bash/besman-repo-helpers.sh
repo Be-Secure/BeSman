@@ -207,12 +207,22 @@ function __besman_construct_raw_url(){
     # namespace/repo_name
     local repo=$1
     local branch=$2
+    local file_path=$3
+    local encoded_repo encoded_file_path
+    encoded_repo=$(echo "$repo" | sed 's/\//%2F/g')
+    encoded_file_path=$(echo "$file_path" | sed 's/\//%2F/g')
     case $BESMAN_CODE_COLLAB_PLATFORM in
         "github")
-            echo "https://raw.githubusercontent.com/$repo/$branch"
+            echo "https://raw.githubusercontent.com/$repo/$branch/$file_path"
             ;;
         "gitlab")
-            echo "$BESMAN_CODE_COLLAB_URL/$repo/-/raw/$branch"
+            #http://gitlab.com/api/v4/projects/arun.suresh%2Fbesecure-ce-env-repo/repository/files/environment-metadata.json/raw?ref=main
+            if [[ -z $BESMAN_ACCESS_TOKEN ]];
+            then
+                echo "$BESMAN_CODE_COLLAB_URL/$repo/-/raw/$branch/$file_path"
+            else
+                echo "$BESMAN_CODE_COLLAB_URL/api/v4/projects/$encoded_repo/repository/files/$encoded_file_path/raw?ref=$branch"
+            fi
             ;;
         *)
             ;;

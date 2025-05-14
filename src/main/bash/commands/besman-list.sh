@@ -111,9 +111,9 @@ function __besman_check_repo_exist() {
     repo=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 2)
     repo_url="$BESMAN_CODE_COLLAB_URL/$namespace/$repo"
 
-    response=$(curl --head --insecure --silent "$repo_url" | head -n 1 | awk '{print $2}')
+    response=$(__besman_check_url_valid "$repo_url")
 
-    if [ "$response" -ne 200 ]; then
+    if [[ -n "$response" && "$response" -ne 200 ]]; then
         __besman_echo_red "Repository $repo does not exist under $namespace"
         return 1
     fi
