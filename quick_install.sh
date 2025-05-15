@@ -237,6 +237,7 @@ EOF
 		echo "BESMAN_LOCAL_PLAYBOOK=false"
 		echo "BESMAN_LOCAL_PLAYBOOK_DIR="
 		echo "BESMAN_PLAYBOOK_DIR=$besman_playbook_dir"
+		echo "BESMAN_INSECURE_SSL=false"
 	} >>"$besman_user_config_file"
 
 	cp ./src/main/bash/besman-* "$besman_src_folder"

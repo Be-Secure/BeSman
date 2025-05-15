@@ -75,6 +75,9 @@ function __besman_source_env_params
     elif [[ -f $BESMAN_DIR/tmp/$env_config ]]; then
       export BESMAN_ENV_CONFIG_FILE_PATH=$BESMAN_DIR/tmp/$env_config
       __besman_echo_yellow "Sourcing default config parameters from $BESMAN_ENV_CONFIG_FILE_PATH"
+	else
+		__besman_download_default_configations "$environment" "$version" || return 1
+      	export BESMAN_ENV_CONFIG_FILE_PATH=$BESMAN_DIR/tmp/$env_config
 	fi
 
 	# creating a temporary shell script file for exporting variables from config file.
@@ -330,9 +333,9 @@ function __besman_download_default_configations() {
 		ossp=$(echo "$environment_name" | cut -d "-" -f 1)
 
 	fi
-	raw_url=$(__besman_construct_raw_url "$BESMAN_ENV_REPO" "$BESMAN_ENV_REPO_BRANCH")
+	config_url=$(__besman_construct_raw_url "$BESMAN_ENV_REPO" "$BESMAN_ENV_REPO_BRANCH" "${ossp}/${version_id}/besman-$environment_name-config.yaml")
 
-	config_url="$raw_url/${ossp}/${version_id}/besman-$environment_name-config.yaml"
+	# config_url="$raw_url/${ossp}/${version_id}/besman-$environment_name-config.yaml"
 	default_config_path=$BESMAN_DIR/tmp/besman-$environment_name-config.yaml
 
 	[[ -f "$default_config_path" ]] && rm "$default_config_path"

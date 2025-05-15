@@ -181,6 +181,7 @@ function __bes_help_set {
     printf "%-30s %-70s %-25s\n" "BESMAN_LOCAL_ENV" "If value is true, env is installed from BESMAN_LOCAL_ENV_DIR" "true or false"
     printf "%-30s %-70s %-25s\n" "BESMAN_LOCAL_PLAYBOOK_DIR" "Local playbook dir from which user can run playbook" "complete path to dir"
     printf "%-30s %-70s %-25s\n" "BESMAN_LOCAL_PLAYBOOK" "If value is true, playbook is installed from BESMAN_LOCAL_PLAYBOOK_DIR" "true or false"
+    printf "%-30s %-70s %-25s\n" "BESMAN_INSECURE_SSL" "If value is true, curl will not check for SSL certificate" "true or false"
 
     __besman_echo_white "-----------------------------------------------------------------------------------------------------------------------------------"
 }

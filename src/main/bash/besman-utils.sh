@@ -37,7 +37,7 @@ function __besman_secure_curl {
 		# __besman_echo_yellow ""
 		header=""	
 	fi
-	if [[ "${besman_insecure_ssl}" == 'true' ]]; then
+	if [[ "${BESMAN_INSECURE_SSL}" == 'true' ]]; then
 		curl --insecure --silent --location -H "$header" "$1"
 	else
 		curl --silent --location -H "$header" "$1"
@@ -62,7 +62,7 @@ function __besman_curl_head()
 		# __besman_echo_yellow "" >&2
 		header=""	
 	fi
-	if [[ "${besman_insecure_ssl}" == 'true' ]]; then
+	if [[ "${BESMAN_INSECURE_SSL}" == 'true' ]]; then
 		curl --insecure -L --head --silent --connect-timeout 10 --output /dev/null --write-out "%{http_code}" -H "$header" "$1"
 	else
 		curl -L --head --silent --connect-timeout 10 --output /dev/null --write-out "%{http_code}" -H "$header" "$1"
@@ -71,7 +71,7 @@ function __besman_curl_head()
 
 function __besman_secure_curl_download {
 	local curl_params="--progress-bar --location"
-	if [[ "${besman_insecure_ssl}" == 'true' ]]; then
+	if [[ "${BESMAN_INSECURE_SSL}" == 'true' ]]; then
 		curl_params="$curl_params --insecure"
 	fi
 
@@ -99,7 +99,7 @@ function __besman_secure_curl_download {
 }
 
 function __besman_secure_curl_with_timeouts {
-	if [[ "${besman_insecure_ssl}" == 'true' ]]; then
+	if [[ "${BESMAN_INSECURE_SSL}" == 'true' ]]; then
 		curl --insecure --silent --location --connect-timeout ${besman_curl_connect_timeout} --max-time ${besman_curl_max_time} "$1"
 	else
 		curl --silent --location --connect-timeout ${besman_curl_connect_timeout} --max-time ${besman_curl_max_time} "$1"

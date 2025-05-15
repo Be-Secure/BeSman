@@ -262,7 +262,6 @@ function __besman_construct_raw_url(){
             echo "https://raw.githubusercontent.com/$repo/$branch/$file_path"
             ;;
         "gitlab")
-            #http://gitlab.com/api/v4/projects/arun.suresh%2Fbesecure-ce-env-repo/repository/files/environment-metadata.json/raw?ref=main
             if [[ -z $BESMAN_ACCESS_TOKEN ]];
             then
                 echo "$BESMAN_CODE_COLLAB_URL/$repo/-/raw/$branch/$file_path"
@@ -274,4 +273,17 @@ function __besman_construct_raw_url(){
             ;;
     esac
     
+}
+
+function __besman_check_for_access_token()
+{
+    if [[ -z "$BESMAN_ACCESS_TOKEN" ]]; then        
+    __besman_echo_warn "No access token provided. Will try unauthenticated request."
+    __besman_echo_blue ""
+    __besman_echo_white "If you are using a private repository"
+    __besman_echo_white "set the BESMAN_ACCESS_TOKEN environment variable."
+    __besman_echo_blue ""
+    __besman_echo_yellow "export BESMAN_ACCESS_TOKEN=<your_access_token>"
+    __besman_echo_yellow ""
+    fi
 }

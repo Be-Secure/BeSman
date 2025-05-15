@@ -5,6 +5,7 @@ function __bes_list {
     local flag=$1
     local env sorted_list
 
+    __besman_check_for_access_token
     # For listing playbooks
     if [[ (-n $flag) && (($flag == "--playbook") || ($flag == "-P")) ]]; then
 
@@ -46,7 +47,7 @@ function __besman_list_envs() {
     [[ -f "$BESMAN_DIR/var/current" ]] && current_env=$(cat "$BESMAN_DIR/var/current")
     [[ -f "$BESMAN_DIR/envs/besman-$current_env/current" ]] && current_version=$(cat "$BESMAN_DIR/envs/besman-$current_env/current")
 
-    installed_annotation=$(__besman_echo_red "*")
+    installed_annotation=$(__besman_echo_yellow "*")
     remote_annotation=$(__besman_echo_yellow "^")
 
     # For listing environments
@@ -117,7 +118,7 @@ function __besman_check_repo_exist() {
    __besman_check_url_valid "$repo_url" || return 1
 
     # if [[ -n "$response" && "$response" -ne 200 ]]; then
-    #     __besman_echo_red "Repository $repo does not exist under $namespace"
+    #     __besman_echo_error "Repository $repo does not exist under $namespace"
     #     return 1
     # fi
 
@@ -125,10 +126,14 @@ function __besman_check_repo_exist() {
 
 function __besman_update_list() {
     local bes_list exit_code
+    local env_script_file="$BESMAN_DIR/scripts/besman-get-env-list.py"
+
+    [[ ! -f $env_script_file ]] && __besman_echo_error "Could not find script file for env listing: $env_script_file" && return 1
+
     if [[ (-n $BESMAN_LOCAL_ENV) && ($BESMAN_LOCAL_ENV == "true") ]]; then
         local env_dir_list bes_list
         if [[ -z $BESMAN_LOCAL_ENV_DIR ]]; then
-            __besman_echo_red "Could not find your local environment dir"
+            __besman_echo_error "Could not find your local environment dir"
             __besman_echo_no_colour ""
             __besman_echo_white "Use the below command to set it first"
             __besman_echo_no_colour ""
@@ -137,10 +142,8 @@ function __besman_update_list() {
 
             return 1
         fi
-        [[ ! -d $BESMAN_LOCAL_ENV_DIR ]] && __besman_echo_red "Could not find dir $BESMAN_LOCAL_ENV_DIR" && return 1
-        local env_script_file="$BESMAN_DIR/scripts/besman-get-env-list.py"
-        [[ ! -f $env_script_file ]] && __besman_echo_red "Could not find script file $env_script_file" && return 1
-
+        [[ ! -d $BESMAN_LOCAL_ENV_DIR ]] && __besman_echo_error "Could not find dir $BESMAN_LOCAL_ENV_DIR" && return 1
+        # local env_script_file="$BESMAN_DIR/scripts/besman-get-env-list.py"
         python3 $env_script_file
         # env_dir_list=$(< "$BESMAN_LOCAL_ENV_DIR/list.txt")
         # bes_list=$BESMAN_DIR/var/list.txt
@@ -154,8 +157,7 @@ function __besman_update_list() {
         # bes_list="$BESMAN_DIR/var/list.txt"
         # # path="https://raw.githubusercontent.com/$org/$repo/$branch/list.txt"
         # # __besman_secure_curl "$path" > "$bes_list"
-        local env_script_file="$BESMAN_DIR/scripts/besman-get-env-list.py"
-        [[ ! -f $env_script_file ]] && __besman_echo_red "Could not find script file $env_script_file" && return 1
+        # local env_script_file="$BESMAN_DIR/scripts/besman-get-env-list.py"
 
         python3 $env_script_file
 
@@ -164,16 +166,16 @@ function __besman_update_list() {
         if [[ $exit_code -eq 0 ]]; then
             return 0
         elif [[ $exit_code -eq 1 ]]; then
-            __besman_echo_red "Error fetching data."
+            __besman_echo_error "Error fetching data."
             return 1
         elif [[ $exit_code -eq 2 ]]; then
-            __besman_echo_red "Error parsing JSON."
+            __besman_echo_error "Error parsing JSON."
             return 1
         elif [[ $exit_code -eq 3 ]]; then
-            __besman_echo_red "Error writing to file."
+            __besman_echo_error "Error writing to file."
             return 1
         else
-            __besman_echo_red "An unexpected error occurred."
+            __besman_echo_error "An unexpected error occurred."
             return 1
         fi
     fi
@@ -231,7 +233,7 @@ function __besman_get_playbook_details() {
     local version=$2
     scripts_file="$BESMAN_DIR/scripts/besman-get-playbook-details.py"
 
-    [[ ! -f "$scripts_file" ]] && __besman_echo_red "Could not find $scripts_file" && return 1
+    [[ ! -f "$scripts_file" ]] && __besman_echo_error "Could not find $scripts_file" && return 1
 
     if [[ -z $environment || -z $version ]]; then
         python3 "$scripts_file" --master_list True
@@ -240,7 +242,7 @@ function __besman_get_playbook_details() {
     fi
 
     if [[ "$?" != "0" ]]; then
-        __besman_echo_red "Error while fetching playbook details"
+        __besman_echo_error "Error while fetching playbook details"
         return 1
     fi
 }
@@ -248,25 +250,25 @@ function __besman_list_playbooks() {
 
     local playbook_details_file playbook_details local_annotation remote_annotation
 
-    [[ ! -f "$BESMAN_DIR/var/current" || -z $(cat "$BESMAN_DIR/var/current") ]] && __besman_echo_red "Missing environment" && __besman_echo_white "\nInstall an environment to get the list of compatible playbooks" && return 1
+    [[ ! -f "$BESMAN_DIR/var/current" || -z $(cat "$BESMAN_DIR/var/current") ]] && __besman_echo_error "Missing environment" && __besman_echo_white "\nInstall an environment to get the list of compatible playbooks" && return 1
 
     local current_env=$(cat "$BESMAN_DIR/var/current")
 
-    [[ -z $current_env ]] && __besman_echo_red "Could not find installed environment" && return 1
+    [[ -z $current_env ]] && __besman_echo_error "Could not find installed environment" && return 1
 
-    [[ ! -d "$BESMAN_DIR/envs/besman-$current_env" ]] && __besman_echo_red "Could not find installed environment" && return 1
+    [[ ! -d "$BESMAN_DIR/envs/besman-$current_env" ]] && __besman_echo_error "Could not find installed environment" && return 1
 
     local current_env_version=$(cat "$BESMAN_DIR/envs/besman-$current_env/current")
 
     playbook_details_file="$BESMAN_DIR/tmp/playbook_details.txt"
 
     __besman_get_playbook_details "$current_env" "$current_env_version" || return 1
-
+    [[ ! -f "$playbook_details_file" ]] && __besman_echo_error "Could not find playbook details file" && return 1
     playbook_details=$(cat "$playbook_details_file")
 
-    [[ (! -f "$playbook_details_file") || (-z $playbook_details) ]] && __besman_echo_red "Could not find playbook details" && return 1
+    [[ (! -f "$playbook_details_file") || (-z $playbook_details) ]] && __besman_echo_error "Could not find playbook details" && return 1
 
-    local_annotation=$(__besman_echo_red "+")
+    local_annotation=$(__besman_echo_yellow "+")
     remote_annotation=$(__besman_echo_yellow "^")
     printf "\n%-35s Compatible playbooks for $(__besman_echo_yellow "$current_env" "$current_env_version")"
     __besman_echo_white "\n=======================================================================================================================\n"

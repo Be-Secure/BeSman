@@ -66,7 +66,7 @@ def get_env_list():
 
         sys.exit(0)  # Exit with a success code
     except requests.exceptions.RequestException as e:
-        print(f"Error fetching data: {e}")
+        print(f"Error fetching data from url {raw_url}: {e}")
         sys.exit(1)  # Exit with an error code
     except (KeyError, TypeError, json.JSONDecodeError) as e:
         print(f"Error parsing JSON: {e}")
