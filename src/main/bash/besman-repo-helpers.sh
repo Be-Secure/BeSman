@@ -203,14 +203,60 @@ function __besman_check_github_id
     fi
 }
 
+function __besman_construct_repo_url(){
+    local repo encoded_repo
+    repo=$1
+
+    if [[  -n "$BESMAN_ACCESS_TOKEN" && "$BESMAN_CODE_COLLAB_PLATFORM" == "gitlab" ]] 
+    then
+        encoded_repo=$(__besman_get_encoded "$repo")
+        echo "$BESMAN_CODE_COLLAB_URL/api/v4/projects/$encoded_repo"
+    else
+        echo "$BESMAN_CODE_COLLAB_URL/$repo"
+    fi 
+}
+
+function __besman_check_url_valid()
+{
+	local url response header
+
+	url="$1"
+	response=$(__besman_curl_head "$url")
+
+	if [[ $response -eq 200 ]]; then
+		
+		unset url response
+		return 0
+
+	else
+		if [[ $response -eq 401 ]]; then
+			__besman_echo_error "Authentication failed. Please check your access token for url $url."
+		elif [[ $response -eq 403 ]]; then
+			__besman_echo_error "Access forbidden. Please check your permissions for url $url."
+		elif [[ $response -eq 404 ]]; then
+			__besman_echo_error "URL not found. Please check the URL $url."
+		elif [[ $response -eq 500 ]]; then
+			__besman_echo_error "Server error for url $url. Please try again later."
+        elif [[ $response -eq 000 ]]; then
+			__besman_echo_error "Connection timed out for url $url"
+		fi
+
+		unset url response
+		return 1
+	fi
+	
+
+}
+
 function __besman_construct_raw_url(){
     # namespace/repo_name
     local repo=$1
     local branch=$2
     local file_path=$3
     local encoded_repo encoded_file_path
-    encoded_repo=$(echo "$repo" | sed 's/\//%2F/g')
-    encoded_file_path=$(echo "$file_path" | sed 's/\//%2F/g')
+    encoded_repo=$(__besman_get_encoded "$repo")
+    encoded_file_path=$(__besman_get_encoded "$file_path")
+
     case $BESMAN_CODE_COLLAB_PLATFORM in
         "github")
             echo "https://raw.githubusercontent.com/$repo/$branch/$file_path"

@@ -104,19 +104,22 @@ function __besman_list_envs() {
     fi
 }
 
+
+
 function __besman_check_repo_exist() {
     local namespace repo response repo_url
     [[ $BESMAN_LOCAL_ENV == "true" ]] && return 0
-    namespace=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 1)
-    repo=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 2)
-    repo_url="$BESMAN_CODE_COLLAB_URL/$namespace/$repo"
+    # namespace=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 1)
+    # repo=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 2)
 
-    response=$(__besman_check_url_valid "$repo_url")
+    repo_url=$(__besman_construct_repo_url "$BESMAN_ENV_REPO")
 
-    if [[ -n "$response" && "$response" -ne 200 ]]; then
-        __besman_echo_red "Repository $repo does not exist under $namespace"
-        return 1
-    fi
+   __besman_check_url_valid "$repo_url" || return 1
+
+    # if [[ -n "$response" && "$response" -ne 200 ]]; then
+    #     __besman_echo_red "Repository $repo does not exist under $namespace"
+    #     return 1
+    # fi
 
 }
 

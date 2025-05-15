@@ -88,43 +88,16 @@ function __besman_link_candidate_version() {
 	ln -s "${version}" "${BESMAN_CANDIDATES_DIR}/${candidate}/current"
 }
 
-function __besman_check_url_valid()
-{
-	local url response header
-
-	url="$1"
-	if [[ -n "$BESMAN_ACCESS_TOKEN" ]]; then
-		if [[ "$BESMAN_CODE_COLLAB_PLATFORM" == "github" ]]; then
-			header="Authorization: token $BESMAN_ACCESS_TOKEN"
-		elif [[ "$BESMAN_CODE_COLLAB_PLATFORM" == "gitlab" ]]; then
-			header="PRIVATE-TOKEN: $BESMAN_ACCESS_TOKEN"
-		fi
+function __besman_get_encoded() {
+	local string encoded_string
+	string="$1"
+	if [[ -z "$(which jq)" ]] 
+	then
+		# only for / in paths
+		encoded_string=$(echo "$string" | sed 's/\//%2F/g')
 	else
-		__besman_echo_warn "No access token provided. Will try unauthenticated request."
-		header=""
+		encoded_string=$(echo "$string" | jq "@uri" -jRr)
 	fi
-
-	response=$(curl -L --head --silent --output /dev/null --write-out "%{http_code}" -H "$header" "$url")
-
-	if [[ $response -eq 200 ]]; then
-		
-		unset url response
-		return 0
-
-	else
-		if [[ $response -eq 401 ]]; then
-			__besman_echo_error "Authentication failed. Please check your access token for url $url."
-		elif [[ $response -eq 403 ]]; then
-			__besman_echo_error "Access forbidden. Please check your permissions for url $url."
-		elif [[ $response -eq 404 ]]; then
-			__besman_echo_error "URL not found. Please check the URL $url."
-		elif [[ $response -eq 500 ]]; then
-			__besman_echo_error "Server error. Please try again later." 			
-		fi
-
-		unset url response
-		return 1
-	fi
+	echo "$encoded_string"
 	
-
 }

@@ -29,12 +29,12 @@ function __besman_secure_curl {
 			header="PRIVATE-TOKEN: $BESMAN_ACCESS_TOKEN"
 		fi
 	else
-		__besman_echo_warn "No access token provided. Will try unauthenticated request."
-		__besman_echo_white "If you are using a private repository, press CTRL + C to cancel and"
-		__besman_echo_white "set the BESMAN_ACCESS_TOKEN environment variable."
-		__besman_echo_blue ""
-		__besman_echo_yellow "export BESMAN_ACCESS_TOKEN=<your_access_token>"
-		__besman_echo_yellow ""
+		# __besman_echo_warn "No access token provided. Will try unauthenticated request."
+		# __besman_echo_white "If you are using a private repository, press CTRL + C to cancel and"
+		# __besman_echo_white "set the BESMAN_ACCESS_TOKEN environment variable."
+		# __besman_echo_blue ""
+		# __besman_echo_yellow "export BESMAN_ACCESS_TOKEN=<your_access_token>"
+		# __besman_echo_yellow ""
 		header=""	
 	fi
 	if [[ "${besman_insecure_ssl}" == 'true' ]]; then
@@ -53,18 +53,19 @@ function __besman_curl_head()
 			header="PRIVATE-TOKEN: $BESMAN_ACCESS_TOKEN"
 		fi
 	else
-		__besman_echo_warn "No access token provided. Will try unauthenticated request."
-		__besman_echo_white "If you are using a private repository, press CTRL + C to cancel and"
-		__besman_echo_white "set the BESMAN_ACCESS_TOKEN environment variable."
-		__besman_echo_blue ""
-		__besman_echo_yellow "export BESMAN_ACCESS_TOKEN=<your_access_token>"
-		__besman_echo_yellow ""
+		# __besman_echo_warn "No access token provided. Will try unauthenticated request." >&2
+		# __besman_echo_blue "" >&2
+		# __besman_echo_white "If you are using a private repository, press CTRL + C to cancel and" >&2
+		# __besman_echo_white "set the BESMAN_ACCESS_TOKEN environment variable." >&2
+		# __besman_echo_blue "" >&2
+		# __besman_echo_yellow "export BESMAN_ACCESS_TOKEN=<your_access_token>" >&2
+		# __besman_echo_yellow "" >&2
 		header=""	
 	fi
 	if [[ "${besman_insecure_ssl}" == 'true' ]]; then
-		curl --insecure --head --silent --location -H "$header" "$1"
+		curl --insecure -L --head --silent --connect-timeout 10 --output /dev/null --write-out "%{http_code}" -H "$header" "$1"
 	else
-		curl --silent --head --location -H "$header" "$1"
+		curl -L --head --silent --connect-timeout 10 --output /dev/null --write-out "%{http_code}" -H "$header" "$1"
 	fi
 }
 
@@ -150,7 +151,7 @@ function __besman_echo_yellow {
 
 function __besman_echo_warn()
 {
-	__besman_echo "33m" "[WARN]: $1"
+	__besman_echo_yellow "[WARN]: $1"
 }
 
 function __besman_echo_green {
