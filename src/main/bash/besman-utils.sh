@@ -38,9 +38,9 @@ function __besman_secure_curl {
 		header=""	
 	fi
 	if [[ "${BESMAN_INSECURE_SSL}" == 'true' ]]; then
-		curl --insecure --silent --location -H "$header" "$1"
+		curl --insecure --silent --connect-timeout "$BESMAN_CURL_CONNECT_TIMEOUT" --location -H "$header" "$1"
 	else
-		curl --silent --location -H "$header" "$1"
+		curl --silent --location --connect-timeout "$BESMAN_CURL_CONNECT_TIMEOUT" -H "$header" "$1"
 	fi
 }
 
@@ -63,9 +63,9 @@ function __besman_curl_head()
 		header=""	
 	fi
 	if [[ "${BESMAN_INSECURE_SSL}" == 'true' ]]; then
-		curl --insecure -L --head --silent --connect-timeout 10 --output /dev/null --write-out "%{http_code}" -H "$header" "$1"
+		curl --insecure -L --head --silent --connect-timeout "$BESMAN_CURL_CONNECT_TIMEOUT" --output /dev/null --write-out "%{http_code}" -H "$header" "$1"
 	else
-		curl -L --head --silent --connect-timeout 10 --output /dev/null --write-out "%{http_code}" -H "$header" "$1"
+		curl -L --head --silent --connect-timeout "$BESMAN_CURL_CONNECT_TIMEOUT" --output /dev/null --write-out "%{http_code}" -H "$header" "$1"
 	fi
 }
 
