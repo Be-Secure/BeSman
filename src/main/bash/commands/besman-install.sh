@@ -206,7 +206,7 @@ function __besman_download_env_repo() {
 	elif [[ "$BESMAN_CODE_COLLAB_PLATFORM" == "gitlab" ]]
 	then
 		env_repo_name=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 2)
-		repo_url="http://$BESMAN_CODE_COLLAB_URL/$BESMAN_ENV_REPO/-/archive/$BESMAN_ENV_REPO_BRANCH/$env_repo_name-$BESMAN_ENV_REPO_BRANCH.zip"
+		repo_url="$BESMAN_CODE_COLLAB_URL/$BESMAN_ENV_REPO/-/archive/$BESMAN_ENV_REPO_BRANCH/$env_repo_name-$BESMAN_ENV_REPO_BRANCH.zip"
 	fi
 	local env_repo_name="$2"
 	[[ -f "$env_zip" ]] && rm -f "$env_zip"
