@@ -499,10 +499,10 @@ def write_json_data(osar_data, osar_file_path):
 # Add more tools and their corresponding processing functions here
 tool_processors = {
     "sonarqube": sonar_parser,
-    "spdx-sbom-generator": sbom_parser,
+    "SpdxSbomGenerator": sbom_parser,
     "scorecard": scorecard_parser,
     "fossology": fossology_parser,
-    "criticality_score": criticality_score_parser,
+    "CriticalityScore": criticality_score_parser,
     "watchtower": watchtower_parser,
     "counterfit": counterfit_parser,
     "cyclonedx-sbom-generator": cdx_sbom_parser,
