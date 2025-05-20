@@ -348,3 +348,18 @@ function __besman_download_default_configations() {
 	__besman_secure_curl "$config_url" >>"$default_config_path"
 
 }
+
+
+function __besman_check_current_env()
+{
+	local current_env
+
+	current_env=$(ls "$BESMAN_DIR/envs" | grep -E "^besman-")
+	if [[ -n $current_env ]]; then
+		__besman_echo_red "You have installed an environment. Uninstall it before installing a new one."
+		__besman_echo_no_colour "Current environment: $current_env"
+		return 1
+	else
+		return 0
+	fi
+}

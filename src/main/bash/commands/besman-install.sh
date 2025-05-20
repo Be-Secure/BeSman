@@ -15,7 +15,7 @@ function __bes_install {
 
 	# If environmnet not installed.
 	if [[ ! -d "${BESMAN_DIR}/envs/besman-${environment_name}/$version_id" ]]; then
-
+		__besman_check_current_env || return 1
 
 		if [[ (-n $BESMAN_LOCAL_ENV) && ($BESMAN_LOCAL_ENV == "true") ]]; then
 			__besman_get_local_env "$environment_name" "$version_id" || return 1
