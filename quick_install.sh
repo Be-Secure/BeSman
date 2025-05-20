@@ -171,17 +171,20 @@ EOF
 	fi
 
 	if [[ -z $(command -v jupyter) ]]; then
-		echo "Installing jupyter notebook"
-		python3 -m pip install notebook
+		echo "Installing  notebook"
+		python3 -m pip install jupyter
+		#sudo python3 -m pip install notebook
 	fi
 
-	if [[ -z $(command -v jupyter) ]]; then
-		echo "Installing jupyter notebook"
-		sudo apt-get install jupyter -y
+	if [[ ! -z $(command -v jupyter) ]]; then
+		echo "Configuring jupyter notebook"
 		jupyter notebook --generate-config
-		#sed -i "s/# c.ServerApp.ip = 'localhost'/c.ServerApp.ip = '0.0.0.0'/g" $HOME/.jupyter/jupyter_notebook_config.py
-		#sed -i "s/# c.ServerApp.open_browser = False/c.ServerApp.open_browser = False/g" $HOME/.jupyter/jupyter_notebook_config.py
-		#python3 -m pip install notebook
+		sed -i "s/# c.ServerApp.ip = 'localhost'/c.ServerApp.ip = '0.0.0.0'/g" $HOME/.jupyter/jupyter_notebook_config.py
+		sed -i "s/# c.ServerApp.open_browser = False/c.ServerApp.open_browser = False/g" $HOME/.jupyter/jupyter_notebook_config.py
+		sed -i "s/# c.NotebookApp.ip = 'localhost'/c.NotebookApp.ip = '0.0.0.0'/g" $HOME/.jupyter/jupyter_notebook_config.py
+		sed -i "s/# c.NotebookApp.open_browser = True/c.NotebookApp.open_browser = False/g" $HOME/.jupyter/jupyter_notebook_config.py
+    else
+	    echo "Jupyter notebook not installed successfully"
 	fi
 
 	echo "Installing BeSMAN scripts..."
