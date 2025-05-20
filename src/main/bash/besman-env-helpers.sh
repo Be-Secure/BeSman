@@ -143,7 +143,7 @@ function __besman_unset_env_parameters_and_cleanup() {
 
 	done <"$BESMAN_ENV_CONFIG_FILE_PATH"
 
-	[[ -f $BESMAN_DIR/tmp/besman-$environment-config.yaml ]] && rm "$BESMAN_ENV_CONFIG_FILE_PATH"
+	[[ -f $BESMAN_DIR/tmp/besman-$environment-config.yaml ]] && rm "$$BESMAN_DIR/tmp/besman-$environment-config.yaml"
 	[[ -d $BESMAN_DIR/tmp/$ossp ]] && rm -rf "$BESMAN_DIR/tmp/$ossp"
 }
 
