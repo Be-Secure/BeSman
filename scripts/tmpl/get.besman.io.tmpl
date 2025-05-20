@@ -198,7 +198,22 @@ EOF
 
 	if [[ -z $(command -v jupyter) ]]; then
 		echo "Installing jupyter notebook"
-		python3 -m pip install notebook
+		python3 -m pip install jupyter
+		#python3 -m pip install jupyter
+	fi
+
+	if [[ ! -z $(command -v jupyter) ]]; then
+		echo "Configuring jupyter notebook"
+		jupyter notebook --generate-config
+		if [[ -f $HOME/.jupyter/jupyter_notebook_config.py ]]; then
+			echo "Jupyter notebook config file found"
+			sed -i "s/# c.ServerApp.ip = 'localhost'/c.ServerApp.ip = '0.0.0.0'/g" $HOME/.jupyter/jupyter_notebook_config.py
+			sed -i "s/# c.ServerApp.open_browser = False/c.ServerApp.open_browser = False/g" $HOME/.jupyter/jupyter_notebook_config.py
+			sed -i "s/# c.NotebookApp.ip = 'localhost'/c.NotebookApp.ip = '0.0.0.0'/g" $HOME/.jupyter/jupyter_notebook_config.py
+			sed -i "s/# c.NotebookApp.open_browser = True/c.NotebookApp.open_browser = False/g" $HOME/.jupyter/jupyter_notebook_config.py
+		fi
+	else
+	    echo "Jupyter notebook not installed successfully"
 	fi
 
 	if [[ "$solaris" == true ]]; then
