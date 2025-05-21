@@ -505,7 +505,7 @@ tool_processors = {
     "criticalityscore": criticality_score_parser,
     "watchtower": watchtower_parser,
     "counterfit": counterfit_parser,
-    "cyclonedx-sbom-generator": cdx_sbom_parser,
+    "cyclonedxsbomgenerator": cdx_sbom_parser,
     
     "cybersecevalautocomplete": cse_autocomplete_parser,
     "cybersecevalfrr": cse_frr_parser,
