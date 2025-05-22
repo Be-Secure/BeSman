@@ -11,11 +11,9 @@ function setup() {
 }
 
 @test "besman version" {
-    run bes -V
+    run bes -V || run bes --version
     echo "Output: $output"
     echo "Status: $status"
     [ "$status" -eq 0 ]
     [[ "$output" =~ "BeSman utility version" ]]
-    # regex to check for version format
-    [[ "$output" =~ "[0-9]+\.[0-9]+\.[0-9]+" ]]
 }

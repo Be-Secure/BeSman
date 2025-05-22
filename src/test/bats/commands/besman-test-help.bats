@@ -15,7 +15,7 @@ function setup() {
     echo "Output: $output"
     echo "Status: $status"
     [ "$status" -eq 0 ]
-    [[ "$output" =~ " bes - The cli for BeSman" ]]
+    [[ "$output" =~ "bes - The cli for BeSman" ]]
 }
 
 @test "besman help install" {
