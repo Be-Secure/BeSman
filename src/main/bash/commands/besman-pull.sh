@@ -86,11 +86,21 @@ function __besman_fetch_steps_file() {
         flag=0
         url=$(__besman_construct_raw_url "$BESMAN_PLAYBOOK_REPO" "$BESMAN_PLAYBOOK_REPO_BRANCH" "playbooks/$steps_file_base_name.$ext")
         # --fail/-f makes curl return non‑zero on 404, --head/-I fetches only headers
-        if curl --fail --head "$url" >/dev/null 2>&1; then
-            # curl -L "$url" -o "$NAME.$ext"
-            download_url="$url"
-            flag=1
-            break
+        if [[ -n $BESMAN_ACCESS_TOKEN ]] 
+        then   
+            if curl --fail --head -H "PRIVATE-TOKEN: $BESMAN_ACCESS_TOKEN" "$url" >/dev/null 2>&1; then
+                # curl -L "$url" -o "$NAME.$ext"
+                download_url="$url"
+                flag=1
+                break
+            fi
+        else
+            if curl --fail --head "$url" >/dev/null 2>&1; then
+                # curl -L "$url" -o "$NAME.$ext"
+                download_url="$url"
+                flag=1
+                break
+            fi
         fi
     done
     if [[ $flag -eq 0 ]]; then
