@@ -79,19 +79,35 @@ function __besman_fetch_steps_file() {
     local playbook_name="$1"
     local playbook_version="$2"
     local steps_file_base_name="besman-$playbook_name-steps-$playbook_version"
-    local download_url ext raw_url url flag file_name steps_file_path
+    local download_url ext raw_url url flag file_name steps_file_path response
     extensions=(sh md ipynb)
     # raw_url=$(__besman_construct_raw_url "$BESMAN_PLAYBOOK_REPO" "$BESMAN_PLAYBOOK_REPO_BRANCH" "playbooks/$steps_file_base_name.$ext")
     for ext in "${extensions[@]}"; do
         flag=0
         url=$(__besman_construct_raw_url "$BESMAN_PLAYBOOK_REPO" "$BESMAN_PLAYBOOK_REPO_BRANCH" "playbooks/$steps_file_base_name.$ext")
         # --fail/-f makes curl return non‑zero on 404, --head/-I fetches only headers
-        if curl --fail --head "$url" >/dev/null 2>&1; then
-            # curl -L "$url" -o "$NAME.$ext"
+        # if [[ -n $BESMAN_ACCESS_TOKEN ]] 
+        # then   
+        #     if curl --fail --head -H "PRIVATE-TOKEN: $BESMAN_ACCESS_TOKEN" "$url" >/dev/null 2>&1; then
+        #         # curl -L "$url" -o "$NAME.$ext"
+        #         download_url="$url"
+        #         flag=1
+        #         break
+        #     fi
+        # else
+        #     if curl --fail --head "$url" >/dev/null 2>&1; then
+        #         # curl -L "$url" -o "$NAME.$ext"
+        #         download_url="$url"
+        #         flag=1
+        #         break
+        #     fi
+        # fi
+	    response=$(__besman_curl_head "$url")
+        [[ $response -eq 200 ]] && {
             download_url="$url"
             flag=1
             break
-        fi
+        }
     done
     if [[ $flag -eq 0 ]]; then
         __besman_echo_red "No matching steps file found for $playbook_name $playbook_version"
