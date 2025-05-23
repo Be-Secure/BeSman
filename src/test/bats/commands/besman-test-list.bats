@@ -1,11 +1,11 @@
 #!/usr/bin/env bats
 
 load '../helper/besman-list-helper'
-load '../mocks/besman-mock-for-list'
+load '../mocks/besman-mock-functions'
 
 setup() {
     # Create temporary directories for testing
-    export BESMAN_DIR="${BATS_TMPDIR}/besman"
+    export BESMAN_DIR="${BATS_TMPDIR}/.besman"
     export BESMAN_PLAYBOOK_DIR="${BESMAN_DIR}/playbooks"
     export BESMAN_SCRIPTS_DIR="${BESMAN_DIR}/scripts"
     export BESMAN_ENV_REPO="test-org/test-repo"

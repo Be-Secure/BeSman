@@ -17,6 +17,10 @@ __besman_echo_error() {
   echo "ERROR: $*" >&2
 }
 
+__besman_echo_red() {
+  echo "ERROR: $*" >&2
+}
+
 __besman_construct_repo_url() {
   echo "https://github.com/$1"
 }
@@ -42,3 +46,4 @@ python3() {
   fi
   return 0
 }
+
