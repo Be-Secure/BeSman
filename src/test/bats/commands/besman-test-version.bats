@@ -14,7 +14,6 @@ function teardown() {
 }
 
 @test "besman version" {
-    # run bes -V || run bes --version
     run __bes_version
     echo "Output: $output"
     echo "Status: $status"

@@ -47,3 +47,18 @@ python3() {
   return 0
 }
 
+__besman_construct_raw_url() {
+  echo "https://raw.githubusercontent.com/$1/$2/$3"
+}
+
+__besman_secure_curl() { 
+  echo "# Mock config content for $1"; 
+}
+
+__besman_open_files_in_vscode() { 
+    echo "VSCODE: $*"; 
+}
+
+
+
+
