@@ -30,6 +30,7 @@ function teardown() {
     echo  "Output: $output"
     echo "Status: $status"
     [[ "$status" -eq 0 ]]
+    [[ -f "$HOME/besman-fastjson-RT-env-config.yaml" ]]
     [[ $output =~ "$BESMAN_ENV_REPO" ]]
     [[ $output =~ "$BESMAN_ENV_REPO_BRANCH" ]]
     [[ $output =~ "Trying to open config file in vscode.." ]]
@@ -57,16 +58,43 @@ function teardown() {
     # Mock code command
     code() { echo "Opening files: $*"; }
     export -f code
+
     
     # Mock user input - choose to replace
-    echo "n" | run __bes_config "fastjson-RT-env" "1.0.0"
+    run __bes_config "fastjson-RT-env" "1.0.0" <<EOF
+    y
+EOF
     # write output to console
     echo "Output: $output"
     echo "Status: $status"
     
     [[ $status -eq 0 ]]
+    [[ -f "$HOME/besman-fastjson-RT-env-config.yaml" ]]
+    [[ "$output" == *"File besman-fastjson-RT-env-config.yaml already exists under"* ]]
+    [[ "$output" =~ "Replacing..." ]]
+    [[ "$output" =~ "Downloading config file" ]]
+}
 
-    # [[ "$output" =~ "File fastjson-RT-env already exists under $HOME" ]]
-    # [[ "$output" =~ "Replacing..." ]]
-    # [[ "$output" =~ "Downloading config file" ]]
+
+@test "Config command prompts user when config file already exists and user not chooses to replace" {
+    # Create existing config file
+    echo "# Existing config" > "${HOME}/besman-fastjson-RT-env-config.yaml"
+    # Mock code command
+    code() { echo "Opening files: $*"; }
+    export -f code
+
+    
+    # Mock user input - choose to replace
+    run __bes_config "fastjson-RT-env" "1.0.0" <<EOF
+    n
+EOF
+    # write output to console
+    echo "Output: $output"
+    echo "Status: $status"
+    
+    [[ $status -eq 1 ]]
+    [[ -f "$HOME/besman-fastjson-RT-env-config.yaml" ]]
+    [[ "$output" == *"File besman-fastjson-RT-env-config.yaml already exists under"* ]]
+    [[ "$output" == *"You chose not to replace."* ]]
+    [[ "$output" =~ "Exiting.." ]]
 }
