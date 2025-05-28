@@ -1,0 +1,206 @@
+name: Bats Tests
+
+on:
+  #Trigger on pull requests to master and develop branches when src/ files change
+  pull_request:
+    branches:
+      - master
+      - develop
+    paths:
+      - 'src/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v3
+
+    - name: Update package list and install Bats
+      run: |
+        echo "Updating package list..."
+        sudo apt-get update
+        
+        echo "Installing Bats using apt..."
+        sudo apt-get install -y bats
+    - name: Verify Bats installation
+      run: |
+        bats --version
+        which bats
+        echo "✅Bats installed successfully via apt"
+
+
+    - name: Run Bats tests with detailed output
+      id: run-tests
+      run: |
+        echo "::group::Running Bats Tests"
+        
+        # Set up test output files
+        TEST_OUTPUT_FILE="bats_test_output.log"
+        
+        # Run tests with TAP output and detailed logging
+        set +e  # Don't exit on test failures
+        
+        if [ -d "src/test/bats/commands" ] && [ "$(find src/test/bats/commands -name "*.bats" 2>/dev/null | wc -l)" -gt 0 ]; then
+          echo "Found test files, running tests..."
+          bats --tap --recursive src/test/bats/commands/ 2>&1 | tee "${TEST_OUTPUT_FILE}"
+          TEST_EXIT_CODE=${PIPESTATUS[0]}
+        else
+          echo "No .bats test files found in src/test/bats/commands/"
+          TEST_EXIT_CODE=${PIPESTATUS[0]}
+        fi
+        
+        echo "::endgroup::"
+        
+        # Save the exit code for later steps
+        echo "TEST_EXIT_CODE=${TEST_EXIT_CODE}" >> $GITHUB_ENV
+        echo "TEST_OUTPUT_FILE=${TEST_OUTPUT_FILE}" >> $GITHUB_ENV
+
+    - name: Process test results
+      if: always()
+      run: |
+        set -x
+        echo "::group::Test Results Summary"
+          # Count passed and failed tests
+
+          if [[ -f "${TEST_OUTPUT_FILE}" ]]
+          then
+            if ! grep -c "^ok " "${TEST_OUTPUT_FILE}"
+            then
+              PASSED_TESTS=0
+            else
+              PASSED_TESTS=$(grep -c "^ok " "${TEST_OUTPUT_FILE}")
+            fi
+            
+            if ! grep -c "^not ok " "${TEST_OUTPUT_FILE}"
+            then
+              FAILED_TESTS=0
+            else
+              FAILED_TESTS=$(grep -c "^not ok " "${TEST_OUTPUT_FILE}")
+            fi
+
+            if ! grep -c "^ok .* # skip" "${TEST_OUTPUT_FILE}"
+            then
+              SKIPPED_TESTS=0
+            else
+              SKIPPED_TESTS=$(grep -c "^ok .* # skip" "${TEST_OUTPUT_FILE}")
+            fi
+            TOTAL_TESTS=$((PASSED_TESTS + FAILED_TESTS + SKIPPED_TESTS))
+            echo "Test Summary:"
+            echo "  📝 Total tests: ${TOTAL_TESTS}"
+            echo "  ✅ Passed: ${PASSED_TESTS}"
+            echo "  ❌ Failed: ${FAILED_TESTS}"
+            echo "  ⏭️  Skipped: ${SKIPPED_TESTS}"
+
+            if [ "${TOTAL_TESTS}" -gt 0 ]; then
+              SUCCESS_RATE=$(( (PASSED_TESTS * 100) / TOTAL_TESTS ))
+              echo "  📈 Success Rate: ${SUCCESS_RATE}%"
+            fi
+            
+            echo "PASSED_TESTS=${PASSED_TESTS}" >> $GITHUB_ENV
+            echo "FAILED_TESTS=${FAILED_TESTS}" >> $GITHUB_ENV
+            echo "SKIPPED_TESTS=${SKIPPED_TESTS}" >> $GITHUB_ENV
+            echo "TOTAL_TESTS=${TOTAL_TESTS}" >> $GITHUB_ENV
+          else
+            echo "PASSED_TESTS=0" >> $GITHUB_ENV
+            echo "FAILED_TESTS=0" >> $GITHUB_ENV
+            echo "SKIPPED_TESTS=0" >> $GITHUB_ENV
+            echo "TOTAL_TESTS=0" >> $GITHUB_ENV
+          fi
+        echo "::endgroup::"
+    
+    - name: Highlight test failures
+      if: always()
+      run: |
+        
+        if [ -f "${TEST_OUTPUT_FILE}" ] && [ "${TEST_EXIT_CODE}" != "0" ]; then
+          FAILED_TESTS=$(grep -c "^not ok " "${TEST_OUTPUT_FILE}" || echo "0")
+
+            echo "::group::❌ Test Failures Detected"
+              
+            echo "::error title=Bats Tests Failed::${FAILED_TESTS} test(s) failed out of ${TOTAL_TESTS} total tests"
+            
+            # Extract and highlight failed tests
+            echo "Failed tests:"
+            grep -n "^not ok " "${TEST_OUTPUT_FILE}" | while IFS= read -r line; do
+              echo "::error::${line}"
+            done
+            
+            # Show detailed failure output
+            echo ""
+            echo "Detailed failure output:"
+            grep -A 5 -B 1 "^not ok " "${TEST_OUTPUT_FILE}" || true
+            
+            # Show any error messages
+            if grep -q "# " "${TEST_OUTPUT_FILE}"; then
+              echo ""
+              echo "Error details:"
+              grep "# " "${TEST_OUTPUT_FILE}" | while IFS= read -r line; do
+                echo "::error::${line}"
+              done
+            fi
+        fi
+          
+        echo "::endgroup::"
+    - name: Generate test report
+      if: always()
+      run: |
+        echo "::group::📋 Generating Test Report"
+        
+        # Create a markdown report
+        cat > test-report.md << EOF
+        # BeSman Bats Test Report
+        
+        **Test Run Date:** $(date)
+        **Branch:** ${GITHUB_REF#refs/heads/}
+        **Commit:** ${GITHUB_SHA:0:8}
+        **Workflow:** [Run #${GITHUB_RUN_NUMBER}](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})
+        
+        ## 📊 Summary
+        | Metric | Value |
+        |--------|-------|
+        | Total Tests | ${TOTAL_TESTS:-0} |
+        | Passed | ✅ ${PASSED_TESTS:-0} |
+        | Failed | ❌ ${FAILED_TESTS:-0} |
+        | Skipped | ⏭️ ${SKIPPED_TESTS:-0} |
+        | Success Rate | $(( TOTAL_TESTS > 0 ? (PASSED_TESTS * 100) / TOTAL_TESTS : 0 ))% |
+        
+        ## Test Status
+        $(if [ "${TEST_EXIT_CODE}" = "0" ]; then echo "✅ All tests passed!"; else echo "❌ Some tests failed"; fi)
+        
+        EOF
+        
+        if [ -f "${TEST_OUTPUT_FILE}" ] && [ "${FAILED_TESTS:-0}" -gt 0 ]; then
+          echo "" >> test-report.md
+          echo "## Failed Tests" >> test-report.md
+          echo "\`\`\`" >> test-report.md
+          grep "^not ok " "${TEST_OUTPUT_FILE}" >> test-report.md || true
+          echo "\`\`\`" >> test-report.md
+        fi
+        
+        echo "Test report generated:"
+        cat test-report.md
+        
+        echo "::endgroup::"
+
+
+    - name: Upload test artifacts
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: bats-test-results-${{ github.run_number }}
+        path: |
+          bats_test_output.log
+          test-report.md
+        retention-days: 90
+
+    - name: Set final status
+      if: always()
+      run: |
+        if [ "${TEST_EXIT_CODE}" != "0" ]; then
+          echo "::error title=Test Suite Failed::${FAILED_TESTS} test(s) failed. Check the test output above for details."
+          exit 1
+        else
+          echo "::notice title=Test Suite Passed::All ${TOTAL_TESTS} tests passed successfully! 🎉"
+        fi
