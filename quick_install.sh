@@ -23,9 +23,6 @@ function quick_install() {
 		export BESMAN_DIR="$HOME/.besman"
 	fi
 
-	if [[ -z "$BESMAN_CODE_COLLAB_URL" ]]; then
-		export BESMAN_CODE_COLLAB_URL="https://github.com"
-	fi
 
 	if [[ -z "$BESMAN_VCS" ]]; then
 		export BESMAN_VCS="git"
@@ -174,17 +171,23 @@ EOF
 	fi
 
 	if [[ -z $(command -v jupyter) ]]; then
-		echo "Installing jupyter notebook"
-		python3 -m pip install notebook
+		echo "Installing  notebook"
+		python3 -m pip install jupyter
+		#sudo python3 -m pip install notebook
 	fi
 
-	if [[ -z $(command -v jupyter) ]]; then
-		echo "Installing jupyter notebook"
-		sudo apt-get install jupyter -y
+	if [[ ! -z $(command -v jupyter) ]]; then
+		echo "Configuring jupyter notebook"
 		jupyter notebook --generate-config
-		#sed -i "s/# c.ServerApp.ip = 'localhost'/c.ServerApp.ip = '0.0.0.0'/g" $HOME/.jupyter/jupyter_notebook_config.py
-		#sed -i "s/# c.ServerApp.open_browser = False/c.ServerApp.open_browser = False/g" $HOME/.jupyter/jupyter_notebook_config.py
-		#python3 -m pip install notebook
+		if [[ -f "$HOME/.jupyter/jupyter_notebook_config.py" ]]; then
+			echo "Jupyter notebook config file found"
+			sed -i "s/# c.ServerApp.ip = 'localhost'/c.ServerApp.ip = '0.0.0.0'/g" $HOME/.jupyter/jupyter_notebook_config.py
+			sed -i "s/# c.ServerApp.open_browser = False/c.ServerApp.open_browser = False/g" $HOME/.jupyter/jupyter_notebook_config.py
+			sed -i "s/# c.NotebookApp.ip = 'localhost'/c.NotebookApp.ip = '0.0.0.0'/g" $HOME/.jupyter/jupyter_notebook_config.py
+			sed -i "s/# c.NotebookApp.open_browser = True/c.NotebookApp.open_browser = False/g" $HOME/.jupyter/jupyter_notebook_config.py
+		fi
+    else
+	    echo "Jupyter notebook not installed successfully"
 	fi
 
 	echo "Installing BeSMAN scripts..."
@@ -222,7 +225,8 @@ EOF
 	{
 		echo "BESMAN_VERSION=$BESMAN_VERSION"
 		echo "BESMAN_USER_NAMESPACE="
-		echo "BESMAN_CODE_COLLAB_URL=$BESMAN_CODE_COLLAB_URL"
+		echo "BESMAN_CODE_COLLAB_PLATFORM=github"
+		echo "BESMAN_CODE_COLLAB_URL=https://github.com"
 		echo "BESMAN_VCS=$BESMAN_VCS"
 		echo "BESMAN_ENV_ROOT=$HOME/BeSman_env"
 		echo "BESMAN_NAMESPACE=$BESMAN_NAMESPACE"
@@ -239,11 +243,13 @@ EOF
 		echo "BESMAN_LOCAL_PLAYBOOK=false"
 		echo "BESMAN_LOCAL_PLAYBOOK_DIR="
 		echo "BESMAN_PLAYBOOK_DIR=$besman_playbook_dir"
+		echo "BESMAN_INSECURE_SSL=false"
+		echo "BESMAN_CURL_CONNECT_TIMEOUT=15"
 	} >>"$besman_user_config_file"
 
 	cp ./src/main/bash/besman-* "$besman_src_folder"
 	cp ./src/main/bash/commands/besman-* "$besman_src_folder"
-	cp ./src/main/bash/scripts/besman-* "$besman_scripts_folder"
+	cp ./src/main/bash/scripts/besman* "$besman_scripts_folder"
 	mv "$besman_src_folder/besman-init.sh" "$besman_bin_folder"
 
 	touch "$besman_var_folder/list.txt"

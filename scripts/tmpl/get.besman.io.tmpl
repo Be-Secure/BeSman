@@ -35,10 +35,6 @@ function __bes_install_besman() {
 		export BESMAN_DIR="$HOME/.besman"
 	fi
 
-	if [[ -z "$BESMAN_CODE_COLLAB_URL" ]]; then
-		export BESMAN_CODE_COLLAB_URL="https://github.com"
-	fi
-
 	if [[ -z "$BESMAN_VCS" ]]; then
 		export BESMAN_VCS="git"
 	fi
@@ -202,7 +198,22 @@ EOF
 
 	if [[ -z $(command -v jupyter) ]]; then
 		echo "Installing jupyter notebook"
-		python3 -m pip install notebook
+		python3 -m pip install jupyter
+		#python3 -m pip install jupyter
+	fi
+
+	if [[ ! -z $(command -v jupyter) ]]; then
+		echo "Configuring jupyter notebook"
+		jupyter notebook --generate-config
+		if [[ -f $HOME/.jupyter/jupyter_notebook_config.py ]]; then
+			echo "Jupyter notebook config file found"
+			sed -i "s/# c.ServerApp.ip = 'localhost'/c.ServerApp.ip = '0.0.0.0'/g" $HOME/.jupyter/jupyter_notebook_config.py
+			sed -i "s/# c.ServerApp.open_browser = False/c.ServerApp.open_browser = False/g" $HOME/.jupyter/jupyter_notebook_config.py
+			sed -i "s/# c.NotebookApp.ip = 'localhost'/c.NotebookApp.ip = '0.0.0.0'/g" $HOME/.jupyter/jupyter_notebook_config.py
+			sed -i "s/# c.NotebookApp.open_browser = True/c.NotebookApp.open_browser = False/g" $HOME/.jupyter/jupyter_notebook_config.py
+		fi
+	else
+	    echo "Jupyter notebook not installed successfully"
 	fi
 
 	if [[ "$solaris" == true ]]; then
@@ -270,7 +281,8 @@ EOF
 	{
 		echo "BESMAN_VERSION=$BESMAN_VERSION"
 		echo "BESMAN_USER_NAMESPACE="
-		echo "BESMAN_CODE_COLLAB_URL=$BESMAN_CODE_COLLAB_URL"
+		echo "BESMAN_CODE_COLLAB_PLATFORM=github"
+		echo "BESMAN_CODE_COLLAB_URL=https://github.com"
 		echo "BESMAN_VCS=$BESMAN_VCS"
 		echo "BESMAN_ENV_ROOT=$HOME/BeSman_env"
 		echo "BESMAN_NAMESPACE=$BESMAN_NAMESPACE"
@@ -287,6 +299,8 @@ EOF
 		echo "BESMAN_LOCAL_PLAYBOOK=false"
 		echo "BESMAN_LOCAL_PLAYBOOK_DIR="
 		echo "BESMAN_PLAYBOOK_DIR=$besman_playbook_dir"
+		echo "BESMAN_INSECURE_SSL=false"
+		echo "BESMAN_CURL_CONNECT_TIMEOUT=15"
 	} >>"$besman_user_config_file"
 	echo "Download script archive..."
 
@@ -319,7 +333,7 @@ EOF
 
 	mv "${besman_stage_folder}/besman-init.sh" "$besman_bin_folder"
 	mv "$besman_stage_folder"/besman-*.sh "$besman_src_folder"
-	mv "$besman_stage_folder"/besman-*.py* "$besman_scripts_folder"
+	mv "$besman_stage_folder"/besman*.py* "$besman_scripts_folder"
 	mv "$besman_stage_folder"/list.txt "$besman_var_folder"
 	[[ -d ${besman_stage_folder} ]] && rm -rf ${besman_stage_folder}/*
 

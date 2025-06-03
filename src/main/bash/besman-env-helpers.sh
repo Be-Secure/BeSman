@@ -50,24 +50,34 @@ function __besman_check_value_empty()
 
 function __besman_source_env_params
 {
-    local  key value line tmp_var_file environment env_config version
+    local  key value line tmp_var_file environment env_config version ossp
     environment=$1
     version=$2
     env_config="besman-$environment-config.yaml"
+	if echo "$environment" | grep -qE 'RT|BT'; then
+		ossp=$(echo "$environment" | sed -E 's/-(RT|BT)-env//')
+	else
+		ossp=$(echo "$environment" | cut -d "-" -f 1)
+
+	fi
     
     # checks whether user configuration exists
     if [[ -f $HOME/$env_config ]]; then
         
       export BESMAN_ENV_CONFIG_FILE_PATH=$HOME/$env_config
       __besman_echo_yellow "Sourcing user config parameters from $BESMAN_ENV_CONFIG_FILE_PATH"
-    
+	# checks whether local configuration exists
+    elif [[ "$BESMAN_LOCAL_ENV" == "true" && -f $BESMAN_LOCAL_ENV_DIR/$ossp/$version/$env_config ]];  
+	then
+	  export BESMAN_ENV_CONFIG_FILE_PATH="$BESMAN_LOCAL_ENV_DIR/$ossp/$version/$env_config"
+	  __besman_echo_yellow "Sourcing local config parameters from $BESMAN_ENV_CONFIG_FILE_PATH"
+	# checks whether default configuration exists. this is useful in new shells
     elif [[ -f $BESMAN_DIR/tmp/$env_config ]]; then
       export BESMAN_ENV_CONFIG_FILE_PATH=$BESMAN_DIR/tmp/$env_config
-      __besman_echo_yellow "Sourcing default config parameters"
-    else
+      __besman_echo_yellow "Sourcing default config parameters from $BESMAN_ENV_CONFIG_FILE_PATH"
+	else
 		__besman_download_default_configations "$environment" "$version" || return 1
-      export BESMAN_ENV_CONFIG_FILE_PATH=$BESMAN_DIR/tmp/$env_config
-      __besman_echo_yellow "Sourcing default config parameters"
+      	export BESMAN_ENV_CONFIG_FILE_PATH=$BESMAN_DIR/tmp/$env_config
 	fi
 
 	# creating a temporary shell script file for exporting variables from config file.
@@ -97,6 +107,7 @@ function __besman_source_env_params
     [[ -f $tmp_var_file ]] && rm "$tmp_var_file"
 
 }
+
 
 function __besman_handle_interruption()
 {
@@ -132,7 +143,7 @@ function __besman_unset_env_parameters_and_cleanup() {
 
 	done <"$BESMAN_ENV_CONFIG_FILE_PATH"
 
-	[[ -f $BESMAN_DIR/tmp/besman-$environment-config.yaml ]] && rm "$BESMAN_ENV_CONFIG_FILE_PATH"
+	[[ -f $BESMAN_DIR/tmp/besman-$environment-config.yaml ]] && rm "$BESMAN_DIR/tmp/besman-$environment-config.yaml"
 	[[ -d $BESMAN_DIR/tmp/$ossp ]] && rm -rf "$BESMAN_DIR/tmp/$ossp"
 }
 
@@ -312,9 +323,7 @@ function __besman_validate_assessment {
 }
 
 function __besman_download_default_configations() {
-	local environment_name env_repo_namespace env_repo ossp env_url default_config_path curl_flag config_url
-	env_repo_namespace=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 1)
-	env_repo=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 2)
+	local environment_name ossp default_config_path config_url
 	environment_name=$1
   version_id=$2
 	if  echo "$environment_name" | grep -qE 'RT|BT'
@@ -324,7 +333,9 @@ function __besman_download_default_configations() {
 		ossp=$(echo "$environment_name" | cut -d "-" -f 1)
 
 	fi
-	config_url="https://raw.githubusercontent.com/${env_repo_namespace}/${env_repo}/$BESMAN_ENV_REPO_BRANCH/${ossp}/${version_id}/besman-$environment_name-config.yaml"
+	config_url=$(__besman_construct_raw_url "$BESMAN_ENV_REPO" "$BESMAN_ENV_REPO_BRANCH" "${ossp}/${version_id}/besman-$environment_name-config.yaml")
+
+	# config_url="$raw_url/${ossp}/${version_id}/besman-$environment_name-config.yaml"
 	default_config_path=$BESMAN_DIR/tmp/besman-$environment_name-config.yaml
 
 	[[ -f "$default_config_path" ]] && rm "$default_config_path"
@@ -336,4 +347,19 @@ function __besman_download_default_configations() {
 	fi
 	__besman_secure_curl "$config_url" >>"$default_config_path"
 
+}
+
+
+function __besman_check_current_env()
+{
+	local current_env
+
+	current_env=$(ls "$BESMAN_DIR/envs" | grep -E "^besman-")
+	if [[ -n $current_env ]]; then
+		__besman_echo_red "You have installed an environment. Uninstall it before installing a new one."
+		__besman_echo_no_colour "Current environment: $current_env"
+		return 1
+	else
+		return 0
+	fi
 }

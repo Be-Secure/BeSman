@@ -15,7 +15,7 @@ function __bes_install {
 
 	# If environmnet not installed.
 	if [[ ! -d "${BESMAN_DIR}/envs/besman-${environment_name}/$version_id" ]]; then
-
+		__besman_check_current_env || return 1
 
 		if [[ (-n $BESMAN_LOCAL_ENV) && ($BESMAN_LOCAL_ENV == "true") ]]; then
 			__besman_get_local_env "$environment_name" "$version_id" || return 1
@@ -120,9 +120,7 @@ function __besman_manage_install_out {
 function __besman_get_remote_env {
 
 	# This code fetches the environment and its config file from env repo
-	local environment_name env_repo_namespace env_repo ossp env_url default_config_path replace curl_flag
-	env_repo_namespace=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 1)
-	env_repo=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 2)
+	local environment_name ossp env_url default_config_path
 	environment_name=$1
 	env_type=$(echo "$environment_name" | rev | cut -d "-" -f 2 | rev)
 
@@ -133,9 +131,9 @@ function __besman_get_remote_env {
 		ossp=$(echo "$environment_name" | cut -d "-" -f 1)
 
 	fi
-	env_url="https://raw.githubusercontent.com/${env_repo_namespace}/${env_repo}/$BESMAN_ENV_REPO_BRANCH/${ossp}/${version_id}/besman-${environment_name}.sh"
+	env_url=$(__besman_construct_raw_url "$BESMAN_ENV_REPO" "$BESMAN_ENV_REPO_BRANCH" "${ossp}/${version_id}/besman-${environment_name}.sh")
+	# env_url="$raw_url/${ossp}/${version_id}/besman-${environment_name}.sh"
 	default_config_path=$BESMAN_DIR/tmp/besman-$environment_name-config.yaml
-	curl_flag=true
 	__besman_check_url_valid "$env_url" || return 1
 	__besman_secure_curl "$env_url" >>"${BESMAN_DIR}/envs/besman-${environment_name}.sh"
 
@@ -200,11 +198,20 @@ function __besman_show_lab_association_prompt() {
 function __besman_download_env_repo() {
 	local env_zip_dir="$1"
 	local env_zip="$env_zip_dir/env.zip"
-	local repo_url="$BESMAN_CODE_COLLAB_URL/$BESMAN_ENV_REPO/archive/refs/heads/$BESMAN_ENV_REPO_BRANCH.zip"
+	local repo_url env_repo_name
+	if [[ "$BESMAN_CODE_COLLAB_PLATFORM" == "github" ]]
+	then
+		
+		repo_url="$BESMAN_CODE_COLLAB_URL/$BESMAN_ENV_REPO/archive/refs/heads/$BESMAN_ENV_REPO_BRANCH.zip"
+	elif [[ "$BESMAN_CODE_COLLAB_PLATFORM" == "gitlab" ]]
+	then
+		env_repo_name=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 2)
+		repo_url="$BESMAN_CODE_COLLAB_URL/$BESMAN_ENV_REPO/-/archive/$BESMAN_ENV_REPO_BRANCH/$env_repo_name-$BESMAN_ENV_REPO_BRANCH.zip"
+	fi
 	local env_repo_name="$2"
 	[[ -f "$env_zip" ]] && rm -f "$env_zip"
 	[[ -d "$env_zip_dir/$env_repo_name-$BESMAN_ENV_REPO_BRANCH" ]] && rm -rf "$env_zip_dir/$env_repo_name-$BESMAN_ENV_REPO_BRANCH"
-	curl --insecure -s -L "$repo_url" -o "$env_zip" || {
+	__besman_secure_curl "$repo_url" >> "$env_zip" || {
 		__besman_echo_red "Failed to download ZIP file."
 		return 1
 	}

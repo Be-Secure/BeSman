@@ -2,14 +2,15 @@
 
 function __besman_check_vcs_exist()
 {
-    if [[ "$BESMAN_VCS"="git" ]]
+    if [[ "$BESMAN_VCS" == "git" ]]
     then
         __besman_check_for_git || return 1
-    elif [[ "$BESMAN_VCS"="gh" ]]
+    elif [[ "$BESMAN_VCS" == "gh" ]]
     then
         __besman_check_for_gh || return 1
     fi
 }
+
 
 function __besman_check_for_git()
 {
@@ -34,12 +35,12 @@ function __besman_check_for_gh
 
 function __besman_check_vcs_auth
 {
-    if [[ "$BESMAN_VCS"="git" ]]
+    if [[ "$BESMAN_VCS" == "git" ]]
     then
         __besman_git_auth || return 1
-    elif [[ "$BESMAN_VCS"="gh" ]]
+    elif [[ "$BESMAN_VCS" == "gh" ]]
     then
-        __besman_gh_auth || return 1
+        __besman_gh_auth "$BESMAN_USER_NAMESPACE" || return 1
     fi
 }
 
@@ -199,5 +200,90 @@ function __besman_check_github_id
         __besman_echo_no_colour ""
         # __besman_error_rollback "$environment"
         return 1
+    fi
+}
+
+function __besman_construct_repo_url(){
+    local repo encoded_repo
+    repo=$1
+
+    if [[  -n "$BESMAN_ACCESS_TOKEN" && "$BESMAN_CODE_COLLAB_PLATFORM" == "gitlab" ]] 
+    then
+        encoded_repo=$(__besman_get_encoded "$repo")
+        echo "$BESMAN_CODE_COLLAB_URL/api/v4/projects/$encoded_repo"
+    else
+        echo "$BESMAN_CODE_COLLAB_URL/$repo"
+    fi 
+}
+
+function __besman_check_url_valid()
+{
+	local url response header
+
+	url="$1"
+	response=$(__besman_curl_head "$url")
+
+	if [[ $response -eq 200 ]]; then
+		
+		unset url response
+		return 0
+
+	else
+		if [[ $response -eq 401 ]]; then
+			__besman_echo_error "Authentication failed. Please check your access token for url $url."
+		elif [[ $response -eq 403 ]]; then
+			__besman_echo_error "Access forbidden. Please check your permissions for url $url."
+		elif [[ $response -eq 404 ]]; then
+			__besman_echo_error "URL not found. Please check the URL $url."
+		elif [[ $response -eq 500 ]]; then
+			__besman_echo_error "Server error for url $url. Please try again later."
+        elif [[ $response -eq 000 ]]; then
+			__besman_echo_error "Connection timed out for url $url"
+		fi
+
+		unset url response
+		return 1
+	fi
+	
+
+}
+
+function __besman_construct_raw_url(){
+    # namespace/repo_name
+    local repo=$1
+    local branch=$2
+    local file_path=$3
+    local encoded_repo encoded_file_path
+    encoded_repo=$(__besman_get_encoded "$repo")
+    encoded_file_path=$(__besman_get_encoded "$file_path")
+
+    case $BESMAN_CODE_COLLAB_PLATFORM in
+        "github")
+            echo "https://raw.githubusercontent.com/$repo/$branch/$file_path"
+            ;;
+        "gitlab")
+            if [[ -z $BESMAN_ACCESS_TOKEN ]];
+            then
+                echo "$BESMAN_CODE_COLLAB_URL/$repo/-/raw/$branch/$file_path"
+            else
+                echo "$BESMAN_CODE_COLLAB_URL/api/v4/projects/$encoded_repo/repository/files/$encoded_file_path/raw?ref=$branch"
+            fi
+            ;;
+        *)
+            ;;
+    esac
+    
+}
+
+function __besman_check_for_access_token()
+{
+    if [[ -z "$BESMAN_ACCESS_TOKEN" ]]; then        
+    __besman_echo_warn "No access token provided. Will try unauthenticated request."
+    __besman_echo_blue ""
+    __besman_echo_white "If you are using a private repository"
+    __besman_echo_white "set the BESMAN_ACCESS_TOKEN environment variable."
+    __besman_echo_blue ""
+    __besman_echo_yellow "export BESMAN_ACCESS_TOKEN=<your_access_token>"
+    __besman_echo_yellow ""
     fi
 }

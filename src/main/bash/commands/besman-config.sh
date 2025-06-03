@@ -2,7 +2,7 @@
 
 function __bes_config()
 {
-    local environment_name version user_config bes_config config_url
+    local environment_name version user_config bes_config
 
     environment_name=$1
     version=$2
@@ -25,7 +25,7 @@ function __bes_config()
 
         fi
         config_file=besman-$environment_name-config.yaml
-        config_url="https://raw.githubusercontent.com/$BESMAN_ENV_REPO/$BESMAN_ENV_REPO_BRANCH/$ossp/$version/$config_file"
+        raw_url=$(__besman_construct_raw_url "$BESMAN_ENV_REPO" "$BESMAN_ENV_REPO_BRANCH" "$ossp/$version/$config_file")
         
         if [[ -f $HOME/$config_file ]] 
         then
@@ -34,10 +34,10 @@ function __bes_config()
 
         fi  
         [[ -f $HOME/$config_file ]] && rm "$HOME/$config_file"
-        __besman_check_url_valid "$config_url" || return 1
+        __besman_check_url_valid "$raw_url" || return 1
         __besman_echo_white "Downloading config file from $(__besman_echo_yellow "$BESMAN_ENV_REPO"); branch - $(__besman_echo_yellow "$BESMAN_ENV_REPO_BRANCH")"
 
-        __besman_secure_curl "$config_url" >> "$HOME/$config_file"
+        __besman_secure_curl "$raw_url" >> "$HOME/$config_file"
 
         __besman_echo_no_colour "Trying to open config file in vscode.."
         __besman_open_files_in_vscode "$HOME/$config_file"
