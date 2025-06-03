@@ -6,7 +6,7 @@ function quick_install() {
   # Handle --force or -F flag
   if [[ -n $force && ($force == "--force" || $force == "-F") ]]; then
     rm -rf "$HOME/.besman"
-  elif [[ -n $force ]]; then
+  else
     echo "Usage: ./quick_install [--force|-F]"
     echo "--force | -F : Removes the existing installation of BeSman"
     return
