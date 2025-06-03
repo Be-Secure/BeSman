@@ -10,27 +10,38 @@ should_skip_install() {
 }
 
 function quick_install() {
-	local force
-	force=$1
-	if [[ (-n $force) && (($force == "--force") || ($force == "-F")) ]]; then
-		rm -rf "$HOME/.besman"
-	elif [[ (-n $force) && (($force != "--force") || ($force != "-F")) ]]; then
-		echo "Usage: ./quick_install [--force|-F]"
-		echo "--force | -F : Removes the existing installation of BeSman"
-		return
-	fi
-	BESMAN_PLATFORM=$(uname)
-	export BESMAN_SERVICE="https://raw.githubusercontent.com"
+  local force=$1
 
-	# BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
+  # Handle --force or -F flag
+  if [[ -n $force && ($force == "--force" || $force == "-F") ]]; then
+    rm -rf "$HOME/.besman"
+  else
+    echo "Usage: ./quick_install [--force|-F]"
+    echo "--force | -F : Removes the existing installation of BeSman"
+    return
+  fi
 
-	BESMAN_NAMESPACE="Be-Secure"
-	BESMAN_VERSION="$(git branch --show-current)"
-	BESMAN_ENV_REPO="$BESMAN_NAMESPACE/besecure-ce-env-repo"
+  export BESMAN_PLATFORM=$(uname)
+  export BESMAN_SERVICE="https://raw.githubusercontent.com"
+  export BESMAN_NAMESPACE="Be-Secure"
+  export BESMAN_VERSION="current_branch_$(git branch --show-current)"
+  export BESMAN_ENV_REPOS="$BESMAN_NAMESPACE/besecure-ce-env-repo"
+  export BESMAN_DIR="${BESMAN_DIR:-$HOME/.besman}"
+  export BESMAN_CODE_COLLAB_URL="${BESMAN_CODE_COLLAB_URL:-https://github.com}"
+  export BESMAN_VCS="${BESMAN_VCS:-git}"
 
-	if [ -z "$BESMAN_DIR" ]; then
-		export BESMAN_DIR="$HOME/.besman"
-	fi
+  # Directory structure
+  declare -A dirs=(
+    [bin]="$BESMAN_DIR/bin"
+    [src]="$BESMAN_DIR/src"
+    [tmp]="$BESMAN_DIR/tmp"
+    [stage]="$BESMAN_DIR/tmp/stage"
+    [envs]="$BESMAN_DIR/envs"
+    [etc]="$BESMAN_DIR/etc"
+    [var]="$BESMAN_DIR/var"
+    [scripts]="$BESMAN_DIR/scripts"
+    [playbooks]="$BESMAN_DIR/playbooks"
+  )
 
 	if [[ -z "$BESMAN_VCS" ]]; then
 		export BESMAN_VCS="git"
@@ -60,96 +71,89 @@ function quick_install() {
 		cat <<EOF
 #THIS MUST BE AT THE END OF THE FILE FOR BESMAN TO WORK!!!
 export BESMAN_DIR="$BESMAN_DIR"
-[[ -s "${BESMAN_DIR}/bin/besman-init.sh" ]] && source "${BESMAN_DIR}/bin/besman-init.sh"
+[[ -s "\$BESMAN_DIR/bin/besman-init.sh" ]] && source "\$BESMAN_DIR/bin/besman-init.sh"
 EOF
-	)
+  )
 
-	# OS specific support (must be 'true' or 'false').
-	cygwin=false
-	darwin=false
-	solaris=false
-	freebsd=false
-	case "$(uname)" in
-	CYGWIN*)
-		cygwin=true
-		;;
-	Darwin*)
-		darwin=true
-		;;
-	SunOS*)
-		solaris=true
-		;;
-	FreeBSD*)
-		freebsd=true
-		;;
-	esac
+  # OS specific support (must be 'true' or 'false').
+  cygwin=false
+  darwin=false
+  solaris=false
+  freebsd=false
+  case "$BESMAN_PLATFORM" in
+    CYGWIN*) cygwin=true ;;
+    Darwin*) darwin=true ;;
+    SunOS*)  solaris=true ;;
+    FreeBSD*) freebsd=true ;;
+    *) ;;
+  esac
 
-	# Sanity checks
+  # Sanity checks
 
-	echo "Looking for a previous installation of BeSman..."
-	if [ -d "$BESMAN_DIR/bin" ]; then
-		echo "BeSman found."
-		echo ""
-		echo "======================================================================================================"
-		echo " You already have BeSman installed."
-		echo " BeSman was found at:"
-		echo ""
-		echo "    ${BESMAN_DIR}"
-		echo ""
-		echo " Please consider running the following if you need to upgrade."
-		echo ""
-		echo "    $ bes selfupdate force"
-		echo ""
-		echo "======================================================================================================"
-		echo ""
-		exit 0
-	fi
-	echo ' BBBBBBBBBBBBBBBBB                         SSSSSSSSSSSSSSS                                                             '
-	echo ' B::::::::::::::::B                      SS:::::::::::::::S                                                            '
-	echo ' B::::::BBBBBB:::::B                    S:::::SSSSSS::::::S                                                            '
-	echo ' BB:::::B     B:::::B                   S:::::S     SSSSSSS                                                            '
-	echo '   B::::B     B:::::B    eeeeeeeeeeee   S:::::S               mmmmmmm    mmmmmmm     aaaaaaaaaaaaa  nnnn  nnnnnnnn     '
-	echo '   B::::B     B:::::B  ee::::::::::::ee S:::::S             mm:::::::m  m:::::::mm   a::::::::::::a n:::nn::::::::nn   '
-	echo '   B::::BBBBBB:::::B  e::::::eeeee:::::eeS::::SSSS         m::::::::::mm::::::::::m  aaaaaaaaa:::::an::::::::::::::nn  '
-	echo '   B:::::::::::::BB  e::::::e     e:::::e SS::::::SSSSS    m::::::::::::::::::::::m           a::::ann:::::::::::::::n '
-	echo '   B::::BBBBBB:::::B e:::::::eeeee::::::e   SSS::::::::SS  m:::::mmm::::::mmm:::::m    aaaaaaa:::::a  n:::::nnnn:::::n '
-	echo '   B::::B     B:::::Be:::::::::::::::::e       SSSSSS::::S m::::m   m::::m   m::::m  aa::::::::::::a  n::::n    n::::n '
-	echo '   B::::B     B:::::Be::::::eeeeeeeeeee             S:::::Sm::::m   m::::m   m::::m a::::aaaa::::::a  n::::n    n::::n '
-	echo '   B::::B     B:::::Be:::::::e                      S:::::Sm::::m   m::::m   m::::ma::::a    a:::::a  n::::n    n::::n '
-	echo ' BB:::::BBBBBB::::::Be::::::::e         SSSSSSS     S:::::Sm::::m   m::::m   m::::ma::::a    a:::::a  n::::n    n::::n '
-	echo ' B:::::::::::::::::B  e::::::::eeeeeeee S::::::SSSSSS:::::Sm::::m   m::::m   m::::ma:::::aaaa::::::a  n::::n    n::::n '
-	echo ' B::::::::::::::::B    ee:::::::::::::e S:::::::::::::::SS m::::m   m::::m   m::::m a::::::::::aa:::a n::::n    n::::n '
-	echo ' BBBBBBBBBBBBBBBBB       eeeeeeeeeeeeee  SSSSSSSSSSSSSSS   mmmmmm   mmmmmm   mmmmmm  aaaaaaaaaa  aaaa nnnnnn    nnnnnn '
+  echo "Looking for a previous installation of BeSman..."
+  if [ -d "$BESMAN_DIR/bin" ]; then
+    echo "BeSman found."
+    echo ""
+    echo "======================================================================================================"
+    echo " You already have BeSman installed."
+    echo " BeSman was found at:"
+    echo ""
+    echo "    ${BESMAN_DIR}"
+    echo ""
+    echo " Please consider running the following if you need to upgrade."
+    echo ""
+    echo "    $ bes selfupdate force"
+    echo ""
+    echo "======================================================================================================"
+    echo ""
+    exit 0
+  fi
+  echo ' BBBBBBBBBBBBBBBBB                         SSSSSSSSSSSSSSS                                                             '
+  echo ' B::::::::::::::::B                      SS:::::::::::::::S                                                            '
+  echo ' B::::::BBBBBB:::::B                    S:::::SSSSSS::::::S                                                            '
+  echo ' BB:::::B     B:::::B                   S:::::S     SSSSSSS                                                            '
+  echo '   B::::B     B:::::B    eeeeeeeeeeee   S:::::S               mmmmmmm    mmmmmmm     aaaaaaaaaaaaa  nnnn  nnnnnnnn     '
+  echo '   B::::B     B:::::B  ee::::::::::::ee S:::::S             mm:::::::m  m:::::::mm   a::::::::::::a n:::nn::::::::nn   '
+  echo '   B::::BBBBBB:::::B  e::::::eeeee:::::eeS::::SSSS         m::::::::::mm::::::::::m  aaaaaaaaa:::::an::::::::::::::nn  '
+  echo '   B:::::::::::::BB  e::::::e     e:::::e SS::::::SSSSS    m::::::::::::::::::::::m           a::::ann:::::::::::::::n '
+  echo '   B::::BBBBBB:::::B e:::::::eeeee::::::e   SSS::::::::SS  m:::::mmm::::::mmm:::::m    aaaaaaa:::::a  n:::::nnnn:::::n '
+  echo '   B::::B     B:::::Be:::::::::::::::::e       SSSSSS::::S m::::m   m::::m   m::::m  aa::::::::::::a  n::::n    n::::n '
+  echo '   B::::B     B:::::Be::::::eeeeeeeeeee             S:::::Sm::::m   m::::m   m::::m a::::aaaa::::::a  n::::n    n::::n '
+  echo '   B::::B     B:::::Be:::::::e                      S:::::Sm::::m   m::::m   m::::ma::::a    a:::::a  n::::n    n::::n '
+  echo ' BB:::::BBBBBB::::::Be::::::::e         SSSSSSS     S:::::Sm::::m   m::::m   m::::ma::::a    a:::::a  n::::n    n::::n '
+  echo ' B:::::::::::::::::B  e::::::::eeeeeeee S::::::SSSSSS:::::Sm::::m   m::::m   m::::ma:::::aaaa::::::a  n::::n    n::::n '
+  echo ' B::::::::::::::::B    ee:::::::::::::e S:::::::::::::::SS m::::m   m::::m   m::::m a::::::::::aa:::a n::::n    n::::n '
+  echo ' BBBBBBBBBBBBBBBBB       eeeeeeeeeeeeee  SSSSSSSSSSSSSSS   mmmmmm   mmmmmm   mmmmmm  aaaaaaaaaa  aaaa nnnnnn    nnnnnn '
 
-	if [[ "$solaris" == true ]]; then
-		echo "Looking for gsed..."
-		if [ -z "$(which gsed)" ]; then
-			echo "Not found."
-			echo ""
-			echo "======================================================================================================"
-			echo " Please install gsed on your solaris system."
-			echo ""
-			echo " BeSman uses gsed extensively."
-			echo ""
-			echo " Restart after installing gsed."
-			echo "======================================================================================================"
-			echo ""
-			exit 1
-		fi
-	else
-		echo "Looking for sed..."
-		if [ -z "$(which sed)" ]; then
-			echo "Not found."
-			echo ""
-			echo "======================================================================================================"
-			echo " Please install sed on your system using your favourite package manager."
-			echo ""
-			echo " Restart after installing sed."
-			echo "======================================================================================================"
-			echo ""
-			exit 1
-		fi
-	fi
+  if [[ "$solaris" == true ]]; then
+    echo "Looking for gsed..."
+    if [ -z "$(which gsed)" ]; then
+      echo "Not found."
+      echo ""
+      echo "======================================================================================================"
+      echo " Please install gsed on your solaris system."
+      echo ""
+      echo " BeSman uses gsed extensively."
+      echo ""
+      echo " Restart after installing gsed."
+      echo "======================================================================================================"
+      echo ""
+      exit 1
+    fi
+  else
+    echo "Looking for sed..."
+    if [ -z "$(which sed)" ]; then
+      echo "Not found."
+      echo ""
+      echo "======================================================================================================"
+      echo " Please install sed on your system using your favourite package manager."
+      echo ""
+      echo " Restart after installing sed."
+      echo "======================================================================================================"
+      echo ""
+      exit 1
+    fi
+  fi
 
 	if [ -z "$(which ansible)" ]; then
 		if should_skip_install "ansible"; then
@@ -227,9 +231,12 @@ EOF
 		echo "Jupyter notebook not found. Skipping configuration."
 	fi
 
-	echo "Installing BeSMAN scripts..."
+  cp ./src/main/bash/besman-* "${dirs[src]}"
+  cp ./src/main/bash/commands/besman-* "${dirs[src]}"
+  cp ./src/main/bash/scripts/besman-* "${dirs[scripts]}"
+  mv "${dirs[src]}/besman-init.sh" "${dirs[bin]}"
 
-	# Create directory structure
+  touch "$var_file"
 
 	echo "Create distribution directories..."
 	mkdir -p "$besman_bin_folder"
@@ -243,20 +250,35 @@ EOF
 	mkdir -p "$besman_playbook_dir"
 	mkdir -p "$besman_log_folder"
 
-	echo "Prime the config file..."
-	echo "config selfupdate/debug_mode = true"
+  if [[ $darwin == true ]]; then
+    touch "$besman_bash_profile"
+    echo "Attempt update of login bash profile on OSX..."
+    if [[ -z $(grep 'besman-init.sh' "$besman_bash_profile") ]]; then
+      echo -e "\n$init_snippet" >>"$besman_bash_profile"
+      echo "Added besman init snippet to $besman_bash_profile"
+    fi
+  else
+    echo "Attempt update of interactive bash profile on regular UNIX..."
+    touch "${besman_bashrc}"
+    if [[ -z $(grep 'besman-init.sh' "$besman_bashrc") ]]; then
+      echo -e "\n$init_snippet" >>"$besman_bashrc"
+      echo "Added besman init snippet to $besman_bashrc"
+    fi
+    if [ -f "${besman_profile}" ]; then
+      if [[ -z $(grep 'oah-init.sh' "${besman_profile}") ]]; then
+        echo -e "\n${init_snippet}" >>"${besman_profile}"
+        echo "Updated existing ${besman_profile}"
+      fi
+    fi
+  fi
+  echo "Attempt update of zsh profile..."
+  touch "$besman_zshrc"
+  if [[ -z $(grep 'besman-init.sh' "$besman_zshrc") ]]; then
+    echo -e "\n$init_snippet" >>"$besman_zshrc"
+    echo "Updated existing ${besman_zshrc}"
+  fi
 
-	touch "$besman_config_file"
-	{
-		echo "besman_auto_answer=false"
-		echo "besman_auto_selfupdate=false"
-		echo "besman_insecure_ssl=false"
-		echo "besman_curl_connect_timeout=7"
-		echo "besman_curl_max_time=10"
-		echo "besman_beta_channel=false"
-		echo "besman_debug_mode=true"
-		echo "besman_colour_enable=true"
-	} >>"$besman_config_file"
+  echo -e "\n\n\nAll done!\n\n"
 
 	echo "Setting up user configs"
 	touch "$besman_user_config_file"
@@ -332,5 +354,10 @@ EOF
 		echo -e "\n\033[0;32mSuccessfully installed BeSman from branch $BESMAN_VERSION\033[0m\n"
 	fi
 
+  echo "    "
+  echo "Then issue the following command:"
+  echo ""
+  echo "    bes help"
+  echo ""
 }
 quick_install "$1"
