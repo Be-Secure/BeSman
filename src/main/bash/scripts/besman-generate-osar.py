@@ -3,6 +3,36 @@ import os
 import sys
 import yaml
 
+## CBOM parser
+def cbom_parser(user_data):
+    """
+    Parses CBOM JSON to count total occurrences of cryptographic assets.
+
+    Each 'cryptographic-asset' component may have multiple evidence.occurrences entries.
+    This function sums all such occurrences.
+
+    Args:
+        user_data (dict): Parsed CBOM JSON content.
+
+    Returns:
+        list: OSAR-formatted output with total count.
+    """
+    total_occurrences = 0
+
+    for comp in user_data.get("components", []):
+        if comp.get("type") == "cryptographic-asset":
+            occurrences = comp.get("evidence", {}).get("occurrences", [])
+            total_occurrences += len(occurrences)
+
+    return [{
+        "feature": "Cryptographic-Asset",
+        "aspect": "Count",
+        "attribute": "N/A",
+        "value": total_occurrences
+    }]
+
+
+
 ##------------Add parsers for CyberSecEval result------------------------------
 
 def cse_autocomplete_parser(user_data):
@@ -516,7 +546,9 @@ tool_processors = {
     "cybersecevalspearphishing": cse_spear_phishing_parser,
     
     "garak": garak_parser,
-    "modelbench": modelbench_parser
+    "modelbench": modelbench_parser,
+    
+    "cbomkitaction": cbom_parser
 }
 
 
