@@ -4,14 +4,12 @@ function quick_install() {
   local force=$1
 
   # Handle --force or -F flag
-  if [[ -n $force ]]; then
-    if [[ $force == "--force" || $force == "-F" ]]; then
-      rm -rf "$HOME/.besman"
-    else
-      echo "Usage: ./quick_install [--force|-F]"
-      echo "--force | -F : Removes the existing installation of BeSman"
-      return
-    fi
+  if [[ -n $force && ($force == "--force" || $force == "-F") ]]; then
+    rm -rf "$HOME/.besman"
+  elif [[ -n $force ]]; then
+    echo "Usage: ./quick_install [--force|-F]"
+    echo "--force | -F : Removes the existing installation of BeSman"
+    return
   fi
 
   export BESMAN_PLATFORM=$(uname)
