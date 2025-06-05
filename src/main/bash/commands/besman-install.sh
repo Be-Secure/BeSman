@@ -1,73 +1,153 @@
 #!/usr/bin/env bash
 
+function __bes_log_info {
+	echo "[INFO] $1" >> "$BESMAN_DIR/var/install.log"
+}
+
+function __bes_log_error {
+	echo "[ERROR] $1" >> "$BESMAN_DIR/var/install.log"
+}
+
+
 function __bes_install {
+	local environment_name="$1" version_id="$2"
 
-	local environment_name env_repo environment_name version_id env_config
-	environment_name=$1
-	version_id=$2
-	if [[ -z $version_id ]]
-	then
-		version_id=$(__besman_get_latest_env_version "$environment_name" || return 1)
+	__bes_log_info "Starting installation for environment: $environment_name, version: ${version_id:-latest}"
 
-		__besman_echo_yellow "No version specified. Using latest version $version_id"
-	fi
-	trap "__besman_echo_red ''; __besman_echo_red 'User interrupted'; __besman_echo_red ''; __besman_error_rollback $environment_name || return 1" SIGINT
+	__bes_handle_missing_version "$environment_name" "$version_id" || return 1
+	version_id="$(__besman_get_latest_env_version "$environment_name")"
 
-	# If environmnet not installed.
-	if [[ ! -d "${BESMAN_DIR}/envs/besman-${environment_name}/$version_id" ]]; then
-		__besman_check_current_env || return 1
+	trap "__bes_handle_interrupt '$environment_name'" SIGINT
 
-		if [[ (-n $BESMAN_LOCAL_ENV) && ($BESMAN_LOCAL_ENV == "true") ]]; then
-			__besman_get_local_env "$environment_name" "$version_id" || return 1
-		fi
-		if [[ (-n $BESMAN_LOCAL_ENV) && ($BESMAN_LOCAL_ENV == "false") ]]; then
-			__besman_get_remote_env "$environment_name" || return 1
-		fi
-		mkdir -p "${BESMAN_DIR}/envs/besman-${environment_name}"
-		touch "${BESMAN_DIR}/envs/besman-${environment_name}/current"
-		current="${BESMAN_DIR}/envs/besman-${environment_name}/current"
-		echo "${environment_name}" >"$BESMAN_DIR/var/current"
-
-		mkdir -p "${BESMAN_DIR}/envs/besman-${environment_name}/$version_id"
-
-		__besman_echo_no_colour "$version_id" >"$current"
-
-
-		mv "${BESMAN_DIR}/envs/besman-${environment_name}.sh" "${BESMAN_DIR}/envs/besman-${environment_name}/$version_id/"
-		__besman_source_env_params "$environment_name" "$version_id"
-		if [[ $? -eq 1 ]]; then
-			__besman_error_rollback "$environment_name"
-			__besman_manage_install_out "$return_val" "$environment_name"
-			return 1
-		fi
-
-		__besman_show_lab_association_prompt "$environment_name" "$version_id"
-		if [[ $? -eq 1 ]]; then
-
-			__besman_error_rollback "$environment_name"
-			return 1
-
-		fi
-		source "${BESMAN_DIR}/envs/besman-${environment_name}/${version_id}/besman-${environment_name}.sh"
-		__besman_install "${environment_name}" "${version_id}"
-
-		return_val="$?"
-
-		__besman_manage_install_out "$return_val" "$environment_name"
-
-	# if environmnet installed, but user wants to install a different version of the same environment.
-	elif [[ -d ${BESMAN_DIR}/envs/besman-${environment_name}/$version_id && $(cat "${BESMAN_DIR}/envs/besman-${environment_name}/current") != "$version_id" ]]; then
-
-		__besman_echo_white "Please remove the existing installation for $environment_name with version $version_id and try again."
-		return 1
-
+	if __bes_env_not_installed "$environment_name" "$version_id"; then
+		__bes_log_info "Environment not found locally. Proceeding with installation."
+		__bes_prepare_env_dir "$environment_name" "$version_id" || return 1
+		__bes_fetch_env_script "$environment_name" "$version_id" || return 1
+		__bes_finalize_env_setup "$environment_name" "$version_id" || return 1
 	else
-		# If user tries to install the already installed version of the environment
-		__besman_echo_white "${environment_name} $version_id is currently installed in your system "
-
+		__bes_handle_existing_env "$environment_name" "$version_id" || return 1
 	fi
-	unset return_val env_repo environment_name namespace version_id
+
+	__bes_log_info "Installation process completed for $environment_name $version_id"
 	trap - SIGINT
+}
+
+
+function __bes_handle_missing_version {
+	local env="$1" ver="$2"
+	if [[ -z "$ver" ]]; then
+		ver="$(__besman_get_latest_env_version "$env" || {
+			__bes_log_error "Failed to fetch latest version for $env"
+			return 1
+		})"
+		__besman_echo_yellow "No version specified. Using latest version $ver"
+	fi
+	return 0
+}
+
+function __bes_handle_interrupt {
+	local env="$1"
+	__besman_echo_red ''
+	__besman_echo_red 'User interrupted'
+	__besman_echo_red ''
+	__bes_log_error "Installation interrupted by user for environment: $env"
+	__besman_error_rollback "$env" || __bes_log_error "Rollback failed for $env"
+}
+
+function __bes_env_not_installed {
+	local env="$1" ver="$2"
+	[[ ! -d "${BESMAN_DIR}/envs/besman-${env}/${ver}" ]]
+}
+
+function __bes_prepare_env_dir {
+	local env="$1" ver="$2"
+	__besman_check_current_env || {
+		__bes_log_error "Current environment check failed for $env"
+		return 1
+	}
+
+	mkdir -p "${BESMAN_DIR}/envs/besman-${env}" || {
+		__bes_log_error "Failed to create environment directory for $env"
+		return 1
+	}
+	touch "${BESMAN_DIR}/envs/besman-${env}/current"
+	echo "$env" >"$BESMAN_DIR/var/current"
+	mkdir -p "${BESMAN_DIR}/envs/besman-${env}/${ver}" || {
+		__bes_log_error "Failed to create version subdirectory for $env $ver"
+		return 1
+	}
+	return 0
+}
+
+function __bes_fetch_env_script {
+	local env="$1" ver="$2"
+
+	if [[ "$BESMAN_LOCAL_ENV" == "true" ]]; then
+		__besman_get_local_env "$env" "$ver" || {
+			__bes_log_error "Failed to get local environment for $env $ver"
+			return 1
+		}
+	elif [[ "$BESMAN_LOCAL_ENV" == "false" ]]; then
+		__besman_get_remote_env "$env" || {
+			__bes_log_error "Failed to fetch remote environment script for $env"
+			return 1
+		}
+	else
+		__bes_log_error "Unknown BESMAN_LOCAL_ENV value: $BESMAN_LOCAL_ENV"
+		return 1
+	fi
+
+	mv "${BESMAN_DIR}/envs/besman-${env}.sh" "${BESMAN_DIR}/envs/besman-${env}/${ver}/" || {
+		__bes_log_error "Failed to move script into versioned directory for $env"
+		return 1
+	}
+	return 0
+}
+
+function __bes_finalize_env_setup {
+	local env="$1" ver="$2"
+	local current="${BESMAN_DIR}/envs/besman-${env}/current"
+	echo "$ver" >"$current"
+
+	__besman_source_env_params "$env" "$ver"
+	if [[ $? -ne 0 ]]; then
+		__bes_log_error "Sourcing env params failed for $env $ver"
+		__besman_error_rollback "$env"
+		__besman_manage_install_out "$?" "$env"
+		return 1
+	fi
+
+	__besman_show_lab_association_prompt "$env" "$ver"
+	if [[ $? -ne 0 ]]; then
+		__bes_log_error "Lab association rejected or failed for $env $ver"
+		__besman_error_rollback "$env"
+		return 1
+	fi
+
+	source "${BESMAN_DIR}/envs/besman-${env}/${ver}/besman-${env}.sh"
+	__besman_install "$env" "$ver"
+	local return_val="$?"
+
+	if [[ $return_val -ne 0 ]]; then
+		__bes_log_error "Installation script failed for $env $ver"
+	fi
+
+	__besman_manage_install_out "$return_val" "$env"
+	return "$return_val"
+}
+
+function __bes_handle_existing_env {
+	local env="$1" ver="$2"
+	local current_ver_file="${BESMAN_DIR}/envs/besman-${env}/current"
+
+	if [[ -d "${BESMAN_DIR}/envs/besman-${env}/${ver}" && $(cat "$current_ver_file") != "$ver" ]]; then
+		__besman_echo_white "Please remove the existing installation for $env with version $ver and try again."
+		__bes_log_info "Install attempt for different version $ver while another is active for $env"
+		return 1
+	else
+		__besman_echo_white "${env} $ver is currently installed in your system"
+		__bes_log_info "$env $ver already installed. Skipping installation."
+	fi
 }
 
 function __besman_get_local_env() {
@@ -152,26 +232,6 @@ function __besman_show_lab_association_prompt() {
 		ossp=$(echo "$environment_name" | cut -d "-" -f 1)
 
 	fi
-	# if [[ -z "$BESMAN_LAB_NAME" ]]; then
-	# 	__besman_echo_red "Lab name is missing."
-	# 	__besman_echo_yellow "Please use the below command to export it."
-	# 	__besman_echo_no_colour ""
-	# 	__besman_echo_white "$ export BESMAN_LAB_NAME=<Name of the lab>"
-	# 	__besman_echo_no_colour ""
-	# 	__besman_echo_yellow "OR"
-	# 	__besman_echo_no_colour ""
-	# 	__besman_echo_no_colour "1. Check if the file $HOME/besman-$environment_name-config.yaml exists in $HOME"
-	# 	__besman_echo_no_colour ""
-	# 	__besman_echo_no_colour "2. If the file does not exist, run the below command to download the file"
-	# 	__besman_echo_no_colour ""
-	# 	__besman_echo_yellow "		wget -P \$HOME https://raw.githubusercontent.com/$BESMAN_NAMESPACE/besecure-ce-env-repo/master/$ossp/$version/besman-$environment_name-config.yaml"
-	# 	__besman_echo_no_colour ""
-	# 	__besman_echo_no_colour "3. Open the file $HOME/besman-$environment_name-config.yaml in an editor"
-	# 	__besman_echo_no_colour ""
-	# 	__besman_echo_white "	 4. Edit the variables - BESMAN_LAB_NAME and BESMAN_LAB_TYPE"
-	# 	__besman_echo_no_colour ""
-	# 	return 1
-	# fi
 	if [[ $BESMAN_LAB_NAME == "Be-Secure" && ! -f $HOME/besman-$environment-config.yaml ]]; then
 		__besman_echo_yellow "Going with default lab association - Be-Secure Commuinity Lab"
 		read -rp "Do you wish to change the lab association (y/n)?:" user_input
