@@ -84,6 +84,7 @@ function __bes_handle_missing_playbook() {
 function __bes_run() {
     local playbook_name="$1"
     local playbook_version="$2"
+    local force_flag="$3"
     local playbook_file
 
     if __bes_is_local_playbook_enabled; then
