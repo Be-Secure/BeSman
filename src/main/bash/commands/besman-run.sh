@@ -102,6 +102,53 @@ function __bes_run() {
     source "$playbook_file" || return 1
 
     __besman_launch "$force_flag"
+    local flag=$?
+    
+    if [[ "$force_flag" == "-f" && $flag -eq 0 ]]; then
+        local base_name="${ASSESSMENT_TOOL_NAME}-${ASSESSMENT_TOOL_TYPE// /_}"
+        local log_dir="$BESMAN_DIR/log"
+
+        local pid_file="${log_dir}/${base_name}_assessment.pid"
+        local log_file="${log_dir}/${base_name}_watcher.log"
+
+        # 🔄 Start a background watcher process
+        nohup bash -c '
+            export BESMAN_DIR="'"$BESMAN_DIR"'"
+            source "$BESMAN_DIR/bin/besman-init.sh"
+            source "$playbook_file" || return 1
+
+            pid_file="'"$pid_file"'"
+            log_file="'"$log_file"'"
+
+            echo "[Watcher] Looking for PID file: $pid_file" >> "$log_file"
+            sleep 1
+
+            if [[ -f "$pid_file" ]]; then
+                pid=$(<"$pid_file")
+                __besman_echo_yellow "Monitoring assessment in background (PID: $pid)" >> "$log_file"
+
+                while ps -p "$pid" > /dev/null 2>&1; do
+                    sleep 2
+                done
+
+                __besman_echo_white "Assessment finished. Running post-assessment steps..." >> "$log_file"
+                __besman_prepare >> "$log_file" 2>&1
+                __besman_cleanup >> "$log_file" 2>&1
+            else
+                __besman_echo_red "[ERROR] PID file not found. Cannot monitor assessment." >> "$log_file"
+                __besman_cleanup >> "$log_file" 2>&1
+            fi
+        ' >"$log_file" 2>&1 &
+
+        disown
+
+    else
+        if [[ $flag -eq 0 ]]; then
+            __besman_prepare
+            __besman_publish
+        fi
+        __besman_cleanup
+    fi
     [[ "$?" -eq 0 ]] && __besman_echo_green "Done."
     unset playbook_name playbook_version playbook_file
 }
