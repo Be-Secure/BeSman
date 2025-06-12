@@ -101,7 +101,7 @@ function __bes_run() {
 
     source "$playbook_file" || return 1
 
-    __besman_launch
+    __besman_launch "$force_flag"
     [[ "$?" -eq 0 ]] && __besman_echo_green "Done."
     unset playbook_name playbook_version playbook_file
 }
