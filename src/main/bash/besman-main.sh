@@ -194,15 +194,21 @@ function bes {
 		__bes_"$command" "$variable" "$value"
 		;;
 	run)
-		# bes run --playbook sbom -V 0.0.1
+		# bes run --playbook sbom -V 0.0.1 [-f]
 
 		[[ "${#args[@]}" -ne 3 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_run && return 1
-		[[ "${#opts[@]}" -ne 2 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_run && return 1
+    [[ "${#opts[@]}" -lt 2 || "${#opts[@]}" -gt 3 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_run && return 1
 
-		local follow_flag="false"
-		for opt in "${opts[@]}"; do
-			[[ "$opt" == "-f" ]] && follow_flag="true"
-		done
+		follow_flag=""
+    for opt in "${opts[@]}"; do
+        if [[ "$opt" == "-f" ]]; then
+            follow_flag="-f"
+        elif [[ "$opt" != "--playbook" && "$opt" != "-V" ]]; then
+            __besman_echo_red "Unknown option: $opt"
+            __bes_help_run
+            return 1
+        fi
+    done
 
 		# [[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
 		__bes_"$command" "${args[1]}" "${args[2]}" "$follow_flag"
