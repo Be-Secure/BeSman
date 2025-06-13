@@ -25,7 +25,7 @@ function bes {
 		rm | remove)
 			args=("${args[@]}" "$1")
 			;;
-		-env | -V | --environment | --version | --playbook | -P | --role | --file | --path | -f)
+		-env | -V | --environment | --version | --playbook | -P | --role | --file | --path | --background | -bg)
 			opts=("${opts[@]}" "$1") ## -env | -V
 			;;
 		*)
@@ -194,24 +194,25 @@ function bes {
 		__bes_"$command" "$variable" "$value"
 		;;
 	run)
-		# bes run --playbook sbom -V 0.0.1 [-f]
+		# Expected usage:
+		# bes run --playbook sbom -V 0.0.1 [--background|-bg]
 
 		[[ "${#args[@]}" -ne 3 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_run && return 1
-    [[ "${#opts[@]}" -lt 2 || "${#opts[@]}" -gt 3 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_run && return 1
+		[[ "${#opts[@]}" -lt 2 || "${#opts[@]}" -gt 3 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_run && return 1
 
-		follow_flag=""
-    for opt in "${opts[@]}"; do
-        if [[ "$opt" == "-f" ]]; then
-            follow_flag="-f"
-        elif [[ "$opt" != "--playbook" && "$opt" != "-V" ]]; then
-            __besman_echo_red "Unknown option: $opt"
-            __bes_help_run
-            return 1
-        fi
-    done
+		background_flag=""
+		for opt in "${opts[@]}"; do
+			if [[ "$opt" == "--background" || "$opt" == "-bg" ]]; then
+				background_flag="--background"
+			elif [[ "$opt" != "--playbook" && "$opt" != "-V" ]]; then
+				__besman_echo_red "Unknown option: $opt"
+				__bes_help_run
+				return 1
+			fi
+		done
 
-		# [[ "${#opts[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && return 1
-		__bes_"$command" "${args[1]}" "${args[2]}" "$follow_flag"
+		__bes_"$command" "${args[1]}" "${args[2]}" "$background_flag"
+
 		;;
 	list)
 		if [[ -z ${opts[0]} ]]; then
