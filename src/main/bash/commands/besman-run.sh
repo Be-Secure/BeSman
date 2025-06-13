@@ -105,7 +105,7 @@ function __bes_run() {
     local flag=$?
 
     if [[ "$force_flag" == "--background" || "$force_flag" == "-bg" && $flag -eq 0 ]]; then
-        local base_name="${ASSESSMENT_TOOL_NAME}-${BESMAN_ARTIFACT_NAME}:${BESMAN_ARTIFACT_VERSION}-${ASSESSMENT_TOOL_TYPE// /_}"
+        local base_name="${ASSESSMENT_TOOL_NAME}-${BESMAN_ARTIFACT_NAME}-${BESMAN_ARTIFACT_VERSION}-${ASSESSMENT_TOOL_TYPE// /_}"
         local log_dir="$BESMAN_DIR/log"
 
         local pid_file="${log_dir}/${base_name}_assessment.pid"
