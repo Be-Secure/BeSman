@@ -112,9 +112,9 @@ function __bes_run() {
         local log_file="${log_dir}/${base_name}_watcher.log"
 
         export BESMAN_PLAYBOOK_FILE="$playbook_file"
+        export BESMAN_DIR="$BESMAN_DIR"
         # 🔄 Start a background watcher process
         nohup bash -c '
-            export BESMAN_DIR="'"$BESMAN_DIR"'"
             source "$BESMAN_DIR/bin/besman-init.sh"
             bes reload
             source "$BESMAN_PLAYBOOK_FILE" || exit 1
@@ -153,6 +153,9 @@ function __bes_run() {
         disown
 
     else
+        source "$BESMAN_DIR/bin/besman-init.sh"
+        bes reload
+        source "$BESMAN_PLAYBOOK_FILE" || exit 1
         if [[ $flag -eq 0 ]]; then
             _besman_prepare
             __besman_publish
