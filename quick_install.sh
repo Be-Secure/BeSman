@@ -32,6 +32,7 @@ function quick_install() {
 	besman_bin_folder="${BESMAN_DIR}/bin"
 	besman_src_folder="${BESMAN_DIR}/src"
 	besman_tmp_folder="${BESMAN_DIR}/tmp"
+	besman_log_folder="${BESMAN_DIR}/log"
 	besman_stage_folder="${besman_tmp_folder}/stage"
 	besman_zip_file="${besman_tmp_folder}/besman-${BESMAN_VERSION}.zip"
 	besman_env_folder="${BESMAN_DIR}/envs"
@@ -204,6 +205,7 @@ EOF
 	mkdir -p "$besman_var_folder"
 	mkdir -p "$besman_scripts_folder"
 	mkdir -p "$besman_playbook_dir"
+	mkdir -p "$besman_log_folder"
 
 	echo "Prime the config file..."
 	echo "config selfupdate/debug_mode = true"
