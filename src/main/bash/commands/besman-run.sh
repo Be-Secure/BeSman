@@ -103,7 +103,7 @@ function __bes_run() {
 
     __besman_launch "$force_flag"
     local flag=$?
-    
+
     if [[ "$force_flag" == "-f" && $flag -eq 0 ]]; then
         local base_name="${ASSESSMENT_TOOL_NAME}-${ASSESSMENT_TOOL_TYPE// /_}"
         local log_dir="$BESMAN_DIR/log"
@@ -111,11 +111,13 @@ function __bes_run() {
         local pid_file="${log_dir}/${base_name}_assessment.pid"
         local log_file="${log_dir}/${base_name}_watcher.log"
 
+        export BESMAN_PLAYBOOK_FILE="$playbook_file"
         # 🔄 Start a background watcher process
         nohup bash -c '
             export BESMAN_DIR="'"$BESMAN_DIR"'"
             source "$BESMAN_DIR/bin/besman-init.sh"
-            source "$playbook_file" || return 1
+            bes reload
+            source "$BESMAN_PLAYBOOK_FILE" || exit 1
 
             pid_file="'"$pid_file"'"
             log_file="'"$log_file"'"
@@ -130,6 +132,14 @@ function __bes_run() {
                 while ps -p "$pid" > /dev/null 2>&1; do
                     sleep 2
                 done
+            
+                if [[ -s "$BESMAN_RESULTS_PATH/autocomplete_stat.json" ]]; then
+                    jq 'to_entries[0].value' "$BESMAN_RESULTS_PATH/autocomplete_stat.json" >"$BESMAN_RESULTS_PATH/autocomplete_stat.tmp.json"
+                    mv "$BESMAN_RESULTS_PATH/autocomplete_stat.tmp.json" "$BESMAN_RESULTS_PATH/autocomplete_stat.json"
+                else
+                    __besman_echo_red "[ERROR] autocomplete_stat.json is missing or empty."
+                    export AUTOCOMPLETE_RESULT=1
+                fi
 
                 __besman_echo_white "Assessment finished. Running post-assessment steps..." >> "$log_file"
                 __besman_prepare >> "$log_file" 2>&1
@@ -144,8 +154,9 @@ function __bes_run() {
 
     else
         if [[ $flag -eq 0 ]]; then
-            __besman_prepare
+            _besman_prepare
             __besman_publish
+            __besman_cleanup
         fi
         __besman_cleanup
     fi
