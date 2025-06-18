@@ -1,18 +1,19 @@
 #!/usr/bin/env bash
 
-function __besman_log_info{
-	echo "[INFO] $1" >> "$BESMAN_DIR/var/install.log"
+# Logs informational messages
+__besman_log_info() {
+    echo "[INFO] $1" >> "$BESMAN_DIR/var/install.log"
 }
 
-function __besman_log_error {
-	echo "[ERROR] $1" >> "$BESMAN_DIR/var/install.log"
+# Logs error messages
+__besman_log_error() {
+    echo "[ERROR] $1" >> "$BESMAN_DIR/var/install.log"
 }
-
 
 function __bes_install {
 	local environment_name="$1" version_id="$2"
 
-	__besman_log_info"Starting installation for environment: $environment_name, version: ${version_id:-latest}"
+	__besman_log_info "Starting installation for environment: $environment_name, version: ${version_id:-latest}"
 
 	__besman_handle_missing_version "$environment_name" "$version_id" || return 1
 	version_id="$(__besman_get_latest_env_version "$environment_name")"
@@ -20,7 +21,7 @@ function __bes_install {
 	trap "__bes_handle_interrupt '$environment_name'" SIGINT
 
 	if __bes_env_not_installed "$environment_name" "$version_id"; then
-		__besman_log_info"Environment not found locally. Proceeding with installation."
+		__besman_log_info "Environment not found locally. Proceeding with installation."
 		__bes_prepare_env_dir "$environment_name" "$version_id" || return 1
 		__bes_fetch_env_script "$environment_name" "$version_id" || return 1
 		__bes_finalize_env_setup "$environment_name" "$version_id" || return 1
@@ -28,7 +29,7 @@ function __bes_install {
 		__bes_handle_existing_env "$environment_name" "$version_id" || return 1
 	fi
 
-	__besman_log_info"Installation process completed for $environment_name $version_id"
+	__besman_log_info "Installation process completed for $environment_name $version_id"
 	trap - SIGINT
 }
 
@@ -136,11 +137,11 @@ function __bes_handle_existing_env {
 
 	if [[ -d "${BESMAN_DIR}/envs/besman-${env}/${ver}" && $(cat "$current_ver_file") != "$ver" ]]; then
 		__besman_echo_white "Please remove the existing installation for $env with version $ver and try again."
-		__besman_log_info"Install attempt for different version $ver while another is active for $env"
+		__besman_log_info "Install attempt for different version $ver while another is active for $env"
 		return 1
 	else
 		__besman_echo_white "${env} $ver is currently installed in your system"
-		__besman_log_info"$env $ver already installed. Skipping installation."
+		__besman_log_info "$env $ver already installed. Skipping installation."
 	fi
 }
 
