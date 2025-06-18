@@ -66,7 +66,7 @@ function __bes_handle_local_playbook() {
     echo "$BESMAN_PLAYBOOK_DIR/besman-$name-playbook-$version.sh"
 }
 
-function __bes_handle_missing_playbook() {
+function __besman_handle_missing_playbook() {
     local file="$1"
     local name="$2"
     local version="$3"
@@ -95,7 +95,7 @@ function __bes_run() {
     fi
 
     if [[ ! -f "$playbook_file" ]]; then
-        __bes_handle_missing_playbook "$playbook_file" "$playbook_name" "$playbook_version"
+        __besman_handle_missing_playbook "$playbook_file" "$playbook_name" "$playbook_version"
         return 1
     fi
 
