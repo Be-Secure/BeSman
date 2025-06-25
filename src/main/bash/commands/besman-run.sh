@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function __bes_is_local_playbook_enabled() {
+function __besman_is_local_playbook_enabled() {
     [[ -n "$BESMAN_LOCAL_PLAYBOOK" && "$BESMAN_LOCAL_PLAYBOOK" == "true" ]]
 }
 
@@ -71,7 +71,7 @@ function __besman_handle_missing_playbook() {
     local name="$2"
     local version="$3"
 
-    if __bes_is_local_playbook_enabled; then
+    if __besman_is_local_playbook_enabled; then
         __besman_echo_red "Error: Playbook file not found: $file"
     else
         __besman_echo_no_colour ""
@@ -87,7 +87,7 @@ function __bes_run() {
     local force_flag="$3"
     local playbook_file
 
-    if __bes_is_local_playbook_enabled; then
+    if __besman_is_local_playbook_enabled; then
         playbook_file="$(__bes_handle_local_playbook "$playbook_name" "$playbook_version")" || return 1
     else
         playbook_file="$BESMAN_PLAYBOOK_DIR/besman-$playbook_name-playbook-$playbook_version.sh"
