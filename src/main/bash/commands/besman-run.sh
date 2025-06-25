@@ -233,14 +233,6 @@ function __bes_run() {
         ' >"$log_file" 2>&1 &
 
         disown
-
-    else
-        if [[ $flag -eq 0 ]]; then
-            __besman_prepare
-            __besman_publish
-            __besman_cleanup
-        fi
-        __besman_cleanup
     fi
     [[ "$?" -eq 0 ]] && __besman_echo_green "Done."
     unset playbook_name playbook_version playbook_file
