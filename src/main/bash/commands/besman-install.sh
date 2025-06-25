@@ -15,7 +15,12 @@ function __bes_install {
 
 	__besman_log_info "Starting installation for environment: $environment_name, version: ${version_id:-latest}"
 
-	__besman_handle_missing_version "$environment_name" "$version_id" || return 1
+	if [[ -z $version_id ]]; then
+		version_id=$(__besman_get_latest_env_version "$environment_name" || return 1)
+
+		__besman_echo_yellow "No version specified. Using latest version $version_id"
+	fi
+
 	version_id="$(__besman_get_latest_env_version "$environment_name")"
 
 	trap "__besman_install_besman '$environment_name'" SIGINT
@@ -31,18 +36,6 @@ function __bes_install {
 
 	__besman_log_info "Installation process completed for $environment_name $version_id"
 	trap - SIGINT
-}
-
-function __besman_handle_missing_version {
-	local env="$1" ver="$2"
-	if [[ -z "$ver" ]]; then
-		__besman_echo_yellow "No version specified. Using latest version: $env"
-		__besman_get_latest_env_version "$env" || {
-			__besman_log_error "Failed to fetch latest version for $env"
-			return 1
-		}
-	fi
-	return 0
 }
 
 function __besman_install_besman {
@@ -259,7 +252,7 @@ function __besman_download_env_repo() {
 	local env_repo_name="$2"
 	[[ -f "$env_zip" ]] && rm -f "$env_zip"
 	[[ -d "$env_zip_dir/$env_repo_name-$BESMAN_ENV_REPO_BRANCH" ]] && rm -rf "$env_zip_dir/$env_repo_name-$BESMAN_ENV_REPO_BRANCH"
-	__besman_secure_curl "$repo_url" >> "$env_zip" || {
+	__besman_secure_curl "$repo_url" >>"$env_zip" || {
 		__besman_echo_red "Failed to download ZIP file."
 		return 1
 	}
