@@ -4,7 +4,7 @@ function __besman_is_local_playbook_enabled() {
     [[ -n "$BESMAN_LOCAL_PLAYBOOK" && "$BESMAN_LOCAL_PLAYBOOK" == "true" ]]
 }
 
-function __bes_find_steps_file() {
+function __besman_find_steps_file() {
     local base_name="$1"
     local steps_path
 
@@ -15,7 +15,7 @@ function __bes_find_steps_file() {
     basename "$steps_path"
 }
 
-function __bes_copy_files_to_playbook_dir() {
+function __besman_copy_files_to_playbook_dir() {
     local playbook_file_local="$1"
     local steps_file_local="$2"
 
@@ -49,7 +49,7 @@ function __bes_handle_local_playbook() {
 
     playbook_file_local="$BESMAN_LOCAL_PLAYBOOK_DIR/playbooks/besman-$name-playbook-$version.sh"
     steps_file_base_name="besman-$name-steps-$version"
-    steps_file_local="$(__bes_find_steps_file "$steps_file_base_name")" || return 1
+    steps_file_local="$(__besman_find_steps_file "$steps_file_base_name")" || return 1
 
     if [[ ! -f "$playbook_file_local" ]]; then
         __besman_echo_red "Error: Local playbook file not found: $playbook_file_local"
@@ -61,7 +61,7 @@ function __bes_handle_local_playbook() {
         return 1
     fi
 
-    __bes_copy_files_to_playbook_dir "$playbook_file_local" "$steps_file_local" || return 1
+    __besman_copy_files_to_playbook_dir "$playbook_file_local" "$steps_file_local" || return 1
 
     echo "$BESMAN_PLAYBOOK_DIR/besman-$name-playbook-$version.sh"
 }

@@ -2,12 +2,12 @@
 
 # Logs informational messages
 __besman_log_info() {
-    echo "[INFO] $1" >> "$BESMAN_DIR/var/install.log"
+	echo "[INFO] $1" >>"$BESMAN_DIR/var/install.log"
 }
 
 # Logs error messages
 __besman_log_error() {
-    echo "[ERROR] $1" >> "$BESMAN_DIR/var/install.log"
+	echo "[ERROR] $1" >>"$BESMAN_DIR/var/install.log"
 }
 
 function __bes_install {
@@ -18,21 +18,20 @@ function __bes_install {
 	__besman_handle_missing_version "$environment_name" "$version_id" || return 1
 	version_id="$(__besman_get_latest_env_version "$environment_name")"
 
-	trap "__bes_handle_interrupt '$environment_name'" SIGINT
+	trap "__besman_install_besman '$environment_name'" SIGINT
 
-	if __bes_env_not_installed "$environment_name" "$version_id"; then
+	if __besman_env_not_installed "$environment_name" "$version_id"; then
 		__besman_log_info "Environment not found locally. Proceeding with installation."
-		__bes_prepare_env_dir "$environment_name" "$version_id" || return 1
-		__bes_fetch_env_script "$environment_name" "$version_id" || return 1
-		__bes_finalize_env_setup "$environment_name" "$version_id" || return 1
+		__besman_prepare_env_dir "$environment_name" "$version_id" || return 1
+		__besman_fetch_env_script "$environment_name" "$version_id" || return 1
+		__besman_finalize_env_setup "$environment_name" "$version_id" || return 1
 	else
-		__bes_handle_existing_env "$environment_name" "$version_id" || return 1
+		__besman_handle_existing_env "$environment_name" "$version_id" || return 1
 	fi
 
 	__besman_log_info "Installation process completed for $environment_name $version_id"
 	trap - SIGINT
 }
-
 
 function __besman_handle_missing_version {
 	local env="$1" ver="$2"
@@ -46,7 +45,7 @@ function __besman_handle_missing_version {
 	return 0
 }
 
-function __bes_handle_interrupt {
+function __besman_install_besman {
 	local env="$1"
 	__besman_echo_red ''
 	__besman_echo_red 'User interrupted'
@@ -55,12 +54,12 @@ function __bes_handle_interrupt {
 	__besman_error_rollback "$env" || __besman_log_error "Rollback failed for $env"
 }
 
-function __bes_env_not_installed {
+function __besman_env_not_installed {
 	local env="$1" ver="$2"
 	[[ ! -d "${BESMAN_DIR}/envs/besman-${env}/${ver}" ]]
 }
 
-function __bes_prepare_env_dir {
+function __besman_prepare_env_dir {
 	local env="$1" ver="$2"
 	__besman_check_current_env || {
 		__besman_log_error "Current environment check failed for $env"
@@ -80,7 +79,7 @@ function __bes_prepare_env_dir {
 	return 0
 }
 
-function __bes_fetch_env_script {
+function __besman_fetch_env_script {
 	local env="$1" ver="$2"
 
 	if [[ "$BESMAN_LOCAL_ENV" == "true" ]]; then
@@ -105,7 +104,7 @@ function __bes_fetch_env_script {
 	return 0
 }
 
-function __bes_finalize_env_setup {
+function __besman_finalize_env_setup {
 	local env="$1" ver="$2"
 	local current="${BESMAN_DIR}/envs/besman-${env}/current"
 	echo "$ver" >"$current"
@@ -131,7 +130,7 @@ function __bes_finalize_env_setup {
 	return "$return_val"
 }
 
-function __bes_handle_existing_env {
+function __besman_handle_existing_env {
 	local env="$1" ver="$2"
 	local current_ver_file="${BESMAN_DIR}/envs/besman-${env}/current"
 
@@ -162,7 +161,6 @@ function __besman_get_local_env() {
 	[[ ! -d $BESMAN_LOCAL_ENV_DIR ]] && __besman_echo_red "Could not find dir $BESMAN_LOCAL_ENV_DIR" && return 1
 	cp "$BESMAN_LOCAL_ENV_DIR/$ossp/$version/besman-$environment.sh" "$BESMAN_DIR/envs/"
 	if [[ ! -f "$HOME/besman-$environment-config.yaml" ]]; then
-
 
 		[[ -f $default_config_path ]] && rm "$default_config_path"
 		touch "$default_config_path"
@@ -211,8 +209,6 @@ function __besman_get_remote_env {
 	default_config_path=$BESMAN_DIR/tmp/besman-$environment_name-config.yaml
 	__besman_check_url_valid "$env_url" || return 1
 	__besman_secure_curl "$env_url" >>"${BESMAN_DIR}/envs/besman-${environment_name}.sh"
-
-
 }
 
 function __besman_show_lab_association_prompt() {
@@ -237,9 +233,8 @@ function __besman_show_lab_association_prompt() {
 			__besman_echo_white "Open the file in your editor and change the value for $(__besman_echo_yellow "BESMAN_LAB_NAME") and $(__besman_echo_yellow "BESMAN_LAB_TYPE")\n"
 			return 1
 		fi
-	elif  [[ $BESMAN_LAB_NAME == "Be-Secure" && -f $HOME/besman-$environment-config.yaml ]] 
-	then
-		
+	elif [[ $BESMAN_LAB_NAME == "Be-Secure" && -f $HOME/besman-$environment-config.yaml ]]; then
+
 		__besman_echo_yellow "Going with default lab association - Be-Secure Commuinity Lab"
 		read -rp "Do you wish to change the lab association (y/n)?:" user_input
 		if [[ $user_input == "y" ]]; then
@@ -254,12 +249,10 @@ function __besman_download_env_repo() {
 	local env_zip_dir="$1"
 	local env_zip="$env_zip_dir/env.zip"
 	local repo_url env_repo_name
-	if [[ "$BESMAN_CODE_COLLAB_PLATFORM" == "github" ]]
-	then
-		
+	if [[ "$BESMAN_CODE_COLLAB_PLATFORM" == "github" ]]; then
+
 		repo_url="$BESMAN_CODE_COLLAB_URL/$BESMAN_ENV_REPO/archive/refs/heads/$BESMAN_ENV_REPO_BRANCH.zip"
-	elif [[ "$BESMAN_CODE_COLLAB_PLATFORM" == "gitlab" ]]
-	then
+	elif [[ "$BESMAN_CODE_COLLAB_PLATFORM" == "gitlab" ]]; then
 		env_repo_name=$(echo "$BESMAN_ENV_REPO" | cut -d "/" -f 2)
 		repo_url="$BESMAN_CODE_COLLAB_URL/$BESMAN_ENV_REPO/-/archive/$BESMAN_ENV_REPO_BRANCH/$env_repo_name-$BESMAN_ENV_REPO_BRANCH.zip"
 	fi
@@ -277,8 +270,7 @@ function __besman_download_env_repo() {
 	rm -f "$env_zip"
 }
 
-function __besman_get_latest_env_version()
-{
+function __besman_get_latest_env_version() {
 	local environment_name env_zip_dir latest_version env_repo_name ossp
 	environment_name=$1
 	env_zip_dir="$BESMAN_DIR/tmp"
