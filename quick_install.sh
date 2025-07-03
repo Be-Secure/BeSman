@@ -18,6 +18,7 @@ function quick_install() {
 	BESMAN_NAMESPACE="Be-Secure"
 	BESMAN_VERSION="$(git branch --show-current)"
 	BESMAN_ENV_REPO="$BESMAN_NAMESPACE/besecure-ce-env-repo"
+	
 
 	if [ -z "$BESMAN_DIR" ]; then
 		export BESMAN_DIR="$HOME/.besman"
@@ -142,27 +143,40 @@ EOF
 		fi
 	fi
 
-	if [[ -z $(which ansible) ]]; then
-		echo "Installing ansible"
-		sudo apt-add-repository -y ppa:ansible/ansible
-		sudo apt update
-		sudo apt install ansible -y
+	if [ -z "$(which ansible)" ]; then
+
+		if echo "$BESMAN_SKIP_INSTALLABLES" | grep -q "ansible"; then
+			echo "Skipping ansible installation as per user request"
+		else
+			echo "Ansible not found. Installing Ansible..."
+			sudo apt-add-repository -y ppa:ansible/ansible
+			sudo apt update
+			sudo apt install ansible -y
+		fi
+
 	fi
 
 	if [[ -z $(which gh) ]]; then
-		echo "Installing GitHub Cli"
-		type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
-		curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
-		sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
-		echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list >/dev/null
-		sudo apt update
-		sudo apt install gh -y
-
+		if echo "$BESMAN_SKIP_INSTALLABLES" | grep -q "gh"; then
+			echo "Skipping GitHub CLI(gh) installation as per user request"
+		else
+			echo "Installing GitHub Cli"
+			type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
+			curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+			sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+			echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list >/dev/null
+			sudo apt update
+			sudo apt install gh -y
+		fi
 	fi
 
 	if [[ -z $(command -v jq) ]]; then
-		echo "Installing jq"
-		sudo apt update && sudo apt install jq -y
+		if echo "$BESMAN_SKIP_INSTALLABLES" | grep -q "jq"; then
+			echo "Skipping jq installation as per user request"
+		else
+			echo "Installing jq"
+			sudo apt update && sudo apt install jq -y
+		fi
 	fi
 
 	if [[ -z $(command -v pip) ]]; then
