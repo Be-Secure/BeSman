@@ -190,8 +190,12 @@ EOF
 	fi
 
 	if [[ -z $(command -v jupyter) ]]; then
-		echo "Installing  notebook"
-		python3 -m pip install jupyter
+		if echo "$BESMAN_SKIP_INSTALLABLES" | grep -q "jupyter"; then
+			echo "Skipping jupyter installation as per user request"
+		else
+			echo "Installing  notebook"
+			python3 -m pip install jupyter
+		fi
 		#sudo python3 -m pip install notebook
 	fi
 
@@ -206,7 +210,7 @@ EOF
 			sed -i "s/# c.NotebookApp.open_browser = True/c.NotebookApp.open_browser = False/g" $HOME/.jupyter/jupyter_notebook_config.py
 		fi
     else
-	    echo "Jupyter notebook not installed successfully"
+	    echo "Jupyter notebook not found. Skipping configuration."
 	fi
 
 	echo "Installing BeSMAN scripts..."
