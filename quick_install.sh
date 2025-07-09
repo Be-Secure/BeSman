@@ -170,6 +170,11 @@ EOF
 		fi
 	fi
 
+	if [[ -z $(which unzip) ]]; then
+		echo "Installing unzip"
+		sudo apt install unzip -y
+	fi
+
 	if [[ -z $(command -v jq) ]]; then
 		if echo "$BESMAN_SKIP_INSTALLABLES" | grep -q "jq"; then
 			echo "Skipping jq installation as per user request"
