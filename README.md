@@ -60,6 +60,17 @@ BeSman is designed to be used in a Linux machine.
 
 `Windows users should use an ubuntu VM or WSL.`
 
+## Skipping tools installation [Optional]
+
+During installation, BeSman will attempt to install several tools (such as `ansible`, `gh`, `jq`, `unzip`, `pip`, `jupyter`, etc.) if they are not already present on your system.  
+
+If you wish to skip the installation of any of these tools, you can set the `BESMAN_SKIP_INSTALLABLES` environment variable with a space-separated list of tool names before running the install command. Then run the installation command.
+
+**Example:**
+To skip installing `ansible` and `jq`:
+
+	export BESMAN_SKIP_INSTALLABLES="ansible jq"
+
 ## Install latest stable version
 
 1. Open your terminal
@@ -67,6 +78,9 @@ BeSman is designed to be used in a Linux machine.
 2.  Run the below command
 
         source <(curl -L https://raw.githubusercontent.com/Be-Secure/BeSman/dist/dist/get.besman.io)
+	
+	**Optional**
+	
 
 3.  Run the below command to confirm installation
 
