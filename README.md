@@ -71,6 +71,10 @@ To skip installing `ansible` and `jq`:
 
 	export BESMAN_SKIP_INSTALLABLES="ansible jq"
 
+> **Note:**  
+> The install script will check the `BESMAN_SKIP_INSTALLABLES` environment variable and skip installing any tool whose name appears in the list.  
+> Make sure to set this variable in your terminal session **before** running the installation command.
+
 ## Install latest stable version
 
 1. Open your terminal
