@@ -2,6 +2,15 @@
 
 #Install: stable
 
+should_skip_install() {
+	local tool="$1"
+	if [ -n "$BESMAN_SKIP_INSTALLABLES" ] && echo "$BESMAN_SKIP_INSTALLABLES" | grep -qw "$tool"; then
+		echo "Skipping $tool installation as per user request"
+		return 0
+	fi
+	return 1
+}
+
 function __bes_install_besman() {
 
 	# Global variables
@@ -174,21 +183,19 @@ EOF
 	fi
 
 	if [ -z "$(which ansible)" ]; then
-
-		if echo "$BESMAN_SKIP_INSTALLABLES" | grep -q "ansible"; then
-			echo "Skipping ansible installation as per user request"
+		if should_skip_install "ansible"; then
+			:
 		else
 			echo "Ansible not found. Installing Ansible..."
 			sudo apt-add-repository -y ppa:ansible/ansible
 			sudo apt update
 			sudo apt install ansible -y
 		fi
-
 	fi
 
 	if [[ -z $(which gh) ]]; then
-		if echo "$BESMAN_SKIP_INSTALLABLES" | grep -q "gh"; then
-			echo "Skipping GitHub CLI(gh) installation as per user request"
+		if should_skip_install "gh"; then
+			:
 		else
 			echo "Installing GitHub Cli"
 			type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
@@ -201,13 +208,17 @@ EOF
 	fi
 
 	if [[ -z $(which unzip) ]]; then
-		echo "Installing unzip"
-		sudo apt install unzip -y
+		if should_skip_install "unzip"; then
+			:
+		else
+			echo "Installing unzip"
+			sudo apt install unzip -y
+		fi
 	fi
 
 	if [[ -z $(command -v jq) ]]; then
-		if echo "$BESMAN_SKIP_INSTALLABLES" | grep -q "jq"; then
-			echo "Skipping jq installation as per user request"
+		if should_skip_install "jq"; then
+			:
 		else
 			echo "Installing jq"
 			sudo apt update && sudo apt install jq -y
@@ -215,14 +226,22 @@ EOF
 	fi
 
 	if [[ -z $(command -v pip) ]]; then
-		echo "Installing pip"
-		sudo apt install python3-pip -y
+		if should_skip_install "pip"; then
+			:
+		else
+			echo "Installing pip"
+			sudo apt install python3-pip -y
+		fi
 	fi
 
 	if [[ -z $(command -v jupyter) ]]; then
-		echo "Installing jupyter notebook"
-		python3 -m pip install jupyter
-		#python3 -m pip install jupyter
+		if should_skip_install "jupyter"; then
+			:
+		else
+			echo "Installing notebook"
+			python3 -m pip install jupyter
+		fi
+		#sudo python3 -m pip install notebook
 	fi
 
 	if [[ ! -z $(command -v jupyter) ]]; then
