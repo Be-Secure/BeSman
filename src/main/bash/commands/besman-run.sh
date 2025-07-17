@@ -222,7 +222,6 @@ function __bes_run() {
                         return 1
                         ;;
                 esac
-
                 __besman_echo_white "Assessment finished. Running post-assessment steps..." >> "$log_file"
                 __besman_prepare >> "$log_file" 2>&1
                 __besman_cleanup >> "$log_file" 2>&1
@@ -231,7 +230,6 @@ function __bes_run() {
                 __besman_cleanup >> "$log_file" 2>&1
             fi
         ' >"$log_file" 2>&1 &
-
         disown
     fi
     [[ "$?" -eq 0 ]] && __besman_echo_green "Done."

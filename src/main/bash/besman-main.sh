@@ -204,7 +204,7 @@ function bes {
 		for opt in "${opts[@]}"; do
 			if [[ "$opt" == "--background" || "$opt" == "-bg" ]]; then
 				background_flag="--background"
-			elif [[ "$opt" != "--playbook" && "$opt" != "-V" ]]; then
+			elif [[ "$opt" != "--playbook" || "$opt" != "-P" && "$opt" != "-V" ]]; then
 				__besman_echo_red "Unknown option: $opt"
 				__bes_help_run
 				return 1

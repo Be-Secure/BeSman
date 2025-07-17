@@ -16,12 +16,9 @@ function __bes_install {
 	__besman_log_info "Starting installation for environment: $environment_name, version: ${version_id:-latest}"
 
 	if [[ -z $version_id ]]; then
-		version_id=$(__besman_get_latest_env_version "$environment_name" || return 1)
-
 		__besman_echo_yellow "No version specified. Using latest version $version_id"
+		version_id="$(__besman_get_latest_env_version "$environment_name")"
 	fi
-
-	version_id="$(__besman_get_latest_env_version "$environment_name")"
 
 	trap "__besman_install_besman '$environment_name'" SIGINT
 
