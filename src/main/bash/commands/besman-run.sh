@@ -100,138 +100,155 @@ function __bes_run() {
     fi
 
     source "$playbook_file" || return 1
-
-    __besman_launch "$force_flag"
-    local flag=$?
-
-    if [[ "$force_flag" == "--background" || "$force_flag" == "-bg" && $flag -eq 0 ]]; then
-        local base_name="${ASSESSMENT_TOOL_NAME}-${BESMAN_ARTIFACT_NAME}-${BESMAN_ARTIFACT_VERSION}-${ASSESSMENT_TOOL_TYPE// /_}"
-        local log_dir="$BESMAN_DIR/log"
-
+    if [[ "$force_flag" == "--background" || "$force_flag" == "-bg" ]]; then
         local pid_file="${log_dir}/${base_name}_assessment.pid"
         local log_file="${log_dir}/${base_name}_watcher.log"
-
         export BESMAN_PLAYBOOK_FILE="$playbook_file"
-        export BESMAN_DIR="$BESMAN_DIR"
-        # 🔄 Start a background watcher process
-        nohup bash -c '
-            source "$BESMAN_DIR/bin/besman-init.sh"
-            bes reload
-            source "$BESMAN_PLAYBOOK_FILE" || exit 1
-
-            pid_file="'"$pid_file"'"
-            log_file="'"$log_file"'"
-
-            echo "[Watcher] Looking for PID file: $pid_file" >> "$log_file"
-            sleep 1
-
-            if [[ -f "$pid_file" ]]; then
-                pid=$(<"$pid_file")
-                __besman_echo_yellow "Monitoring assessment in background (PID: $pid)" >> "$log_file"
-
-                while ps -p "$pid" > /dev/null 2>&1; do
-                    sleep 2
-                done
-
-                case "$playbook_name" in
-                    LLMSecAutocomplete-cyberseceval)
-                        if [[ -s "$BESMAN_RESULTS_PATH/autocomplete_stat.json" ]]; then
-                            jq 'to_entries[0].value' "$BESMAN_RESULTS_PATH/autocomplete_stat.json" >"$BESMAN_RESULTS_PATH/autocomplete_stat.tmp.json"
-                            mv "$BESMAN_RESULTS_PATH/autocomplete_stat.tmp.json" "$BESMAN_RESULTS_PATH/autocomplete_stat.json"
-                        else
-                            __besman_echo_red "[ERROR] autocomplete_stat.json is missing or empty."
-                            export AUTOCOMPLETE_RESULT=1
-                        fi
-                        ;;
-
-                    LLMSecCodeInterpreter-cyberseceval)
-                        if [[ -s "$BESMAN_RESULTS_PATH/interpreter_stat.json" ]]; then
-                            jq 'to_entries[0].value' "$BESMAN_RESULTS_PATH/interpreter_stat.json" >"$BESMAN_RESULTS_PATH/interpreter_stat.tmp.json"
-                            mv "$BESMAN_RESULTS_PATH/interpreter_stat.tmp.json" "$BESMAN_RESULTS_PATH/interpreter_stat.json"
-                            export CODE_INTERPRETER_RESULT=0
-                        else
-                            __besman_echo_red "[ERROR] interpreter_stat.json is missing or empty."
-                            export CODE_INTERPRETER_RESULT=1
-                        fi
-                        ;;
-
-                    LLMSecFalseRefusalRate-cyberseceval)
-                        if [[ -s "$BESMAN_RESULTS_PATH/frr_stat.json" ]]; then
-                            jq 'to_entries[0].value' "$BESMAN_RESULTS_PATH/frr_stat.json" >"$BESMAN_RESULTS_PATH/frr_stat.tmp.json"
-                            mv "$BESMAN_RESULTS_PATH/frr_stat.tmp.json" "$BESMAN_RESULTS_PATH/frr_stat.json"
-                            export FRR_RESULT=0
-                        else
-                            __besman_echo_red "[ERROR] frr_stat.json is missing or empty."
-                            export FRR_RESULT=1
-                        fi
-                        ;;
-
-                    LLMSecInstruct-cyberseceval)
-                        if [[ -s "$BESMAN_RESULTS_PATH/instruct_stat.json" ]]; then
-                            jq 'to_entries[0].value' "$BESMAN_RESULTS_PATH/instruct_stat.json" > "$BESMAN_RESULTS_PATH/instruct_stat.tmp.json"
-                            mv "$BESMAN_RESULTS_PATH/instruct_stat.tmp.json" "$BESMAN_RESULTS_PATH/instruct_stat.json"
-                            export INSTRUCT_RESULT=0
-                        else
-                            __besman_echo_red "[ERROR] instruct_stat.json is missing or empty."
-                            export INSTRUCT_RESULT=1
-                        fi
-                        ;;
-
-                    LLMSecPromptInjection-cyberseceval)
-                        if [[ -s "$BESMAN_RESULTS_PATH/prompt_injection_stat.json" ]]; then
-                            jq 'to_entries[0].value' "$BESMAN_RESULTS_PATH/prompt_injection_stat.json" >"$BESMAN_RESULTS_PATH/prompt_injection_stat.tmp.json" &&
-                                mv "$BESMAN_RESULTS_PATH/prompt_injection_stat.tmp.json" "$BESMAN_RESULTS_PATH/prompt_injection_stat.json"
-                        else
-                            __besman_echo_red "[ERROR] prompt_injection_stat.json is missing or empty."
-                            export AUTOCOMPLETE_RESULT=1
-                        fi
-                        ;;
-
-                    LLMSecSpearPhishing-cyberseceval)
-                        if [[ -s "$BESMAN_RESULTS_PATH/phishing_stats.json" ]]; then
-                            jq 'to_entries[0].value' "$BESMAN_RESULTS_PATH/phishing_stats.json" >"$BESMAN_RESULTS_PATH/phishing_stats.tmp.json" \
-                                && mv "$BESMAN_RESULTS_PATH/phishing_stats.tmp.json" "$BESMAN_RESULTS_PATH/phishing_stats.json"
-                        else
-                            __besman_echo_red "[ERROR] phishing_stats.json is missing or empty."
-                            export AUTOCOMPLETE_RESULT=1
-                        fi
-                        ;;
-
-                    LLMVulnScan-garak)
-                        if [[ -f "$report_file" ]]; then
-                            [[ -f "$DETAILED_REPORT_PATH" ]] && rm "$DETAILED_REPORT_PATH"
-                            jq -n "reduce inputs as \$i ({}; \
-                                if \$i.entry_type == \"eval\" then \
-                                    .[\$i.probe | split(\".\")[0]] |= (. // {}) | \
-                                    .[\$i.probe | split(\".\")[0]][(\$i.probe | split(\".\")[1])] |= (. // {}) | \
-                                    .[\$i.probe | split(\".\")[0]][(\$i.probe | split(\".\")[1])][(\$i.detector | split(\".\")[-1])] = \$i \
-                                else \
-                                    . \
-                                end)" "$report_file" > "$DETAILED_REPORT_PATH"
-                            export GARAK_RESULT=0
-                        else
-                            __besman_echo_red "[ERROR] Garak report not found at $report_file"
-                            export GARAK_RESULT=1
-                            conda deactivate
-                            return 1
-                        fi
-                        ;;
-
-                    *)
-                        __besman_echo_red "[ERROR] Unknown playbook: $playbook_name"
-                        return 1
-                        ;;
-                esac
-                __besman_echo_white "Assessment finished. Running post-assessment steps..." >> "$log_file"
-                __besman_prepare >> "$log_file" 2>&1
-                __besman_cleanup >> "$log_file" 2>&1
-            else
-                __besman_echo_red "[ERROR] PID file not found. Cannot monitor assessment." >> "$log_file"
-                __besman_cleanup >> "$log_file" 2>&1
-            fi
-        ' >"$log_file" 2>&1 &
-        disown
+        if [[ -f "$pid_file" ]]; then
+            pid=$(<"$pid_file")
+            __besman_echo_warn "Assessment in process in background mode (PID: $pid)"
+            __besman_echo_white "Check the logs under $log_file"
+        else
+            nohup bash -c '
+                bes reload
+                [[ -z $BESMAN_PLAYBOOK_FILE || ! -f $BESMAN_PLAYBOOK_FILE ]] && __besman_echo_red "Could not find playbook file" && exit 1
+                source "$BESMAN_PLAYBOOK_FILE" || return 1
+                __besman_launch "$force_flag"
+            ' >"$log_file" 2>&1 &
+            echo "$!" > "$pid_file"
+        fi
+    else
+        __besman_launch "$force_flag"
+        [[ "$?" -eq 0 ]] && __besman_echo_green "Done."
     fi
-    [[ "$?" -eq 0 ]] && __besman_echo_green "Done."
+    # local flag=$?
+
+    # if [[ "$force_flag" == "--background" || "$force_flag" == "-bg" && $flag -eq 0 ]]; then
+    #     local base_name="${ASSESSMENT_TOOL_NAME}-${BESMAN_ARTIFACT_NAME}-${BESMAN_ARTIFACT_VERSION}-${ASSESSMENT_TOOL_TYPE// /_}"
+    #     local log_dir="$BESMAN_DIR/log"
+
+    #     local pid_file="${log_dir}/${base_name}_assessment.pid"
+    #     local log_file="${log_dir}/${base_name}_watcher.log"
+
+    #     export BESMAN_PLAYBOOK_FILE="$playbook_file"
+    #     export BESMAN_DIR="$BESMAN_DIR"
+    #     # 🔄 Start a background watcher process
+    #     nohup bash -c '
+    #         source "$BESMAN_DIR/bin/besman-init.sh"
+    #         bes reload
+    #         source "$BESMAN_PLAYBOOK_FILE" || exit 1
+
+    #         pid_file="'"$pid_file"'"
+    #         log_file="'"$log_file"'"
+
+    #         echo "[Watcher] Looking for PID file: $pid_file" >> "$log_file"
+    #         sleep 1
+
+    #         if [[ -f "$pid_file" ]]; then
+    #             pid=$(<"$pid_file")
+    #             __besman_echo_yellow "Monitoring assessment in background (PID: $pid)" >> "$log_file"
+
+    #             while ps -p "$pid" > /dev/null 2>&1; do
+    #                 sleep 2
+    #             done
+
+    #             case "$playbook_name" in
+    #                 LLMSecAutocomplete-cyberseceval)
+    #                     if [[ -s "$BESMAN_RESULTS_PATH/autocomplete_stat.json" ]]; then
+    #                         jq 'to_entries[0].value' "$BESMAN_RESULTS_PATH/autocomplete_stat.json" >"$BESMAN_RESULTS_PATH/autocomplete_stat.tmp.json"
+    #                         mv "$BESMAN_RESULTS_PATH/autocomplete_stat.tmp.json" "$BESMAN_RESULTS_PATH/autocomplete_stat.json"
+    #                     else
+    #                         __besman_echo_red "[ERROR] autocomplete_stat.json is missing or empty."
+    #                         export AUTOCOMPLETE_RESULT=1
+    #                     fi
+    #                     ;;
+
+    #                 LLMSecCodeInterpreter-cyberseceval)
+    #                     if [[ -s "$BESMAN_RESULTS_PATH/interpreter_stat.json" ]]; then
+    #                         jq 'to_entries[0].value' "$BESMAN_RESULTS_PATH/interpreter_stat.json" >"$BESMAN_RESULTS_PATH/interpreter_stat.tmp.json"
+    #                         mv "$BESMAN_RESULTS_PATH/interpreter_stat.tmp.json" "$BESMAN_RESULTS_PATH/interpreter_stat.json"
+    #                         export CODE_INTERPRETER_RESULT=0
+    #                     else
+    #                         __besman_echo_red "[ERROR] interpreter_stat.json is missing or empty."
+    #                         export CODE_INTERPRETER_RESULT=1
+    #                     fi
+    #                     ;;
+
+    #                 LLMSecFalseRefusalRate-cyberseceval)
+    #                     if [[ -s "$BESMAN_RESULTS_PATH/frr_stat.json" ]]; then
+    #                         jq 'to_entries[0].value' "$BESMAN_RESULTS_PATH/frr_stat.json" >"$BESMAN_RESULTS_PATH/frr_stat.tmp.json"
+    #                         mv "$BESMAN_RESULTS_PATH/frr_stat.tmp.json" "$BESMAN_RESULTS_PATH/frr_stat.json"
+    #                         export FRR_RESULT=0
+    #                     else
+    #                         __besman_echo_red "[ERROR] frr_stat.json is missing or empty."
+    #                         export FRR_RESULT=1
+    #                     fi
+    #                     ;;
+
+    #                 LLMSecInstruct-cyberseceval)
+    #                     if [[ -s "$BESMAN_RESULTS_PATH/instruct_stat.json" ]]; then
+    #                         jq 'to_entries[0].value' "$BESMAN_RESULTS_PATH/instruct_stat.json" > "$BESMAN_RESULTS_PATH/instruct_stat.tmp.json"
+    #                         mv "$BESMAN_RESULTS_PATH/instruct_stat.tmp.json" "$BESMAN_RESULTS_PATH/instruct_stat.json"
+    #                         export INSTRUCT_RESULT=0
+    #                     else
+    #                         __besman_echo_red "[ERROR] instruct_stat.json is missing or empty."
+    #                         export INSTRUCT_RESULT=1
+    #                     fi
+    #                     ;;
+
+    #                 LLMSecPromptInjection-cyberseceval)
+    #                     if [[ -s "$BESMAN_RESULTS_PATH/prompt_injection_stat.json" ]]; then
+    #                         jq 'to_entries[0].value' "$BESMAN_RESULTS_PATH/prompt_injection_stat.json" >"$BESMAN_RESULTS_PATH/prompt_injection_stat.tmp.json" &&
+    #                             mv "$BESMAN_RESULTS_PATH/prompt_injection_stat.tmp.json" "$BESMAN_RESULTS_PATH/prompt_injection_stat.json"
+    #                     else
+    #                         __besman_echo_red "[ERROR] prompt_injection_stat.json is missing or empty."
+    #                         export AUTOCOMPLETE_RESULT=1
+    #                     fi
+    #                     ;;
+
+    #                 LLMSecSpearPhishing-cyberseceval)
+    #                     if [[ -s "$BESMAN_RESULTS_PATH/phishing_stats.json" ]]; then
+    #                         jq 'to_entries[0].value' "$BESMAN_RESULTS_PATH/phishing_stats.json" >"$BESMAN_RESULTS_PATH/phishing_stats.tmp.json" \
+    #                             && mv "$BESMAN_RESULTS_PATH/phishing_stats.tmp.json" "$BESMAN_RESULTS_PATH/phishing_stats.json"
+    #                     else
+    #                         __besman_echo_red "[ERROR] phishing_stats.json is missing or empty."
+    #                         export AUTOCOMPLETE_RESULT=1
+    #                     fi
+    #                     ;;
+
+    #                 LLMVulnScan-garak)
+    #                     if [[ -f "$report_file" ]]; then
+    #                         [[ -f "$DETAILED_REPORT_PATH" ]] && rm "$DETAILED_REPORT_PATH"
+    #                         jq -n "reduce inputs as \$i ({}; \
+    #                             if \$i.entry_type == \"eval\" then \
+    #                                 .[\$i.probe | split(\".\")[0]] |= (. // {}) | \
+    #                                 .[\$i.probe | split(\".\")[0]][(\$i.probe | split(\".\")[1])] |= (. // {}) | \
+    #                                 .[\$i.probe | split(\".\")[0]][(\$i.probe | split(\".\")[1])][(\$i.detector | split(\".\")[-1])] = \$i \
+    #                             else \
+    #                                 . \
+    #                             end)" "$report_file" > "$DETAILED_REPORT_PATH"
+    #                         export GARAK_RESULT=0
+    #                     else
+    #                         __besman_echo_red "[ERROR] Garak report not found at $report_file"
+    #                         export GARAK_RESULT=1
+    #                         conda deactivate
+    #                         return 1
+    #                     fi
+    #                     ;; 
+    #                 *)
+    #                     __besman_echo_red "[ERROR] Unknown playbook: $playbook_name"
+    #                     return 1
+    #                     ;;
+    #             esac
+    #             __besman_echo_white "Assessment finished. Running post-assessment steps..." >> "$log_file"
+    #             __besman_prepare >> "$log_file" 2>&1
+    #             __besman_cleanup >> "$log_file" 2>&1
+    #         else
+    #             __besman_echo_red "[ERROR] PID file not found. Cannot monitor assessment." >> "$log_file"
+    #             __besman_cleanup >> "$log_file" 2>&1
+    #         fi
+    #     ' >"$log_file" 2>&1 &
+    #     disown
+    # fi
     unset playbook_name playbook_version playbook_file
 }
