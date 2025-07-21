@@ -108,13 +108,13 @@ function __bes_run() {
 
     source "$playbook_file" || return 1
 
-    if [[ "$force_flag" == "--background" || "$force_flag" == "-bg" ]]; then
+    if [[ -n $force_flag && $force_flag == "background" ]]; then
         local base_name="${ASSESSMENT_TOOL_NAME}-${BESMAN_ARTIFACT_NAME}-${BESMAN_ARTIFACT_VERSION}-${ASSESSMENT_TOOL_TYPE// /_}"
         local log_dir="$BESMAN_DIR/log"
         local pid_file="${log_dir}/${base_name}_assessment.pid"
         local log_file="${log_dir}/${base_name}_watcher.log"
         export BESMAN_PLAYBOOK_FILE="$playbook_file"
-
+        
         mkdir -p "$log_dir"
 
         if [[ -f "$pid_file" ]]; then
@@ -134,14 +134,16 @@ function __bes_run() {
             bes reload
             [[ -z $BESMAN_PLAYBOOK_FILE || ! -f $BESMAN_PLAYBOOK_FILE ]] && __besman_echo_red "Could not find playbook file" && exit 1
             source "$BESMAN_PLAYBOOK_FILE" || exit 1
-            __besman_launch "'"$force_flag"'"
+            __besman_launch
         ' >"$log_file" 2>&1 &
 
         echo "$!" > "$pid_file"
         __besman_echo_green "Assessment started in background (PID: $!)"
         __besman_echo_white "Check the logs under $log_file"
+        __besman_echo_no_colour ""
+        __besman_echo_warn "Make sure you have configured your git credentials locally for a seamless completion of assessments."
     else
-        __besman_launch "$force_flag"
+        __besman_launch
         [[ "$?" -eq 0 ]] && __besman_echo_green "Done."
     fi
 
