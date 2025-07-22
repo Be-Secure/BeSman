@@ -194,26 +194,50 @@ function bes {
 		__bes_"$command" "$variable" "$value"
 		;;
 	run)
-		# Expected usage:
-		# bes run --playbook sbom -V 0.0.1 [--background|-bg]
+    # Expected usage:
+    # bes run --playbook sbom -V 0.0.1 [--background|-bg]
 
-		[[ "${#args[@]}" -ne 3 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_run && return 1
-		[[ "${#opts[@]}" -lt 2 || "${#opts[@]}" -gt 3 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_run && return 1
+    [[ "${#args[@]}" -ne 3 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_run && return 1
+    [[ "${#opts[@]}" -lt 2 || "${#opts[@]}" -gt 3 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_run && return 1
 
-		background_flag=""
-		for opt in "${opts[@]}"; do
-			if [[ "$opt" == "--background" || "$opt" == "-bg" ]]; then
-				background_flag="--background"
-			elif [[ "$opt" != "--playbook" || "$opt" != "-P" && "$opt" != "-V" ]]; then
-				__besman_echo_red "Unknown option: $opt"
-				__bes_help_run
-				return 1
-			fi
-		done
+    local playbook_flag=false
+    local version_flag=false
+    local background_flag=false
+    
+    # Validate options
+    for opt in "${opts[@]}"; do
+        case "$opt" in
+            "--playbook"|"-P")
+                playbook_flag=true
+                ;;
+            "-V"|"--version")
+                version_flag=true
+                ;;
+            "--background"|"-bg")
+                background_flag=true
+                ;;
+            *)
+                __besman_echo_red "Unknown option: $opt"
+                __bes_help_run
+                return 1
+                ;;
+        esac
+    done
+    
+    # Ensure required options are present
+    if [[ "$playbook_flag" != true || "$version_flag" != true ]]; then
+        __besman_echo_red "Missing required options: --playbook and -V are mandatory"
+        __bes_help_run
+        return 1
+    fi
 
-		__bes_"$command" "${args[1]}" "${args[2]}" "$background_flag"
-
-		;;
+    # Pass the background flag as a proper parameter
+    if [[ "$background_flag" == true ]]; then
+        __bes_"$command" "${args[1]}" "${args[2]}" "background"
+    else
+        __bes_"$command" "${args[1]}" "${args[2]}" ""
+    fi
+    ;;
 	list)
 		if [[ -z ${opts[0]} ]]; then
 
