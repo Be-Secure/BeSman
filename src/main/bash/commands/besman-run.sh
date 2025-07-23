@@ -109,7 +109,7 @@ function __bes_run() {
     source "$playbook_file" || return 1
 
     if [[ -n $force_flag && $force_flag == "background" ]]; then
-        local base_name="${ASSESSMENT_TOOL_NAME}-${BESMAN_ARTIFACT_NAME}-${BESMAN_ARTIFACT_VERSION}-${ASSESSMENT_TOOL_TYPE// /_}"
+        local base_name="${playbook_name}-${BESMAN_ARTIFACT_NAME}-${BESMAN_ARTIFACT_VERSION}"
         local log_dir="$BESMAN_DIR/log"
         local pid_file="${log_dir}/${base_name}_assessment.pid"
         local log_file="${log_dir}/${base_name}_watcher.log"
