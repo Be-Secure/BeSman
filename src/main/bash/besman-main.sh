@@ -93,7 +93,29 @@ function bes {
 		fi
 
 		;;
-	status | upgrade | remove | reload)
+	status)
+		# Only allow 0 or 1 argument, and at most 1 option
+		[[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
+		[[ "${#opts[@]}" -gt 1 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
+
+		# If an option is passed, check if it's a valid flag
+		if [[ "${#opts[@]}" -eq 1 ]]; then
+			case "${opts[0]}" in
+				-bg|--background|-env|--environment)
+					__bes_"$command" "${opts[0]}"
+					;;
+				*)
+					__besman_echo_red "Invalid flag: ${opts[0]}"
+					__bes_help_"$command"
+					return 1
+					;;
+			esac
+		else
+			# No option passed, call without arguments
+			__bes_"$command"
+		fi
+		;;
+	upgrade | remove | reload)
 		[[ "${#args[@]}" -ne 1 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
 		[[ "${#opts[@]}" -ne 0 ]] && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
 		__bes_"$command"
@@ -102,6 +124,25 @@ function bes {
 		([[ "${#args[@]}" -lt 2 ]] || [[ "${#args[@]}" -gt 3 ]]) && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
 		([[ "${#opts[@]}" -lt 1 ]] || [[ "${#opts[@]}" -gt 2 ]]) && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
 		__bes_"$command" "${opts[@]}" "${args[@]}"
+		;;
+	kill)
+		# Only allow: kill all   OR   kill <pid1> [<pid2> ...]
+		# No options should be passed
+		if [[ "${#opts[@]}" -gt 0 ]]; then
+			__besman_echo_error "Incorrect syntax: options are not allowed for kill command"
+			__bes_help_"$command"
+			return 1
+		fi
+
+		# Must have at least one argument after 'kill'
+		if [[ "${#args[@]}" -lt 2 ]]; then
+			__besman_echo_error "Incorrect syntax: specify 'all' or at least one PID"
+			__bes_help_"$command"
+			return 1
+		fi
+
+		# Pass all arguments after 'kill' to the function
+		__bes_"$command" "${args[@]:1}"
 		;;
 	verify)
 		([[ "${#args[@]}" -lt 2 ]] || [[ "${#args[@]}" -gt 3 ]]) && __besman_echo_red "Incorrect syntax" && __bes_help_"$command" && return 1
@@ -171,6 +212,9 @@ function bes {
 				;;
 			reload)
 				__bes_help_reload
+				;;
+			kill)
+				__bes_help_kill
 				;;
 			*)
 				__besman_echo_red "Unrecognized argument: ${args[1]}" && __bes_help && return 1
