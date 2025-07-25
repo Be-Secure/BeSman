@@ -114,6 +114,7 @@ function __bes_run() {
         #     __besman_echo_yellow "Skipping publish step in background mode."
         #     return 0
         # }
+        [[ "$BESMAN_SKIP_PUBLISH_IN_BACKGROUND" == "true" ]] && __besman_echo_warn "Skipping publish step as BESMAN_SKIP_PUBLISH_IN_BACKGROUND is set."
         local base_name="${playbook_name}-${BESMAN_ARTIFACT_NAME}-${BESMAN_ARTIFACT_VERSION}"
         local log_dir="$BESMAN_DIR/log"
         local pid_file="${log_dir}/${base_name}_assessment.pid"
