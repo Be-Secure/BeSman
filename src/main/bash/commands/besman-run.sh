@@ -109,6 +109,11 @@ function __bes_run() {
     source "$playbook_file" || return 1
 
     if [[ -n $force_flag && $force_flag == "background" ]]; then
+        # Override __besman_publish to skip publishing in background mode
+        function __besman_publish() {
+            __besman_echo_yellow "Skipping publish step in background mode."
+            return 0
+        }
         local base_name="${playbook_name}-${BESMAN_ARTIFACT_NAME}-${BESMAN_ARTIFACT_VERSION}"
         local log_dir="$BESMAN_DIR/log"
         local pid_file="${log_dir}/${base_name}_assessment.pid"
@@ -134,6 +139,11 @@ function __bes_run() {
             bes reload
             [[ -z $BESMAN_PLAYBOOK_FILE || ! -f $BESMAN_PLAYBOOK_FILE ]] && __besman_echo_red "Could not find playbook file" && exit 1
             source "$BESMAN_PLAYBOOK_FILE" || exit 1
+            # Override publish in background mode
+            function __besman_publish() {
+                __besman_echo_yellow "Skipping publish step in background mode."
+                return 0
+            }
             __besman_launch
         ' >"$log_file" 2>&1 &
 
