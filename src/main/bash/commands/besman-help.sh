@@ -200,6 +200,7 @@ function __bes_help_set {
     printf "%-30s %-70s %-25s\n" "BESMAN_LOCAL_PLAYBOOK" "If value is true, playbook is installed from BESMAN_LOCAL_PLAYBOOK_DIR" "true or false"
     printf "%-30s %-70s %-25s\n" "BESMAN_INSECURE_SSL" "If value is true, curl will not check for SSL certificate" "true or false"
     printf "%-30s %-70s %-25s\n" "BESMAN_CURL_CONNECT_TIMEOUT" "Timeout value for curl commands"
+    printf "%-30s %-70s %-25s\n" "BESMAN_SKIP_PUBLISH_IN_BACKGROUND" "Skip publish step in background mode" "true or false"
 
     __besman_echo_white "-----------------------------------------------------------------------------------------------------------------------------------"
 }

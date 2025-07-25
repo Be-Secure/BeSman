@@ -109,6 +109,12 @@ function __bes_run() {
     source "$playbook_file" || return 1
 
     if [[ -n $force_flag && $force_flag == "background" ]]; then
+        # # Override __besman_publish to skip publishing in background mode
+        # function __besman_publish() {
+        #     __besman_echo_yellow "Skipping publish step in background mode."
+        #     return 0
+        # }
+        [[ "$BESMAN_SKIP_PUBLISH_IN_BACKGROUND" == "true" ]] && __besman_echo_warn "Skipping publish step as BESMAN_SKIP_PUBLISH_IN_BACKGROUND is set."
         local base_name="${playbook_name}-${BESMAN_ARTIFACT_NAME}-${BESMAN_ARTIFACT_VERSION}"
         local log_dir="$BESMAN_DIR/log"
         local pid_file="${log_dir}/${base_name}_assessment.pid"
@@ -128,15 +134,24 @@ function __bes_run() {
                 rm -f "$pid_file"
             fi
         fi
-
+        set +m
         nohup bash -c '
             source "$BESMAN_DIR/bin/besman-init.sh"
             bes reload
             [[ -z $BESMAN_PLAYBOOK_FILE || ! -f $BESMAN_PLAYBOOK_FILE ]] && __besman_echo_red "Could not find playbook file" && exit 1
             source "$BESMAN_PLAYBOOK_FILE" || exit 1
+            # Override publish in background mode
+            if [[ "$BESMAN_SKIP_PUBLISH_IN_BACKGROUND" == "true" ]]; then
+                __besman_echo_warn "Skipping publish step as BESMAN_SKIP_PUBLISH_IN_BACKGROUND is set."
+                function __besman_publish() {
+                    return 0
+                }
+            fi
             __besman_launch
+            exit 0
         ' >"$log_file" 2>&1 &
-
+        disown
+        set -m
         echo "$!" > "$pid_file"
         __besman_echo_green "Assessment started in background (PID: $!)"
         __besman_echo_white "Check the logs under $log_file"
