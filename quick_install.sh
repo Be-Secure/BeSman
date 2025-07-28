@@ -1,5 +1,14 @@
 #!/bin/bash
 
+should_skip_install() {
+	local tool="$1"
+	if [ -n "$BESMAN_SKIP_INSTALLABLES" ] && echo "$BESMAN_SKIP_INSTALLABLES" | grep -qw "$tool"; then
+		echo "Skipping $tool installation as per user request"
+		return 0
+	fi
+	return 1
+}
+
 function quick_install() {
 	local force
 	force=$1
@@ -22,7 +31,6 @@ function quick_install() {
 	if [ -z "$BESMAN_DIR" ]; then
 		export BESMAN_DIR="$HOME/.besman"
 	fi
-
 
 	if [[ -z "$BESMAN_VCS" ]]; then
 		export BESMAN_VCS="git"
@@ -142,37 +150,65 @@ EOF
 		fi
 	fi
 
-	if [[ -z $(which ansible) ]]; then
-		echo "Installing ansible"
-		sudo apt-add-repository -y ppa:ansible/ansible
-		sudo apt update
-		sudo apt install ansible -y
+	if [ -z "$(which ansible)" ]; then
+		if should_skip_install "ansible"; then
+			:
+		else
+			echo "Ansible not found. Installing Ansible..."
+			sudo apt-add-repository -y ppa:ansible/ansible
+			sudo apt update
+			sudo apt install ansible -y
+		fi
 	fi
 
 	if [[ -z $(which gh) ]]; then
-		echo "Installing GitHub Cli"
-		type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
-		curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
-		sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
-		echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list >/dev/null
-		sudo apt update
-		sudo apt install gh -y
+		if should_skip_install "gh"; then
+			:
+		else
+			echo "Installing GitHub Cli"
+			type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
+			curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+			sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+			echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list >/dev/null
+			sudo apt update
+			sudo apt install gh -y
+		fi
+	fi
 
+	if [[ -z $(which unzip) ]]; then
+		if should_skip_install "unzip"; then
+			:
+		else
+			echo "Installing unzip"
+			sudo apt install unzip -y
+		fi
 	fi
 
 	if [[ -z $(command -v jq) ]]; then
-		echo "Installing jq"
-		sudo apt update && sudo apt install jq -y
+		if should_skip_install "jq"; then
+			:
+		else
+			echo "Installing jq"
+			sudo apt update && sudo apt install jq -y
+		fi
 	fi
 
 	if [[ -z $(command -v pip) ]]; then
-		echo "Installing pip"
-		sudo apt install python3-pip -y
+		if should_skip_install "pip"; then
+			:
+		else
+			echo "Installing pip"
+			sudo apt install python3-pip -y
+		fi
 	fi
 
 	if [[ -z $(command -v jupyter) ]]; then
-		echo "Installing  notebook"
-		python3 -m pip install jupyter
+		if should_skip_install "jupyter"; then
+			:
+		else
+			echo "Installing notebook"
+			python3 -m pip install jupyter
+		fi
 		#sudo python3 -m pip install notebook
 	fi
 
@@ -186,8 +222,8 @@ EOF
 			sed -i "s/# c.NotebookApp.ip = 'localhost'/c.NotebookApp.ip = '0.0.0.0'/g" $HOME/.jupyter/jupyter_notebook_config.py
 			sed -i "s/# c.NotebookApp.open_browser = True/c.NotebookApp.open_browser = False/g" $HOME/.jupyter/jupyter_notebook_config.py
 		fi
-    else
-	    echo "Jupyter notebook not installed successfully"
+	else
+		echo "Jupyter notebook not found. Skipping configuration."
 	fi
 
 	echo "Installing BeSMAN scripts..."
