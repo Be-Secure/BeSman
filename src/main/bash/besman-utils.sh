@@ -22,16 +22,56 @@ function __besman_echo_debug {
 }
 
 function __besman_secure_curl {
-	if [[ "${besman_insecure_ssl}" == 'true' ]]; then
-		curl --insecure --silent --location "$1"
+	if [[ -n "$BESMAN_ACCESS_TOKEN" ]]; then
+		if [[ "$BESMAN_CODE_COLLAB_PLATFORM" == "github" ]]; then
+			header="Authorization: token $BESMAN_ACCESS_TOKEN"
+		elif [[ "$BESMAN_CODE_COLLAB_PLATFORM" == "gitlab" ]]; then
+			header="PRIVATE-TOKEN: $BESMAN_ACCESS_TOKEN"
+		fi
 	else
-		curl --silent --location "$1"
+		# __besman_echo_warn "No access token provided. Will try unauthenticated request."
+		# __besman_echo_white "If you are using a private repository, press CTRL + C to cancel and"
+		# __besman_echo_white "set the BESMAN_ACCESS_TOKEN environment variable."
+		# __besman_echo_blue ""
+		# __besman_echo_yellow "export BESMAN_ACCESS_TOKEN=<your_access_token>"
+		# __besman_echo_yellow ""
+		header=""	
+	fi
+	if [[ "${BESMAN_INSECURE_SSL}" == 'true' ]]; then
+		curl --insecure --silent --connect-timeout "$BESMAN_CURL_CONNECT_TIMEOUT" --location -H "$header" "$1"
+	else
+		curl --silent --location --connect-timeout "$BESMAN_CURL_CONNECT_TIMEOUT" -H "$header" "$1"
+	fi
+}
+
+function __besman_curl_head()
+{
+	if [[ -n "$BESMAN_ACCESS_TOKEN" ]]; then
+		if [[ "$BESMAN_CODE_COLLAB_PLATFORM" == "github" ]]; then
+			header="Authorization: token $BESMAN_ACCESS_TOKEN"
+		elif [[ "$BESMAN_CODE_COLLAB_PLATFORM" == "gitlab" ]]; then
+			header="PRIVATE-TOKEN: $BESMAN_ACCESS_TOKEN"
+		fi
+	else
+		# __besman_echo_warn "No access token provided. Will try unauthenticated request." >&2
+		# __besman_echo_blue "" >&2
+		# __besman_echo_white "If you are using a private repository, press CTRL + C to cancel and" >&2
+		# __besman_echo_white "set the BESMAN_ACCESS_TOKEN environment variable." >&2
+		# __besman_echo_blue "" >&2
+		# __besman_echo_yellow "export BESMAN_ACCESS_TOKEN=<your_access_token>" >&2
+		# __besman_echo_yellow "" >&2
+		header=""	
+	fi
+	if [[ "${BESMAN_INSECURE_SSL}" == 'true' ]]; then
+		curl --insecure -L --head --silent --connect-timeout "$BESMAN_CURL_CONNECT_TIMEOUT" --output /dev/null --write-out "%{http_code}" -H "$header" "$1"
+	else
+		curl -L --head --silent --connect-timeout "$BESMAN_CURL_CONNECT_TIMEOUT" --output /dev/null --write-out "%{http_code}" -H "$header" "$1"
 	fi
 }
 
 function __besman_secure_curl_download {
 	local curl_params="--progress-bar --location"
-	if [[ "${besman_insecure_ssl}" == 'true' ]]; then
+	if [[ "${BESMAN_INSECURE_SSL}" == 'true' ]]; then
 		curl_params="$curl_params --insecure"
 	fi
 
@@ -59,7 +99,7 @@ function __besman_secure_curl_download {
 }
 
 function __besman_secure_curl_with_timeouts {
-	if [[ "${besman_insecure_ssl}" == 'true' ]]; then
+	if [[ "${BESMAN_INSECURE_SSL}" == 'true' ]]; then
 		curl --insecure --silent --location --connect-timeout ${besman_curl_connect_timeout} --max-time ${besman_curl_max_time} "$1"
 	else
 		curl --silent --location --connect-timeout ${besman_curl_connect_timeout} --max-time ${besman_curl_max_time} "$1"
@@ -97,12 +137,21 @@ function __besman_echo_red {
 	__besman_echo "31m" "$1"
 }
 
+function __besman_echo_error {
+	__besman_echo_red "[ERR]: $1"
+}
+
 function __besman_echo_no_colour {
 	echo "$1"
 }
 
 function __besman_echo_yellow {
 	__besman_echo "33m" "$1"
+}
+
+function __besman_echo_warn()
+{
+	__besman_echo_yellow "[WARN]: $1"
 }
 
 function __besman_echo_green {

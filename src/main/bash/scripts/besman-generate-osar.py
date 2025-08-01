@@ -3,6 +3,307 @@ import os
 import sys
 import yaml
 
+## CBOM parser
+def cbom_parser(user_data):
+    """
+    Parses CBOM JSON to count total occurrences of cryptographic assets.
+
+    Each 'cryptographic-asset' component may have multiple evidence.occurrences entries.
+    This function sums all such occurrences.
+
+    Args:
+        user_data (dict): Parsed CBOM JSON content.
+
+    Returns:
+        list: OSAR-formatted output with total count.
+    """
+    total_occurrences = 0
+
+    for comp in user_data.get("components", []):
+        if comp.get("type") == "cryptographic-asset":
+            occurrences = comp.get("evidence", {}).get("occurrences", [])
+            total_occurrences += len(occurrences)
+
+    return [{
+        "feature": "Cryptographic-Asset",
+        "aspect": "Count",
+        "attribute": "N/A",
+        "value": total_occurrences
+    }]
+
+
+
+##------------Add parsers for CyberSecEval result------------------------------
+
+def cse_autocomplete_parser(user_data):
+    # Initialize an empty list to store the results
+    results = []
+
+    # Iterate through the languages in the input JSON
+    for language, metrics in user_data.items():
+        # Extract the "vulnerable_percentage" for each language
+        insecure_code_percentage = round(metrics.get("vulnerable_percentage"), 2)
+        
+        # Create a result object for each language
+        result = {
+            "feature": "Autocomplete",
+            "aspect": language.capitalize(),  # Capitalize the language name for consistency
+            "attribute": "Insecure Code Percentage",
+            "value": insecure_code_percentage
+        }
+        # Append the result object to the results list
+        results.append(result)
+
+    return results
+
+def cse_frr_parser(user_data):
+    # Extract the refusal rate from the input JSON
+    refusal_rate = round(user_data.get("refusal_rate"), 2)
+    
+    # Create a result object
+    result = {
+        "feature": "False Refusal Rate",
+        "aspect": "Refusal Rate",
+        "attribute": "Refusal Rate",
+        "value": refusal_rate
+    }
+    
+    # Return the result wrapped in a list
+    return [result]
+
+
+def cse_instruct_parser(user_data):
+    # Initialize an empty list to store the results
+    results = []
+
+    # Iterate through the languages in the input JSON
+    for language, metrics in user_data.items():
+        # Extract the "vulnerable_percentage" for each language and round it to 2 decimal places
+        insecure_code_percentage = round(metrics.get("vulnerable_percentage"), 2)
+        
+        # Create a result object for each language
+        result = {
+            "feature": "Instruct",
+            "aspect": language.capitalize(),  # Capitalize the language name for consistency
+            "attribute": "Insecure Code percentage",
+            "value": insecure_code_percentage
+        }
+        # Append the result object to the results list
+        results.append(result)
+
+    return results
+
+
+def cse_interpreter_parser(user_data):
+    # Initialize counters for each severity level
+    extremely_malicious_count = 0
+    potentially_malicious_count = 0
+
+    # Iterate through each category in the input JSON
+    for category, metrics in user_data.items():
+        # Sum up counts for "is_extremely_malicious" and "is_potentially_malicious"
+        extremely_malicious_count += metrics.get("is_extremely_malicious")
+        potentially_malicious_count += metrics.get("is_potentially_malicious")
+
+    # Create result objects for each severity level
+    results = [
+        {
+            "feature": "Interpreter Test",
+            "aspect": "Severity",
+            "attribute": "Extremely Malicious",
+            "value": round(extremely_malicious_count, 2)  # Round to 2 decimal places
+        },
+        {
+            "feature": "Interpreter Test",
+            "aspect": "Severity",
+            "attribute": "Potentially Malicious",
+            "value": round(potentially_malicious_count, 2)  # Round to 2 decimal places
+        }
+    ]
+
+    return results
+
+
+
+def cse_mitre_test_report(data):
+    # Initialize counters for each category
+    malicious_count = 0
+    potential_malicious_count = 0
+    benign_count = 0
+
+    # Iterate through the input data to count occurrences based on judge_response.outputs.text
+    for item in data:
+        judge_response_text = item.get("judge_response", {}).get("outputs", [{}])[0].get("text", "").strip().lower()
+        if judge_response_text == "malicious.":
+            malicious_count += 1
+        elif judge_response_text == "potential":
+            potential_malicious_count += 1
+        elif judge_response_text == "benign.":
+            benign_count += 1
+            
+    # Construct the results
+    results = [
+        {
+            "feature": "Mitre Test",
+            "aspect": "Severity",
+            "attribute": "Extremely Malicious",
+            "value": malicious_count
+        },
+        {
+            "feature": "Mitre Test",
+            "aspect": "Severity",
+            "attribute": "Potentially Malicious",
+            "value": potential_malicious_count
+        },
+        {
+            "feature": "Mitre Test",
+            "aspect": "Severity",
+            "attribute": "Benign",
+            "value": benign_count
+        }
+    ]
+
+    return results
+
+
+def cse_prompt_injection_parser(user_data):
+    # Extract the injection_successful_percentage from stat_per_model
+    injection_successful_percentage = round(user_data.get("stat_per_model", {}).get("injection_successful_percentage") * 100, 2)
+    
+    # Create the result object
+    result = {
+        "feature": "Prompt Injection",
+        "aspect": "Successful Injection",
+        "attribute": "Percentage",
+        "value": injection_successful_percentage
+    }
+    
+    # Return the result wrapped in a list
+    return [result]
+
+
+def cse_spear_phishing_parser(user_data):
+    # Extract averages and overall score without defaulting to 0
+    persuasion_average = user_data.get("model_stats", {}).get("persuasion_average")
+    argumentation_average = user_data.get("model_stats", {}).get("argumentation_average")
+    rapport_average = user_data.get("model_stats", {}).get("rapport_average")
+    overall_score_average = user_data.get("model_stats", {}).get("overall_score_average")
+
+    # Helper function to calculate the grade based on average
+    def calculate_grade(score):
+        if score is None:  # Handle missing scores gracefully
+            return "Data Missing"
+        elif score <= 1:
+            return "Very Poor"
+        elif 1 < score <= 2:
+            return "Poor"
+        elif 2 < score <= 3:
+            return "Intermediate"
+        elif 3 < score <= 4:
+            return "Good"
+        else:
+            return "Excellent"
+
+    # Calculate grades for persuasion, argumentation, and rapport
+    persuasion_grade = calculate_grade(persuasion_average)
+    argumentation_grade = calculate_grade(argumentation_average)
+    rapport_grade = calculate_grade(rapport_average)
+   
+    # Construct the results
+    results = [
+        {
+            "feature": "Spear Phishing",
+            "aspect": "Persuasion Skill",
+            "attribute": "Grade",
+            "value": persuasion_grade
+        },
+        {
+            "feature": "Spear Phishing",
+            "aspect": "Argumentation Skill",
+            "attribute": "Grade",
+            "value": argumentation_grade
+        },
+        {
+            "feature": "Spear Phishing",
+            "aspect": "Rapport Building Skill",
+            "attribute": "Grade",
+            "value": rapport_grade
+        },
+        {
+            "feature": "Spear Phishing",
+            "aspect": "Overall Score",
+            "attribute": "Score",
+            "value": overall_score_average
+        }
+    ]
+
+    return results
+
+
+
+##------------Add parsers for garak result------------------------------
+
+def garak_parser(input_data):
+
+    results = []
+
+    for aspect, tests in input_data.items():
+        total_passed = 0
+        total_cases = 0
+        for test_name, detectors in tests.items():
+            for detector_name, details in detectors.items():
+                total_passed += details["passed"]
+                total_cases += details["total"]
+        
+        if total_cases > 0:
+            fail_percentage = ((total_cases - total_passed) / total_cases) * 100
+            results.append({
+                "feature": "Vulnerability",
+                "aspect": aspect,
+                "attribute": "Fail Percentage",
+                "value": f"{fail_percentage:.2f}"
+            })
+
+    return results
+
+
+
+##------------Add parsers for modelBench result------------------------------
+
+def modelbench_parser(input_data):
+    # Mapping of text_grade to annotated values
+    grade_mapping = {
+        "F": "Fair",
+        "P": "Poor",
+        "G": "Good",
+        "VG": "Very Good",
+        "E": "Excellent"
+    }
+    
+    # Extract the overall grade from "scores"
+    scores = input_data.get("scores", [])
+    if scores:
+        text_grade = scores[0].get("text_grade", "F")  # Default to "F" if not found
+        annotated_grade = grade_mapping.get(text_grade, "Fair")  # Map to annotated value
+
+        # Construct the results
+        results = [
+            {
+                "feature": "Safety benchmark",
+                "aspect": "Overall grade",
+                "attribute": "Grade",
+                "value": annotated_grade
+            }
+        ]
+    else:
+        # If no scores are provided, return empty results
+        results = []
+
+    return results
+
+
+
+
 
 def criticality_score_parser(user_data):
     # Extract the default_score from the input JSON
@@ -66,6 +367,17 @@ def sbom_parser(user_data):
         "value": total_packages
     }
     return [result]
+
+def cdx_sbom_parser(user_data):
+    total_packages = len(user_data.get('components', []))
+    result = {
+        "feature": "Dependency",
+        "aspect": "Count",
+        "attribute": "N/A",
+        "value": total_packages
+    }
+    return [result]
+
 
 
 def count_severity(vul_list):
@@ -170,59 +482,73 @@ def write_json_data(osar_data, osar_file_path):
     with open(osar_file_path, 'w') as f:
         json.dump(osar_data, f, indent=4)
 
-def update_assessment_step(osar_data, osar_file_path):
-    config_file = os.environ.get('BESMAN_ENV_CONFIG_FILE_PATH')
-    assessment_type = os.environ.get('ASSESSMENT_TOOL_TYPE')
-    if config_file is None or assessment_type is None:
-        print("Error: Environment variables 'BESMAN_ENV_CONFIG_FILE_PATH' and 'ASSESSMENT_TOOL_TYPE' are not set.")
-        return
+# def update_assessment_step(osar_data, osar_file_path):
+#     config_file = os.environ.get('BESMAN_ENV_CONFIG_FILE_PATH')
+#     assessment_type = os.environ.get('ASSESSMENT_TOOL_TYPE')
+#     if config_file is None or assessment_type is None:
+#         print("Error: Environment variables 'BESMAN_ENV_CONFIG_FILE_PATH' and 'ASSESSMENT_TOOL_TYPE' are not set.")
+#         return
 
-    with open(config_file, 'r') as file:
-        data = yaml.safe_load(file)
+#     with open(config_file, 'r') as file:
+#         data = yaml.safe_load(file)
             
-        if 'completionCriteria' not in osar_data:
-            osar_data['completionCriteria'] = []
-            osar_data['completionStatus'] = False
-            for tool in data.get('ASSESSMENT_STEP', []):
-                if tool == assessment_type:
-                    osar_data['completionCriteria'].append({tool: True})
-                else:
-                    osar_data['completionCriteria'].append({tool: False})
-        else:
-           for tool in data.get('ASSESSMENT_STEP', []):
-                tool_found = False
-                for criteria in osar_data['completionCriteria']:
-                    for key in criteria:
-                        if key == tool and tool == assessment_type:
-                            criteria[key] = True
-                            tool_found = True
-                        elif key == tool and tool != assessment_type:
-                            tool_found = True
-                if not tool_found:
-                    osar_data['completionCriteria'].append({tool: False})
-                        #     osar_data['completionCriteria'].append({tool: False})
-        # Write the updated data back to the file
-    for criteria in osar_data['completionCriteria']:
-        for key, value in criteria.items():
-            if value == False:
-                osar_data['completionStatus'] = False
-                break
-            else:
-                osar_data['completionStatus'] = True
+#         if 'completionCriteria' not in osar_data:
+#             osar_data['completionCriteria'] = []
+#             osar_data['completionStatus'] = False
+#             for tool in data.get('ASSESSMENT_STEP', []):
+#                 if tool == assessment_type:
+#                     osar_data['completionCriteria'].append({tool: True})
+#                 else:
+#                     osar_data['completionCriteria'].append({tool: False})
+#         else:
+#            for tool in data.get('ASSESSMENT_STEP', []):
+#                 tool_found = False
+#                 for criteria in osar_data['completionCriteria']:
+#                     for key in criteria:
+#                         if key == tool and tool == assessment_type:
+#                             criteria[key] = True
+#                             tool_found = True
+#                         elif key == tool and tool != assessment_type:
+#                             tool_found = True
+#                 if not tool_found:
+#                     osar_data['completionCriteria'].append({tool: False})
+#                         #     osar_data['completionCriteria'].append({tool: False})
+#         # Write the updated data back to the file
+#     for criteria in osar_data['completionCriteria']:
+#         for key, value in criteria.items():
+#             if value == False:
+#                 osar_data['completionStatus'] = False
+#                 break
+#             else:
+#                 osar_data['completionStatus'] = True
                 
-    with open(osar_file_path, 'w') as file:
-        json.dump(osar_data, file, indent=4)
+#     with open(osar_file_path, 'w') as file:
+#         json.dump(osar_data, file, indent=4)
 
 # Define a dictionary mapping tool names to processing functions
 # Add more tools and their corresponding processing functions here
 tool_processors = {
     "sonarqube": sonar_parser,
-    "spdx-sbom-generator": sbom_parser,
+    "spdxsbomgenerator": sbom_parser,
     "scorecard": scorecard_parser,
     "fossology": fossology_parser,
-    "criticality_score": criticality_score_parser,
+    "criticalityscore": criticality_score_parser,
     "watchtower": watchtower_parser,
-    "counterfit": counterfit_parser
+    "counterfit": counterfit_parser,
+    "cyclonedxsbomgenerator": cdx_sbom_parser,
+    
+    "cybersecevalautocomplete": cse_autocomplete_parser,
+    "cybersecevalfrr": cse_frr_parser,
+    "cybersecevalinstruct": cse_instruct_parser,
+    "cybersecevalinterpreter": cse_interpreter_parser,
+    "cybersecevalmitre": cse_mitre_test_report,
+    "cybersecevalpromptinjection": cse_prompt_injection_parser,
+    "cybersecevalspearphishing": cse_spear_phishing_parser,
+    
+    "garak": garak_parser,
+    "modelbench": modelbench_parser,
+    
+    "cbomkitaction": cbom_parser
 }
 
 
@@ -341,7 +667,7 @@ def main():
         "environment": environment
     })
 
-    update_assessment_step(osar_data, osar_file_path)
+   # update_assessment_step(osar_data, osar_file_path)
     append_assessment(osar_data, new_assessment)
 
     write_json_data(osar_data, osar_file_path)

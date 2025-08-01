@@ -88,24 +88,16 @@ function __besman_link_candidate_version() {
 	ln -s "${version}" "${BESMAN_CANDIDATES_DIR}/${candidate}/current"
 }
 
-function __besman_check_url_valid()
-{
-	local url response
-
-	url="$1"
-	response=$(curl --head --silent --output /dev/null --write-out "%{http_code}" "$url")
-
-	if [[ $response -eq 200 ]]; then
-		
-		unset url response
-		return 0
-
+function __besman_get_encoded() {
+	local string encoded_string
+	string="$1"
+	if [[ -z "$(which jq)" ]] 
+	then
+		# only for / in paths
+		encoded_string=$(echo "$string" | sed 's/\//%2F/g')
 	else
-
-    	__besman_echo_red "URL $url returned $response"
-		unset url response
-		return 1
+		encoded_string=$(echo "$string" | jq "@uri" -jRr)
 	fi
+	echo "$encoded_string"
 	
-
 }

@@ -3,12 +3,16 @@ import requests
 import os
 import json
 import sys
+from besman_python_helper import ConstructURL
+
 def get_master_list():
     playbook_repo = os.environ.get("BESMAN_PLAYBOOK_REPO")
     branch = os.environ.get("BESMAN_PLAYBOOK_REPO_BRANCH")
-    url = f'https://raw.githubusercontent.com/{playbook_repo}/{branch}/playbook-metadata.json'
+    url_constructor = ConstructURL(playbook_repo, branch, 'playbook-metadata.json')
+    url = url_constructor.construct_raw_url(playbook_repo, branch, 'playbook-metadata.json')
+    # url = f'{raw_url}/playbook-metadata.json'
     try:
-        response = requests.get(url)
+        response = requests.get(url, headers=url_constructor.header_function(), timeout=10)
         response.raise_for_status()  # Raise an exception for 4xx and 5xx status codes
         data = response.json()
         save_playbook_details_to_file(data['playbooks'])
@@ -17,27 +21,69 @@ def get_master_list():
         sys.exit(1)
 
 def fetch_playbook_metadata(playbooks):
-    playbook_repo = os.environ.get("BESMAN_PLAYBOOK_REPO")
-    branch = os.environ.get("BESMAN_PLAYBOOK_REPO_BRANCH")
-    url = f'https://raw.githubusercontent.com/{playbook_repo}/{branch}/playbook-metadata.json'
+    """Fetches playbook metadata from GitHub or a local source."""
+
+    if os.environ.get("BESMAN_LOCAL_PLAYBOOK") == "true":
+        
+        # Implement your local playbook loading logic here.
+        # This is placeholder example. Replace with your actual implementation.
+        try:
+            # Example: Load from a local JSON file
+            local_metadata_file_path = os.environ.get("BESMAN_LOCAL_PLAYBOOK_DIR")
+            #print("Listing from local playbook directory - ", local_metadata_file_path)  # Indicate local source
+            if not local_metadata_file_path:
+                print("Error: BESMAN_LOCA+L_PLAYBOOK_DIR environment variable not set.")
+                return []
+
+            local_metadata_file = os.path.join(local_metadata_file_path, "playbook-metadata.json") # Use os.path.join
+
+            if not os.path.exists(local_metadata_file): # Check if file exists
+                print(f"Error: Local metadata file '{local_metadata_file}' not found.")
+                return []
+            
+            with open(local_metadata_file, 'r') as f:
+                data = json.load(f)
+                master_playbooks = data.get('playbooks', [])  # Handle missing 'playbooks' key
+        except FileNotFoundError:
+            print(f"Error: Local metadata file '{local_metadata_file}' not found.")
+            return []
+        except json.JSONDecodeError:
+            print(f"Error: Invalid JSON in local metadata file '{local_metadata_file}'.")
+            return []
+        except Exception as e: # Catch any other exceptions
+            print(f"An error occurred while reading local metadata: {e}")
+            return []
+    else:
+        playbook_repo = os.environ.get("BESMAN_PLAYBOOK_REPO")
+        branch = os.environ.get("BESMAN_PLAYBOOK_REPO_BRANCH")
+        if not playbook_repo or not branch: # Check if env variables are set when not using local
+            print("Error: BESMAN_PLAYBOOK_REPO and BESMAN_PLAYBOOK_REPO_BRANCH environment variables must be set when BESMAN_LOCAL_PLAYBOOK is not true.")
+            return []
+        url_constructor = ConstructURL(playbook_repo, branch, 'playbook-metadata.json')
+        url = url_constructor.construct_raw_url(playbook_repo, branch, 'playbook-metadata.json')
+        # url = f'{raw_url}/playbook-metadata.json'
+        try:
+            response = requests.get(url, headers=url_constructor.header_function(), timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            master_playbooks = data.get('playbooks', [])  # Handle missing 'playbooks' key
+        except requests.RequestException as e:
+            print(f"Failed to fetch playbook metadata from GitHub: {e}")
+            return []
+        except (ValueError, KeyError) as e:  # Handle JSON decoding/key errors
+            print(f"Error processing playbook metadata from GitHub: {e}")
+            return []
+
     compatible_playbooks = []
-    try:
-        response = requests.get(url)
-        response.raise_for_status()  # Raise an exception for 4xx and 5xx status codes
-        data = response.json()
-        # return data['playbooks']
-        master_playbooks = data['playbooks']
-    except requests.RequestException as e:
-        print(f"Failed to fetch playbook metadata: {e}")
-        return []
-    
     for playbook in playbooks:
         for pl in master_playbooks:
             if playbook['name'] == pl['name']:
                 for version in playbook['version']:
                     if version == pl['version']:
                         compatible_playbooks.append(pl)
-    # print(compatible_playbooks)
+    if not compatible_playbooks:
+        print(f"[ERR]: No compatible playbooks found for the given environment and version.")
+        return []
     return compatible_playbooks
 
     
@@ -48,7 +94,7 @@ def save_playbook_details_to_file(playbooks):
     
     with open(file_path, 'w') as file:
         for playbook in playbooks:
-            details = f"{playbook['name']} {playbook['version']} {playbook['type']} {playbook['author']['name']}\n"
+            details = f"{playbook['name']} {playbook['intent']} {playbook['version']} {playbook['type']} {playbook['author']['name']} {playbook['description']}\n"
             file.write(details)
 
 def get_env_compatible_playbooks(environment, version):
@@ -57,10 +103,11 @@ def get_env_compatible_playbooks(environment, version):
     if local_env_flag == "false":
         env_repo = os.environ.get("BESMAN_ENV_REPO")
         env_repo_branch = os.environ.get("BESMAN_ENV_REPO_BRANCH")
-        url = f'https://raw.githubusercontent.com/{env_repo}/{env_repo_branch}/environment-metadata.json'
+        url_constructor = ConstructURL(env_repo, env_repo_branch, 'environment-metadata.json')
+        url = url_constructor.construct_raw_url(env_repo, env_repo_branch, 'environment-metadata.json')
 
         try:
-            response = requests.get(url)
+            response = requests.get(url, headers=url_constructor.header_function(), timeout=10)
             response.raise_for_status()
             data = response.json()
         except requests.RequestException as e:

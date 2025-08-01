@@ -8,7 +8,7 @@ function __bes_set()
     file_path="$BESMAN_DIR/etc/user-config.cfg"
 
     if [[ ( -z $variable_name ) || (-z $new_value) ]]; then
-        __besman_display_set_usage "$file_path" 
+        __bes_help_set
         return 1
     fi
 
@@ -21,25 +21,6 @@ function __bes_set()
 
 }
 
-function __besman_display_set_usage()
-{
-    local file_path
-    file_path=$1
-    __besman_echo_white "Usage:"
-    __besman_echo_no_colour ""
-    __besman_echo_yellow "$ bes set <variable> <value>"
-    __besman_echo_no_colour ""
-    __besman_echo_white "<variable>:"
-    while read -r line; 
-    do
-
-        echo "$line" | cut -d "=" -f 1
-        
-    done < "$file_path"
-    __besman_echo_no_colour ""
-
-    return 1   
-}
 
 function __besman_check_if_variable_exist()
 {

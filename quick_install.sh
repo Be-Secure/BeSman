@@ -1,5 +1,14 @@
 #!/bin/bash
 
+should_skip_install() {
+	local tool="$1"
+	if [ -n "$BESMAN_SKIP_INSTALLABLES" ] && echo "$BESMAN_SKIP_INSTALLABLES" | grep -qw "$tool"; then
+		echo "Skipping $tool installation as per user request"
+		return 0
+	fi
+	return 1
+}
+
 function quick_install() {
 	local force
 	force=$1
@@ -23,10 +32,6 @@ function quick_install() {
 		export BESMAN_DIR="$HOME/.besman"
 	fi
 
-	if [[ -z "$BESMAN_CODE_COLLAB_URL" ]]; then
-		export BESMAN_CODE_COLLAB_URL="https://github.com"
-	fi
-
 	if [[ -z "$BESMAN_VCS" ]]; then
 		export BESMAN_VCS="git"
 	fi
@@ -35,6 +40,7 @@ function quick_install() {
 	besman_bin_folder="${BESMAN_DIR}/bin"
 	besman_src_folder="${BESMAN_DIR}/src"
 	besman_tmp_folder="${BESMAN_DIR}/tmp"
+	besman_log_folder="${BESMAN_DIR}/log"
 	besman_stage_folder="${besman_tmp_folder}/stage"
 	besman_zip_file="${besman_tmp_folder}/besman-${BESMAN_VERSION}.zip"
 	besman_env_folder="${BESMAN_DIR}/envs"
@@ -145,48 +151,81 @@ EOF
 		fi
 	fi
 
-	if [[ -z $(which ansible) ]]; then
-		echo "Installing ansible"
-		sudo apt-add-repository -y ppa:ansible/ansible
-		sudo apt update
-		sudo apt install ansible -y
+	if [ -z "$(which ansible)" ]; then
+		if should_skip_install "ansible"; then
+			:
+		else
+			echo "Ansible not found. Installing Ansible..."
+			sudo apt-add-repository -y ppa:ansible/ansible
+			sudo apt update
+			sudo apt install ansible -y
+		fi
 	fi
 
 	if [[ -z $(which gh) ]]; then
-		echo "Installing GitHub Cli"
-		type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
-		curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
-		sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
-		echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list >/dev/null
-		sudo apt update
-		sudo apt install gh -y
+		if should_skip_install "gh"; then
+			:
+		else
+			echo "Installing GitHub Cli"
+			type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
+			curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+			sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+			echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list >/dev/null
+			sudo apt update
+			sudo apt install gh -y
+		fi
+	fi
 
+	if [[ -z $(which unzip) ]]; then
+		if should_skip_install "unzip"; then
+			:
+		else
+			echo "Installing unzip"
+			sudo apt install unzip -y
+		fi
 	fi
 
 	if [[ -z $(command -v jq) ]]; then
-		echo "Installing jq"
-		sudo apt update && sudo apt install jq -y
+		if should_skip_install "jq"; then
+			:
+		else
+			echo "Installing jq"
+			sudo apt update && sudo apt install jq -y
+		fi
 	fi
 
 	if [[ -z $(command -v pip) ]]; then
-		echo "Installing pip"
-		sudo apt install python3-pip -y
+		if should_skip_install "pip"; then
+			:
+		else
+			echo "Installing pip"
+			sudo apt install python3-pip -y
+		fi
 	fi
 
 	if [[ -z $(command -v jupyter) ]]; then
-		echo "Installing jupyter notebook"
-		python3 -m pip install notebook
+		if should_skip_install "jupyter"; then
+			:
+		else
+			echo "Installing notebook"
+			python3 -m pip install jupyter
+		fi
+		#sudo python3 -m pip install notebook
 	fi
 
-if [[ -z $(command -v jupyter) ]]
-then
-	echo "Installing jupyter notebook"
-	sudo apt-get install jupyter -y
-	jupyter notebook --generate-config
-        #sed -i "s/# c.ServerApp.ip = 'localhost'/c.ServerApp.ip = '0.0.0.0'/g" $HOME/.jupyter/jupyter_notebook_config.py
-        #sed -i "s/# c.ServerApp.open_browser = False/c.ServerApp.open_browser = False/g" $HOME/.jupyter/jupyter_notebook_config.py 
-	#python3 -m pip install notebook
-fi
+	if [[ ! -z $(command -v jupyter) ]]; then
+		echo "Configuring jupyter notebook"
+		jupyter notebook --generate-config
+		if [[ -f "$HOME/.jupyter/jupyter_notebook_config.py" ]]; then
+			echo "Jupyter notebook config file found"
+			sed -i "s/# c.ServerApp.ip = 'localhost'/c.ServerApp.ip = '0.0.0.0'/g" $HOME/.jupyter/jupyter_notebook_config.py
+			sed -i "s/# c.ServerApp.open_browser = False/c.ServerApp.open_browser = False/g" $HOME/.jupyter/jupyter_notebook_config.py
+			sed -i "s/# c.NotebookApp.ip = 'localhost'/c.NotebookApp.ip = '0.0.0.0'/g" $HOME/.jupyter/jupyter_notebook_config.py
+			sed -i "s/# c.NotebookApp.open_browser = True/c.NotebookApp.open_browser = False/g" $HOME/.jupyter/jupyter_notebook_config.py
+		fi
+	else
+		echo "Jupyter notebook not found. Skipping configuration."
+	fi
 
 	echo "Installing BeSMAN scripts..."
 
@@ -202,6 +241,7 @@ fi
 	mkdir -p "$besman_var_folder"
 	mkdir -p "$besman_scripts_folder"
 	mkdir -p "$besman_playbook_dir"
+	mkdir -p "$besman_log_folder"
 
 	echo "Prime the config file..."
 	echo "config selfupdate/debug_mode = true"
@@ -223,7 +263,8 @@ fi
 	{
 		echo "BESMAN_VERSION=$BESMAN_VERSION"
 		echo "BESMAN_USER_NAMESPACE="
-		echo "BESMAN_CODE_COLLAB_URL=$BESMAN_CODE_COLLAB_URL"
+		echo "BESMAN_CODE_COLLAB_PLATFORM=github"
+		echo "BESMAN_CODE_COLLAB_URL=https://github.com"
 		echo "BESMAN_VCS=$BESMAN_VCS"
 		echo "BESMAN_ENV_ROOT=$HOME/BeSman_env"
 		echo "BESMAN_NAMESPACE=$BESMAN_NAMESPACE"
@@ -237,12 +278,17 @@ fi
 		echo "BESMAN_OFFLINE_MODE=true"
 		echo "BESMAN_LOCAL_ENV=false"
 		echo "BESMAN_LOCAL_ENV_DIR="
+		echo "BESMAN_LOCAL_PLAYBOOK=false"
+		echo "BESMAN_LOCAL_PLAYBOOK_DIR="
 		echo "BESMAN_PLAYBOOK_DIR=$besman_playbook_dir"
+		echo "BESMAN_INSECURE_SSL=false"
+		echo "BESMAN_CURL_CONNECT_TIMEOUT=15"
+		echo "BESMAN_SKIP_PUBLISH_IN_BACKGROUND=true"
 	} >>"$besman_user_config_file"
 
 	cp ./src/main/bash/besman-* "$besman_src_folder"
 	cp ./src/main/bash/commands/besman-* "$besman_src_folder"
-	cp ./src/main/bash/scripts/besman-* "$besman_scripts_folder"
+	cp ./src/main/bash/scripts/besman* "$besman_scripts_folder"
 	mv "$besman_src_folder/besman-init.sh" "$besman_bin_folder"
 
 	touch "$besman_var_folder/list.txt"
@@ -285,9 +331,6 @@ fi
 	else
 		echo -e "\n\033[0;32mSuccessfully installed BeSman from branch $BESMAN_VERSION\033[0m\n"
 	fi
-
-
-
 
 }
 quick_install "$1"

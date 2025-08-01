@@ -2,6 +2,7 @@ import requests
 import os
 import json
 import sys
+from besman_python_helper import ConstructURL
 
 # Get environment variables
 
@@ -17,13 +18,22 @@ import sys
 
 # Construct the URL
 def get_env_list():
+
     env_repo = os.environ.get("BESMAN_ENV_REPO")
     branch = os.environ.get("BESMAN_ENV_REPO_BRANCH")
     besman_dir = os.environ.get("BESMAN_DIR")
     local_env = os.environ.get("BESMAN_LOCAL_ENV")
     local_env_dir = os.environ.get("BESMAN_LOCAL_ENV_DIR")
+    # platform = os.environ.get("BESMAN_CODE_COLLAB_PLATFORM")
+    # token = os.environ.get("BESMAN_ACCESS_TOKEN")
+    file_path = 'environment-metadata.json'
+    # Construct the URL
+    url_constructor = ConstructURL(env_repo, branch, file_path)
 
-    url = f'https://raw.githubusercontent.com/{env_repo}/{branch}/environment-metadata.json'
+    # Use the construct_raw_url method
+    raw_url = url_constructor.construct_raw_url(env_repo, branch, file_path)
+    
+    # url = f'{raw_url}/environment-metadata.json'
 
     try:
         # Load data
@@ -33,7 +43,8 @@ def get_env_list():
                 data = json.load(local_file)
         else:
             # Fetch JSON from URL
-            response = requests.get(url)
+            header = url_constructor.header_function()
+            response = requests.get(raw_url, headers=header, timeout=10)
             response.raise_for_status()  # Raise an exception for bad responses (4xx or 5xx)
             data = response.json()
             # print(data)
@@ -55,7 +66,7 @@ def get_env_list():
 
         sys.exit(0)  # Exit with a success code
     except requests.exceptions.RequestException as e:
-        print(f"Error fetching data: {e}")
+        print(f"Error fetching data from url {raw_url}: {e}")
         sys.exit(1)  # Exit with an error code
     except (KeyError, TypeError, json.JSONDecodeError) as e:
         print(f"Error parsing JSON: {e}")
