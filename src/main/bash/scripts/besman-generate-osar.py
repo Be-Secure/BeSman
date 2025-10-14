@@ -3,6 +3,63 @@ import os
 import sys
 import yaml
 
+
+
+## ART PArser
+def art_parser(user_data):
+    """
+    Parses an ART adversarial robustness report JSON and returns
+    an OSAR-compatible 'results' list containing:
+      - Clean Accuracy
+      - Adversarial Accuracy (for each attack + parameters)
+
+    Args:
+        user_data (dict): Full ART report JSON as a Python dict.
+
+    Returns:
+        list: List of dicts matching OSAR 'results' schema.
+    """
+
+    results = []
+    try:
+        global_results = user_data.get("GLOBAL_RESULTS", {})
+
+        # 1. Clean Accuracy
+        clean_acc = global_results.get("clean_accuracy")
+        if clean_acc is not None:
+            results.append({
+                "feature": "Evasion",
+                "aspect": "Clean Evaluation",
+                "attribute": "Clean Accuracy",
+                "value": round(float(clean_acc), 4)
+            })
+
+        # 2. Evasion Attacks
+        evasion_attacks = global_results.get("Evasion", {}).get("attacks", [])
+        for attack in evasion_attacks:
+            attack_name = attack.get("name", "").upper()
+            params = attack.get("parameters", {})
+            adv_acc = attack.get("adv_accuracy")
+
+            # Format parameters string: eps=0.1, eps_step=0.01, ...
+            param_str = ", ".join([f"{k}={v}" for k, v in params.items()]) if params else ""
+            aspect = f"{attack_name} ({param_str})" if param_str else attack_name
+
+            if adv_acc is not None:
+                results.append({
+                    "feature": "Evasion",
+                    "aspect": aspect,
+                    "attribute": "Adversarial Accuracy",
+                    "value": round(float(adv_acc), 4)
+                })
+
+    except Exception as e:
+        print(f"[art_parser] Error parsing ART report: {e}")
+
+    return results
+
+    
+
 ## CBOM parser
 def cbom_parser(user_data):
     """
@@ -548,7 +605,9 @@ tool_processors = {
     "garak": garak_parser,
     "modelbench": modelbench_parser,
     
-    "cbomkitaction": cbom_parser
+    "cbomkitaction": cbom_parser,
+    
+    "art": art_parser
 }
 
 
