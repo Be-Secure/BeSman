@@ -32,10 +32,6 @@ function quick_install() {
 		export BESMAN_DIR="$HOME/.besman"
 	fi
 
-<<<<<<< HEAD
-
-=======
->>>>>>> upstream/develop
 	if [[ -z "$BESMAN_VCS" ]]; then
 		export BESMAN_VCS="git"
 	fi
@@ -208,17 +204,12 @@ EOF
 	fi
 
 	if [[ -z $(command -v jupyter) ]]; then
-<<<<<<< HEAD
-		echo "Installing  notebook"
-		python3 -m pip install jupyter
-=======
 		if should_skip_install "jupyter"; then
 			:
 		else
 			echo "Installing notebook"
 			python3 -m pip install jupyter
 		fi
->>>>>>> upstream/develop
 		#sudo python3 -m pip install notebook
 	fi
 
@@ -232,13 +223,8 @@ EOF
 			sed -i "s/# c.NotebookApp.ip = 'localhost'/c.NotebookApp.ip = '0.0.0.0'/g" $HOME/.jupyter/jupyter_notebook_config.py
 			sed -i "s/# c.NotebookApp.open_browser = True/c.NotebookApp.open_browser = False/g" $HOME/.jupyter/jupyter_notebook_config.py
 		fi
-<<<<<<< HEAD
-    else
-	    echo "Jupyter notebook not installed successfully"
-=======
 	else
 		echo "Jupyter notebook not found. Skipping configuration."
->>>>>>> upstream/develop
 	fi
 
 	echo "Installing BeSMAN scripts..."
@@ -297,10 +283,7 @@ EOF
 		echo "BESMAN_PLAYBOOK_DIR=$besman_playbook_dir"
 		echo "BESMAN_INSECURE_SSL=false"
 		echo "BESMAN_CURL_CONNECT_TIMEOUT=15"
-<<<<<<< HEAD
-=======
 		echo "BESMAN_SKIP_PUBLISH_IN_BACKGROUND=true"
->>>>>>> upstream/develop
 	} >>"$besman_user_config_file"
 
 	cp ./src/main/bash/besman-* "$besman_src_folder"
