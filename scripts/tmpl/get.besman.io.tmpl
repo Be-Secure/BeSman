@@ -2,6 +2,7 @@
 
 #Install: stable
 
+<<<<<<< HEAD
 function __bes_install_besman() {
 
 	# Global variables
@@ -57,6 +58,73 @@ function __bes_install_besman() {
 	besman_playbook_dir="$BESMAN_DIR/playbooks"
 	besman_scripts_folder="$BESMAN_DIR/scripts"
 
+=======
+should_skip_install() {
+	local tool="$1"
+	if [ -n "$BESMAN_SKIP_INSTALLABLES" ] && echo "$BESMAN_SKIP_INSTALLABLES" | grep -qw "$tool"; then
+		echo "Skipping $tool installation as per user request"
+		return 0
+	fi
+	return 1
+}
+
+function __bes_install_besman() {
+
+	# Global variables
+	BESMAN_PLATFORM=$(uname)
+	export BESMAN_SERVICE="https://raw.githubusercontent.com"
+
+	# BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
+
+	BESMAN_NAMESPACE="@BES_NAMESPACE@"
+	# BESMAN_VERSION="${BESMAN_VERSION:-@BES_VERSION@}"
+
+	BESMAN_ENV_REPO="$BESMAN_NAMESPACE/besecure-ce-env-repo"
+	# BESMAN_DIST_BRANCH=${BESMAN_DIST_BRANCH:-REL-${BESMAN_VERSION}}
+
+	if [[ -z $(command -v jq) ]]; then
+		echo "Installing jq"
+		sudo apt update && sudo apt install jq -y
+	fi
+
+	if [[ -z "$BESMAN_VERSION" ]]; then
+		echo "Fetching the latest stable version"
+		version=$(curl -s --insecure --silent "https://api.github.com/repos/$BESMAN_NAMESPACE/BeSman/releases" | jq -r '.[].tag_name' | tr ' ' '\n' | grep -v -E 'v?[0-9]+\.[0-9]+\.[0-9]+-(alpha|beta|rc)\.?([0-9]+)?' | head -n 1)
+		export BESMAN_VERSION="$version"
+	else
+		echo "Checking if version $BESMAN_VERSION is valid..."
+		release=$(curl -s --insecure --silent "https://api.github.com/repos/$BESMAN_NAMESPACE/BeSman/releases" | jq -r '.[].tag_name' | grep "^$BESMAN_VERSION$")
+		[[ -z $release ]] && echo -e "\e[31m$release is not a valid version of $BESMAN_NAMESPACE/BeSman\e[0m" && return 1
+	fi
+
+	if [[ -z "$BESMAN_DIR" ]]; then
+		export BESMAN_DIR="$HOME/.besman"
+	fi
+
+	if [[ -z "$BESMAN_VCS" ]]; then
+		export BESMAN_VCS="git"
+	fi
+	# variables
+	besman_bin_folder="${BESMAN_DIR}/bin"
+	besman_src_folder="${BESMAN_DIR}/src"
+	besman_tmp_folder="${BESMAN_DIR}/tmp"
+	besman_log_folder="${BESMAN_DIR}/tmp"
+	besman_stage_folder="${besman_tmp_folder}/stage"
+	besman_zip_file="${besman_tmp_folder}/besman-${BESMAN_VERSION}.zip"
+	besman_env_folder="${BESMAN_DIR}/envs"
+	besman_stage_folder="${besman_tmp_folder}/stage"
+	besman_etc_folder="${BESMAN_DIR}/etc"
+	besman_var_folder="${BESMAN_DIR}/var"
+	besman_config_file="${besman_etc_folder}/config"
+	besman_user_config_file="${besman_etc_folder}/user-config.cfg"
+	besman_bash_profile="${HOME}/.bash_profile"
+	besman_profile="${HOME}/.profile"
+	besman_bashrc="${HOME}/.bashrc"
+	besman_zshrc="${HOME}/.zshrc"
+	besman_playbook_dir="$BESMAN_DIR/playbooks"
+	besman_scripts_folder="$BESMAN_DIR/scripts"
+
+>>>>>>> upstream/develop
 	besman_init_snippet=$(
 		cat <<EOF
 #THIS MUST BE AT THE END OF THE FILE FOR BESMAN TO WORK!!!
@@ -173,6 +241,7 @@ EOF
 		#return 1
 	fi
 
+<<<<<<< HEAD
 	if [[ -z $(which ansible) ]]; then
 		echo "Installing ansible"
 		sudo apt-add-repository -y ppa:ansible/ansible
@@ -200,6 +269,68 @@ EOF
 		echo "Installing jupyter notebook"
 		python3 -m pip install jupyter
 		#python3 -m pip install jupyter
+=======
+	if [ -z "$(which ansible)" ]; then
+		if should_skip_install "ansible"; then
+			:
+		else
+			echo "Ansible not found. Installing Ansible..."
+			sudo apt-add-repository -y ppa:ansible/ansible
+			sudo apt update
+			sudo apt install ansible -y
+		fi
+	fi
+
+	if [[ -z $(which gh) ]]; then
+		if should_skip_install "gh"; then
+			:
+		else
+			echo "Installing GitHub Cli"
+			type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
+			curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+			sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+			echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list >/dev/null
+			sudo apt update
+			sudo apt install gh -y
+		fi
+	fi
+
+	if [[ -z $(which unzip) ]]; then
+		if should_skip_install "unzip"; then
+			:
+		else
+			echo "Installing unzip"
+			sudo apt install unzip -y
+		fi
+	fi
+
+	if [[ -z $(command -v jq) ]]; then
+		if should_skip_install "jq"; then
+			:
+		else
+			echo "Installing jq"
+			sudo apt update && sudo apt install jq -y
+		fi
+	fi
+
+	if [[ -z $(command -v pip) ]]; then
+		if should_skip_install "pip"; then
+			:
+		else
+			echo "Installing pip"
+			sudo apt install python3-pip -y
+		fi
+	fi
+
+	if [[ -z $(command -v jupyter) ]]; then
+		if should_skip_install "jupyter"; then
+			:
+		else
+			echo "Installing notebook"
+			python3 -m pip install jupyter
+		fi
+		#sudo python3 -m pip install notebook
+>>>>>>> upstream/develop
 	fi
 
 	if [[ ! -z $(command -v jupyter) ]]; then
@@ -260,6 +391,10 @@ EOF
 	mkdir -p "$besman_var_folder"
 	mkdir -p "$besman_playbook_dir"
 	mkdir -p "$besman_scripts_folder"
+<<<<<<< HEAD
+=======
+	mkdir -p "$besman_log_folder"
+>>>>>>> upstream/develop
 
 	echo "Prime the config file..."
 	echo "config selfupdate/debug_mode = true"
@@ -301,6 +436,10 @@ EOF
 		echo "BESMAN_PLAYBOOK_DIR=$besman_playbook_dir"
 		echo "BESMAN_INSECURE_SSL=false"
 		echo "BESMAN_CURL_CONNECT_TIMEOUT=15"
+<<<<<<< HEAD
+=======
+		echo "BESMAN_SKIP_PUBLISH_IN_BACKGROUND=true"
+>>>>>>> upstream/develop
 	} >>"$besman_user_config_file"
 	echo "Download script archive..."
 

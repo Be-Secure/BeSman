@@ -31,9 +31,12 @@ function __bes_help {
     __besman_echo_no_colour '   attest: Attest the OSAR report '
     __besman_echo_no_colour '   verify: Verify the OSAR report attestation '
     __besman_echo_no_colour '   rm | remove: Remove BeSman from machine. '
-    __besman_echo_no_colour '   status: Display the list of installed environments and its current version '
+    __besman_echo_no_colour '   status: Display the '
+    __besman_echo_no_colour '               1. list of installed environments and its current version'
+    __besman_echo_no_colour '               2. list of background processes'
     __besman_echo_no_colour '   reload: Reloads the configuration of the current environment '
     __besman_echo_no_colour '   config: Downloads the environment configuration'
+    __besman_echo_no_colour '   kill: Kills the background process'
     __besman_echo_no_colour '  '
     __besman_echo_white ' OPTIONS '
     __besman_echo_no_colour '   -env | --environment: For passing the name of the environment script. '
@@ -42,6 +45,7 @@ function __bes_help {
     __besman_echo_no_colour '   --role: To list the role names '
     __besman_echo_no_colour '   --file: Filename to be attested or verified '
     __besman_echo_no_colour '   --path: Path to the file to be attested or verified '
+    __besman_echo_no_colour '   --background | -bg: For background process'
     __besman_echo_no_colour '  '
     __besman_echo_white 'For more details execute below command'
     __besman_echo_yellow '   $ bes help <command name>'
@@ -121,7 +125,13 @@ function __bes_help_list {
     __besman_echo_yellow '      $ bes list'
     __besman_echo_no_colour '  '
     __besman_echo_no_colour '   Display list of Playbooks'
-    __besman_echo_yellow '      $ bes list --playbook'
+    __besman_echo_yellow '      $ bes list [options]'
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour '[options]'
+    __besman_echo_no_colour '-env | --environment      : List of available environments'
+    __besman_echo_no_colour '-P | --playbook           : List of available playbooks'
+    __besman_echo_no_colour '--role                     : List of available roles'
+
     __besman_echo_no_colour '  '
     __besman_echo_white 'DESCRIPTION'
     __besman_echo_no_colour '   It provides users with a comprehensive overview'
@@ -135,10 +145,17 @@ function __bes_help_list {
 function __bes_help_status {
     __besman_echo_no_colour '  '
     __besman_echo_white 'NAME'
-    __besman_echo_no_colour '   status - To show the list installed environments and its current version'
+    __besman_echo_no_colour '   status - To show the list of '
+    __besman_echo_no_colour '              1. installed environments and its current version'
+    __besman_echo_no_colour '              1. list of background processes and its status'
     __besman_echo_no_colour '  '
     __besman_echo_white 'SYNOPSIS  '
-    __besman_echo_yellow '    $ bes status'
+    __besman_echo_yellow '    $ bes status [options]'
+    __besman_echo_no_colour ''
+    __besman_echo_no_colour '[options]'
+    __besman_echo_no_colour '-------------'
+    __besman_echo_no_colour '-env | --environment      : To get the list of installed environments'
+    __besman_echo_no_colour '-bg | --background        : To get the list of background processes'
     __besman_echo_no_colour '  '
     __besman_echo_white 'DESCRIPTION'
     __besman_echo_no_colour '   Displays the list of installed environments'
@@ -183,6 +200,7 @@ function __bes_help_set {
     printf "%-30s %-70s %-25s\n" "BESMAN_LOCAL_PLAYBOOK" "If value is true, playbook is installed from BESMAN_LOCAL_PLAYBOOK_DIR" "true or false"
     printf "%-30s %-70s %-25s\n" "BESMAN_INSECURE_SSL" "If value is true, curl will not check for SSL certificate" "true or false"
     printf "%-30s %-70s %-25s\n" "BESMAN_CURL_CONNECT_TIMEOUT" "Timeout value for curl commands"
+    printf "%-30s %-70s %-25s\n" "BESMAN_SKIP_PUBLISH_IN_BACKGROUND" "Skip publish step in background mode" "true or false"
 
     __besman_echo_white "-----------------------------------------------------------------------------------------------------------------------------------"
 }
@@ -270,11 +288,14 @@ function __bes_help_run {
     __besman_echo_no_colour '   run - To execute a playbook '
     __besman_echo_no_colour '  '
     __besman_echo_white 'SYNOPSIS  '
-    __besman_echo_yellow '    $ bes run --playbook <playbook name> -V <playbook version>'
+    __besman_echo_yellow '    $ bes run --playbook <playbook name> -V <playbook version> [option]'
     __besman_echo_no_colour '  '
     __besman_echo_white 'DESCRIPTION'
     __besman_echo_no_colour '   Used to execute available playbooks in user system.'
     __besman_echo_no_colour '  '
+    __besman_echo_no_colour '[option]'
+    __besman_echo_no_colour '-----------'
+    __besman_echo_no_colour '-bg | --background        : Runs the playbook in the background.'
     __besman_echo_white 'EXAMPLE'
     __besman_echo_no_colour '   bes run --playbook SBOM-spdxSbomGenerator -V 0.0.1'
     __besman_echo_no_colour '  '
@@ -387,5 +408,20 @@ function __bes_help_reload() {
     __besman_echo_no_colour '  '
     __besman_echo_white 'SYNOPSIS  '
     __besman_echo_yellow '    $ bes reload'
+    __besman_echo_no_colour '  '
+}
+
+function __bes_help_kill() {
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'NAME'
+    __besman_echo_no_colour '   kill - Kills the background process'
+    __besman_echo_no_colour ''
+    __besman_echo_no_colour '  '
+    __besman_echo_white 'SYNOPSIS  '
+    __besman_echo_yellow '    $ bes kill [option] | [PID]'
+    __besman_echo_no_colour '  '
+    __besman_echo_no_colour '[option]'
+    __besman_echo_no_colour '----------  '
+    __besman_echo_no_colour 'all        - Kills all the background processes'
     __besman_echo_no_colour '  '
 }
