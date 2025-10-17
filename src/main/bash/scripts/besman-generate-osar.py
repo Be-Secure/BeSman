@@ -268,6 +268,65 @@ def garak_parser(input_data):
 
 
 
+def promptfoo_parser(user_data):
+    results = []
+    # The 'stats' object is nested inside the 'results' object
+    stats = user_data.get("results", {}).get("stats", {})
+    test_results = user_data.get("results", {}).get("results", [])
+
+    feature_counts = {}
+
+    for item in test_results:
+        if "namedScores" in item:
+            for feature, score in item.get("namedScores", {}).items():
+                if feature not in feature_counts:
+                    feature_counts[feature] = {"Success": 0, "Fail": 0}
+                
+                if item.get("success"):
+                    feature_counts[feature]["Success"] += 1
+                else:
+                    feature_counts[feature]["Fail"] += 1
+
+    for feature, counts in feature_counts.items():
+        results.append({
+            "feature": feature,
+            "aspect": "Success",
+            "attribute": "Count",
+            "value": counts["Success"]
+        })
+        results.append({
+            "feature": feature,
+            "aspect": "Fail",
+            "attribute": "Count",
+            "value": counts["Fail"]
+        })
+
+    total_tests = stats.get("successes", 0) + stats.get("failures", 0)
+    results.extend([
+        {
+            "feature": "AgentRT",
+            "aspect": "TotalTests",
+            "attribute": "Count",
+            "value": total_tests
+        },
+        {
+            "feature": "AgentRT",
+            "aspect": "Total Successes",
+            "attribute": "Count",
+            "value": stats.get("successes", 0)
+        },
+        {
+            "feature": "AgentRT",
+            "aspect": "Total Failures",
+            "attribute": "Count",
+            "value": stats.get("failures", 0)
+        }
+    ])
+
+    return results
+
+
+
 ##------------Add parsers for modelBench result------------------------------
 
 def modelbench_parser(input_data):
@@ -547,6 +606,7 @@ tool_processors = {
     
     "garak": garak_parser,
     "modelbench": modelbench_parser,
+    "promptfoo": promptfoo_parser,
     
     "cbomkitaction": cbom_parser
 }
