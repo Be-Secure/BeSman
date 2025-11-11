@@ -102,7 +102,7 @@ function __besman_finalize_env_setup {
 	__besman_source_env_params "$env" "$ver"
 	if [[ $? -ne 0 ]]; then
 		__besman_log_error "Sourcing env params failed for $env $ver"
-		__besman_manage_install_out "$?" "$env"
+		# __besman_manage_install_out "$?" "$env"
 		return 1
 	fi
 
